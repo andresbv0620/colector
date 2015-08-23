@@ -28,10 +28,14 @@ class ColectorAuth(View):
             if user is not None:
                 try:
                     #validando que exista un colector 
+                    data = {}
                     colector = Colector.objects.get(usuario = user)
                     resp['response_code'] = '200'
                     resp['response_description'] = str('colector found')
-                    resp['response_data'] = str(colector.usuario.username)
+                    data['colector_name'] = colector.usuario.username
+                    data['colector_id'] = colector.usuario.id
+                    resp['response_data'] = []
+                    resp['response_data'].append(data)
                     resp['body_received'] = str(request.body)
                     resp['body_expected'] = str('{"username":" ", "password": " "}')
 
@@ -82,7 +86,7 @@ class TokenAuth(View):
                 empresa = Empresa.objects.get(nombre = str(data['company_name']) , codigo_secreto = str(data['secret_code']))
                 
                 resp['response_code'] = '200'
-                resp['response_description'] = str('Company found')                    
+                resp['response_description'] = str('Company found')                     
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = str('{"company_name":" ", "secret_code": " "}')
 

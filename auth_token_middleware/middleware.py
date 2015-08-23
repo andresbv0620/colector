@@ -17,7 +17,8 @@ class AuthToken(object):
     			#validando que exista el token
     			try:
     				token = Token.objects.get(valor = http_token)
-    				return HttpResponse("token encontrado")
+    				#return HttpResponse("token encontrado")
+    				return None
 
     			except Token.DoesNotExist:
     				resp['response_code'] = '400'

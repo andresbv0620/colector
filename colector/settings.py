@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'registro',
     'authentication',
     'auth_token_middleware',
+    'service',
 
     
 )

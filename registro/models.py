@@ -109,10 +109,10 @@ class Entrada(models.Model):
 		return self.nombre
 
 class Respuesta(models.Model):
-	nombre  = models.CharField(max_length=50, blank = True , unique=True)
+	valor  = models.CharField(max_length=50, blank = True , unique=True)
 
 	def __unicode__(self):
-		return self.nombre
+		return self.valor
 
 class FormularioDiligenciado(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)

@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from service.views import AllowedForms
+from service.views import AllowedForms, SingleForm
 urlpatterns = [
    
     url(r'^colector/allowed/forms/', AllowedForms.as_view()),
+    url(r'^form/single/', SingleForm.as_view()),
     
 ]

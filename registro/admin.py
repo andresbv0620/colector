@@ -45,8 +45,8 @@ class EntradaAdmin(admin.ModelAdmin):
     filter_horizontal = ('respuesta',  )
 
 class RespuestaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', )
-    search_fields = ['nombre', ]
+    list_display = ('valor', )
+    search_fields = ['valor', ]
 
 class FormularioDiligenciadoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'empresa',  'gps', 'fecha_creacion' )    

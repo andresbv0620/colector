@@ -6,7 +6,9 @@ from django.views.decorators.csrf import csrf_exempt
 from registro.models import PermisoFormulario, Colector, Formulario
 import json
 import hashlib
-
+import pymongo
+servidor = pymongo.MongoClient('localhost', 27017)
+database = servidor.colector
 
 # Create your views here.
 
@@ -145,4 +147,189 @@ class SingleForm(View):
 
 
     	return HttpResponse("Single form")
+
+
+class FillForm(View):    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(FillForm, self).dispatch(*args, **kwargs)
+
+    #validando la el formato del formulario enviado
+    def dataValidator(self, array_validation):
+
+        response = {}
+        response['error'] = False
+        response['validation_errors'] = []
+
+        #validacion del formulario
+        if not array_validation['colector_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append("colector_id is blank")
+
+        if not array_validation['form_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append("form_id is blank")
+
+        if not array_validation['form_name'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append("form_name is blank")
+
+        
+
+       
+        if len(array_validation['sections']) == 0:
+            response['error'] = True
+            response['validation_errors'].append("sections is blank")
+
+        else:
+
+            try:
+                for s in array_validation['sections']:
+                    inputs = s['inputs']
+
+                    if len(inputs) == 0:
+                        response['error'] = True
+                        response['validation_errors'].append("inputs is blank")
+                    else:   
+                        for i in inputs:
+
+                            try:
+                                responses = i['responses']
+
+                            except Exception as e:
+
+                                response['error'] = True
+                                response['validation_errors'].append("any input don't contains responses")
+
+
+            except Exception as e:
+
+                response['error'] = True
+                response['validation_errors'].append("any section don't contains inputs")
+
+
+
+
+
+        
+        return response
+
+    def get(self,request, id):
+        resp = {}
+        colector = database.filled_forms.find_one({'colector_id':str(id)}, {'_id':0})
+                
+                #validando si existe un colector con esta id
+        if colector == None:
+            resp['response_code'] = '405'
+            #resp['validation_errors'] = data_validator['validation_errors']
+            resp['response_description'] = str('Colector not found')
+            
+            
+                    
+        else:
+            resp['response_code'] = '200'
+            resp['response_description'] = str('Colector found')
+            resp['response_data'] = json.dumps(colector)
+
+        return HttpResponse(json.dumps(resp), content_type= "application/json")
+                
+        
+        
+
+    def post(self, request):
+        resp = {}
+
+        #validando data correcta enviada en body
+        try:
+            data = json.loads(request.body)
+            colector_id = data['colector_id']
+            form_id = data['form_id']
+            form_name = data['form_name']
+            form_description = data['form_description']
+            sections = data['sections']
+
+
+            array_validation = {}
+            array_validation['colector_id'] = colector_id
+            array_validation['form_id'] = form_id
+            array_validation['form_name'] = form_name
+            array_validation['sections'] = sections
+
+            data_validator = self.dataValidator(array_validation)
+
+            if data_validator["error"] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = data_validator['validation_errors']
+                resp['response_description'] = str('the body data contain validation errors')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = str('{"colector_id":"", "form_id":" ", "form_name": " ", "form_description": " ", "sections":" " }')
+
+
+                return HttpResponse(json.dumps(resp), content_type= "application/json")
+            else:
+                pass
+
+            #construyendo json para insertar en mongodb
+            try:
+
+                form = {}
+                form['form_id'] = form_id
+                form['form_name'] = form_name
+                form['form_description'] = form_description
+                form['sections'] = sections
+
+                
+                #return HttpResponse(json.dumps(data))
+
+                colector = database.filled_forms.find_one({'colector_id':str(colector_id)}, {'_id':0})
+                
+                #validando si existe un colector con esta id
+                if colector == None:
+                    data = {}
+                    data['colector_id'] = colector_id
+                    data['filled_forms'] = []
+                    data['filled_forms'].append(form)
+                    database.filled_forms.insert(data)
+                    
+                else:
+                    database.filled_forms.update({'colector_id':str(colector_id)}, {'$push':{ 'filled_forms': form }})
+                    #return HttpResponse("colector existe")
+                
+
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form filled')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = str('{"colector_id":"", "form_id":" ", "form_name": " ", "form_description": " ", "sections":"[]"  }')
+                resp['response_data'] =  request.body
+
+                return HttpResponse(json.dumps(resp), content_type= "application/json")
+                
+
+            except Exception as e:
+
+                resp['response_code'] = '400'
+                resp['response_description'] = str('Error inserting data in mongodb'+ str(e.args))
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = str('{"colector_id":"", "form_id":" ", "form_name": " ", "form_description": " ", "sections":"[]"  }')
+                resp['response_data'] =  request.body
+
+            return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+
+            
+            
+
+        except  Exception as e:
+
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '+ str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"colector_id":"", "form_id":" ", "form_name": " ", "form_description": " ", "sections":"[]" }')
+
+
+            return HttpResponse(json.dumps(resp), content_type= "application/json")
     	

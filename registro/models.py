@@ -114,6 +114,19 @@ class Respuesta(models.Model):
 	def __unicode__(self):
 		return self.valor
 
+#class FormularioDiligenciado(models.Model):
+	#nombre  = models.CharField(max_length=50, blank = True , unique=True)
+	#empresa = models.ForeignKey('Empresa', null = True,  blank = True)
+	#colector = models.ForeignKey('Colector', null = True,  blank = True)
+	#entrada = models.ForeignKey('Entrada', null = True,  blank = True)
+	#respuesta = models.ForeignKey('Respuesta', null = True,  blank = True)
+	#gps  = models.CharField(max_length=50, blank = True , unique=True)
+	#fecha_creacion = models.DateTimeField(auto_now=True)
+
+	#def __unicode__(self):
+	#	return self.nombre
+
+
 class FormularioDiligenciado(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	empresa = models.ForeignKey('Empresa', null = True,  blank = True)

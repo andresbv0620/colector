@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+{% load staticfiles %}
+<html>
+<head>
+	<title></title>
+	<link href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+</head>
+<body ng-app="app">
+<!-- 	<section id="barra-Herramienta" ng-controller ="barraHerramienta">
+		<h2> Bienvenido [[nombre]]</h2>
+		<input type="text" ng-model="numero" value="Digite un numero"></input>
+		<button ng-click="aceptar()">Aceptar</button>
+
+
+		<ul>
+			<li ng-repeat="p in personas">
+				<h3>[[p.nombre]]</h3>
+				<h3>[[p.cedula]]</h3>
+			</li>
+		</ul> 
+	</section>-->
+	<table ng-controller ="barraHerramienta" data-url="data1.json" data-height="299" data-sort-name="name" data-sort-order="desc">
+    <thead>
+        <tr>
+            <th ng-repeat="header in tableheaders" data-field="id" data-align="right" data-sortable="true">
+            	[[header]]
+        	</th>
+        </tr>
+    </thead>
+    <tbody>
+    	<tr ng-repeat="form in filledforms">
+    		<span ng-repeat="section in form.sections">
+    			<span ng-repeat="input in section.inputs">
+    				<td ng-repeat="response in input.responses">[[response.value]]</td>
+
+    			</span>
+
+    		</span>
+    		
+    	</tr>
+    </tbody>
+	</table>
+
+
+	<table data-url="data1.json" data-height="299" data-sort-name="name" data-sort-order="desc">
+    <thead>
+        <tr>
+            <th data-field="id" data-align="right" data-sortable="true">
+            	NOMBRE
+        	</th>
+        	<th data-field="id" data-align="right" data-sortable="true">
+            	APELLIDO
+        	</th>
+        </tr>
+    </thead>
+    <tbody>
+    	<tr ng-repeat="form in filledforms">
+
+			<td>andres</td>
+			<td>buitrago</td>
+
+    		
+    	</tr>
+    </tbody>
+	</table>
+
+
+	<section id="reportecolector" ng-controller ="barraHerramienta">
+		<h2> Reporte [[colectorid]]</h2>
+		<ul>
+			<li ng-repeat="form in filledforms">
+				<h3>[[form.form_name]]</h3>
+				<ul>
+					<li ng-repeat="section in form.sections">
+						
+						<ul>
+							<li ng-repeat="input in section.inputs">
+								<h3>[[input.name]]</h3>
+								<ul>
+									<li ng-repeat="response in input.responses">
+										<h4>[[response.value]]</h4>
+										
+									</li>
+								</ul>
+							
+							</li>
+						</ul>
+						
+					</li>
+				</ul>
+								
+			</li>
+		</ul>
+	</section>
+
+	<!-- <section id="FirstController" ng-controller ="FirstController">
+		<h2> POSTS</h2>
+		<input type="text" ng-model="newPost.title"><br>
+		<textarea ng-model="newPost.body"></textarea>
+		<button ng-click="addPost()">ENVIAR</button>
+		<ul>
+			<li ng-repeat="post in posts">
+				<h3>[[post.title]]</h3>
+				<h3>[[post.body]]</h3>
+			</li>
+		</ul>
+	</section> -->
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	    <!-- Include all compiled plugins (below), or include individual files as needed -->
+	    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+	    <script src="{% static 'assets/bootstrap/js/bootstrap-table.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'assets/angular.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'assets/aplicacion.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'assets/services.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'administrador/controllers.js' %}"></script>
+</body>
+</html>

@@ -104,6 +104,7 @@ class Entrada(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=50, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
+	form_asociado = models.ForeignKey('Formulario', blank = True, null = True)
 	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
 	def __unicode__(self):
 		return self.nombre

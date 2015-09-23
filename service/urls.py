@@ -17,8 +17,10 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from service.views import AllowedForms, SingleForm, FillForm, ColectorIdReport, FormNameReport
 from service.views import FormIdReport
-urlpatterns = [
-   
+urlpatterns = [    
+
+    
+
     url(r'^colector/allowed/forms/', AllowedForms.as_view()),
     url(r'^form/single/', SingleForm.as_view()),
     url(r'^fill/form/$', FillForm.as_view()),

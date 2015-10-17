@@ -135,7 +135,7 @@ class GetForms(View):
                                         filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
-                                            "filled_forms.form_id":0,
+                                            "filled_forms.form_description":0,
                                             "filled_forms.fecha_creacion":0,
                                             "filled_forms.sections.description":0,
                                             "filled_forms.sections.name":0,

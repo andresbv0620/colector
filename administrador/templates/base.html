@@ -1,0 +1,30 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body ng-app="app" >
+
+        {%block content%}
+
+
+
+        {%endblock content%}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	    <!-- Include all compiled plugins (below), or include individual files as needed -->
+	    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
+
+<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
+
+<!-- Latest compiled and minified Locales -->
+  <script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/locale/bootstrap-table-zh-CN.min.js"></script>
+	    <script type="text/javascript" src="{% static 'assets/angular.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'assets/aplicacion.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'assets/services.js' %}"></script>
+	    <script type="text/javascript" src="{% static 'administrador/controllers.js' %}"></script>
+</body>
+</html>

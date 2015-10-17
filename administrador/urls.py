@@ -13,15 +13,20 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
-from django.contrib import admin
-from service.views import AllowedForms, SingleForm, FillForm, ColectorIdReport, FormNameReport
-from service.views import FormIdReport
+from django.conf.urls import patterns, include, url
 from administrador.views import DevolverJson
+from . import views
 
 urlpatterns = [
    
-url(r'^$', 'administrador.views.index'),
-url(r'^devolver/json/$', DevolverJson.as_view())
+url(r'^$', 'administrador.views.reporte'),
+
+url(r'^devolver/json/$', DevolverJson.as_view()),
+url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'administrador/auth/login.html'}),
+url(r'^logout/$', 'django.contrib.auth.views.logout'),
+url(r'^dashboard/$', views.dashboard),
+url(r'^reporte/$', views.reporte),
+url(r'^index/$', views.index),
+
     
 ]

@@ -1,0 +1,79 @@
+<div class="box box-warning">
+    <div class="box-header with-border">
+
+        <h2 class="box-title">[[formulario.name]]</h2>
+        <h3>Form id [[form_id]] - [[formulario.description]]</h3>
+    </div>
+    <!-- /.box-header -->
+    <div class="box-body">
+        <form role="form" ng-submit="enviarFormulario()">
+            <div class="box-header with-border" ng-repeat="section in formulario.sections">
+                <h3 class="box-title">[[section.name]]</h3>
+                <h4>[[section.description]]</h4>
+                <h4>[[section.id]]</h4>
+                <!-- text input -->
+                <div class="form-group" ng-repeat="input in section.inputs">
+                    <span ng-if="input.type==1">
+                        <label>[[input.name]]</label>
+                        <input name="input_[[input.id]]" ng-model="input.responses[0].value" class="form-control" placeholder="[[input.description]]" type="text">
+                    </span>
+                    <span ng-if="input.type==2">
+                    <label>[[input.name]]</label>
+                    <textarea name="input_[[input.id]]" class="form-control" placeholder="[[input.description]]"></textarea>
+                    </span>
+                    <span ng-if="input.type==3">
+                        <label>[[input.name]]: [[input.description]]</label>
+                        <select name="input_[[input.id]]"  class="form-control">
+                            <option ng-repeat="response in input.responses">[[response.value]]</option>
+                        </select>
+                    </span>
+                    <span ng-if="input.type==4">
+                        <label>[[input.name]]: [[input.description]]</label>
+                        <div class="radio" ng-repeat="response in input.responses">
+                            <label>
+                            <input type="radio" name="input_[[input.id]]" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
+                            [[response.value]]
+                            </label>
+                        </div>
+                    </span>
+                    <span ng-if="input.type==5">
+                        <label>[[input.name]]: [[input.description]]</label>
+                        <div class="checkbox" ng-repeat="response in input.responses">
+                            <label>
+                            <input type="checkbox" name="response_[[response.id]]" id="[[section.id]]_[[input.name]]_[[response.value]]" value="[[response.value]]" checked="">
+                            [[response.value]]
+                            </label>
+                        </div>
+                    </span>
+                    <span ng-if="input.type==6">
+                        <div class="form-group">
+                            <label for="exampleInputFile">[[input.name]]: [[input.description]]</label>
+                            <input name="input_[[input.id]]" type="file" id="exampleInputFile">
+                            <p class="help-block">Suba una foto.</p>
+                        </div>
+                    </span>
+                    <span ng-if="input.type==7">
+                        <div class="form-group">
+                            <label>[[input.name]]: [[input.description]]</label>
+                            <div class="input-group">
+                                <div class="input-group-addon">
+                                    <i class="fa fa-calendar"></i>
+                                </div>
+                                <input name="input_[[input.id]]" type="text" class="form-control" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask="">
+                            </div>
+                            <!-- /.input group -->
+                        </div>
+                    </span>
+                    <span ng-if="input.type==8">
+                    <label>[[input.name]]</label>
+                    <input name="input_[[input.id]]" class="form-control" placeholder="[[input.description]]" type="text">
+                    </span>
+                </div>
+            </div>
+            <div class="box-footer">
+                <button type="submit" class="btn btn-primary">Enviar</button>
+            </div>
+        </form>
+    </div>
+    <!-- /.box-body -->
+</div>

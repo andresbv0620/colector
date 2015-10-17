@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 import hashlib
 from django.contrib.auth import authenticate
-from registro.models import Colector, Empresa
+from registro.models import Colector, Empresa, Tablet
 from auth_token_middleware.models import Token
 # Create your views here.
 
@@ -80,7 +80,7 @@ class TokenAuth(View):
         try:
             data = json.loads(request.body)
             #print data['username']
-            #print data['password'
+            #print data['password']
 
             try:
                 empresa = Empresa.objects.get(nombre = str(data['company_name']) , codigo_secreto = str(data['secret_code']))
@@ -165,6 +165,73 @@ class TokenAuth(View):
             resp['response_description'] = str('invalid body request '+ str(e.args))
             resp['body_received'] = str(request.body)
             resp['body_expected'] = str('{"company_name":" ", "secret_code": " "}')
+
+
+            return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+class TabletAuth(View):    
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(TabletAuth, self).dispatch(*args, **kwargs)
+
+    def post(self, request):
+        resp = {}
+
+        # validando data del body
+        try:
+            data = json.loads(request.body)
+            #print data['tablet_id']
+            #print data['password']
+
+            try:
+                tablet = Tablet.objects.get(id=int(data['tablet_id']))
+
+
+                try:
+                    empresa=tablet.empresa_set.all()
+                    #empresa = Empresa.objects.get(nombre = str(data['company_name']) , codigo_secreto = str(data['secret_code']))
+                    
+                    resp['response_code'] = '200'
+                    resp['response_description'] = str('Company found')                     
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] = str('{"tablet_id":" "}')
+
+                    try:
+
+                        token = Token.objects.get(empresa = empresa )
+                        resp['response_data'] = []
+                        data = {}
+                        data['token'] = str(token.valor)
+                        resp['response_data'].append(data)
+                    except Token.DoesNotExist:
+                        resp['response_data'] = "Token no creado"
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+                    #return HttpResponse("empresa encontrada")
+
+                except Empresa.DoesNotExist:
+                    resp['response_code'] = '404'
+                    resp['response_description'] = str('company not found')
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] =str('{"tablet_id":" "}')
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+            except Tablet.DoesNotExist:
+                    resp['response_code'] = '404'
+                    resp['response_description'] = str('tablet not found')
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] =str('{"tablet_id":" "}')
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+
+        except  Exception as e:             
+            
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '+ str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"tablet_id":" "}')
 
 
             return HttpResponse(json.dumps(resp), content_type= "application/json")

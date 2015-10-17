@@ -1,11 +1,11 @@
-<!DOCTYPE html>
-{% load staticfiles %}
-<html>
-<head>
-	<title></title>
-	<link href="{% static 'assets/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
-</head>
-<body ng-app="app">
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<table ng-controller="reporteFormulario" id="table" data-sort-name="NOMBRE" data-sort-order="desc"></table>
+
+
 <!-- 	<section id="barra-Herramienta" ng-controller ="barraHerramienta">
 		<h2> Bienvenido [[nombre]]</h2>
 		<input type="text" ng-model="numero" value="Digite un numero"></input>
@@ -19,7 +19,9 @@
 			</li>
 		</ul> 
 	</section>-->
-	<table ng-controller ="barraHerramienta" data-url="data1.json" data-height="299" data-sort-name="name" data-sort-order="desc">
+
+
+	<!-- <table ng-controller ="barraHerramienta" data-url="data1.json" data-height="299" data-sort-name="name" data-sort-order="desc">
     <thead>
         <tr>
             <th ng-repeat="header in tableheaders" data-field="id" data-align="right" data-sortable="true">
@@ -39,30 +41,11 @@
     		
     	</tr>
     </tbody>
-	</table>
+	</table> -->
 
 
-	<table data-url="data1.json" data-height="299" data-sort-name="name" data-sort-order="desc">
-    <thead>
-        <tr>
-            <th data-field="id" data-align="right" data-sortable="true">
-            	NOMBRE
-        	</th>
-        	<th data-field="id" data-align="right" data-sortable="true">
-            	APELLIDO
-        	</th>
-        </tr>
-    </thead>
-    <tbody>
-    	<tr ng-repeat="form in filledforms">
 
-			<td>andres</td>
-			<td>buitrago</td>
-
-    		
-    	</tr>
-    </tbody>
-	</table>
+	<!-- <table ng-controller ="barraHerramienta">
 
 
 	<section id="reportecolector" ng-controller ="barraHerramienta">
@@ -91,7 +74,7 @@
 								
 			</li>
 		</ul>
-	</section>
+	</section> -->
 
 	<!-- <section id="FirstController" ng-controller ="FirstController">
 		<h2> POSTS</h2>
@@ -106,13 +89,5 @@
 		</ul>
 	</section> -->
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	    <!-- Include all compiled plugins (below), or include individual files as needed -->
-	    <script src="{% static 'assets/bootstrap/js/bootstrap.min.js' %}"></script>
-	    <script src="{% static 'assets/bootstrap/js/bootstrap-table.js' %}"></script>
-	    <script type="text/javascript" src="{% static 'assets/angular.js' %}"></script>
-	    <script type="text/javascript" src="{% static 'assets/aplicacion.js' %}"></script>
-	    <script type="text/javascript" src="{% static 'assets/services.js' %}"></script>
-	    <script type="text/javascript" src="{% static 'administrador/controllers.js' %}"></script>
-</body>
-</html>
+
+{%endblock content%}

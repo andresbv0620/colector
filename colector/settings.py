@@ -42,9 +42,14 @@ INSTALLED_APPS = (
     'authentication',
     'auth_token_middleware',
     'service',
+    'administrador',
+    'assets',
 
     
 )
+
+LOGIN_URL='/login/'
+LOGIN_REDIRECT_URL='/'
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,7 +68,7 @@ ROOT_URLCONF = 'colector.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -106,7 +111,7 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-STATIC_URL = 'http://54.200.219.177/colector/static/'
-#STATIC_URL = '/static/'
+#STATIC_URL = 'http://54.200.219.177/colector/static/'
+STATIC_URL = '/static/'
 #STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')

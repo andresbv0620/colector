@@ -3,6 +3,8 @@
  */
 
  /*app.controller("FirstController", ['$scope','$http',function($scope,$http){
+
+    $scope.json=;
     $scope.posts=[];
     $scope.newPost={};
     $http.get("http://jsonplaceholder.typicode.com/posts")
@@ -33,67 +35,147 @@
 
  }]);*/
 
+app.controller('llenarFormulario',['$scope','$routeParams','defaultService','globales',function($scope,$routeParams,defaultService,globales){
+  $scope.form_id=$routeParams.form_id;
+  $scope.newFilledForm={}
+  defaultService.post('http://127.0.0.1:8000/service/form/single/','{"form_id":"'+$routeParams.form_id+'"}', function(data){
+     //console.log(d)
+     $scope.formulario=data['response_data'][0];
+     /*form_name=data['response_data'][0].name;
+     form_description=data['response_data'][0].description;
+     form_id=data['response_data'][0].id;
+     form_sections=data['response_data'][0].sections;*/
+  }, function (error){console.log(error)});
 
-app.controller('barraHerramienta', ['$scope', 'defaultService', function ($scope, defaultService) {
+  $scope.enviarFormulario=function(){
+    formularioObject=$scope.formulario;
+    formularioObject.colector_id=globales.user_id;
+    formularioObject.form_id=formularioObject.form_id.toString();
+
+    console.log(formularioObject);
+    defaultService.post('http://127.0.0.1:8000/service/fill/form/',formularioObject, function(data){
+      console.log(data);
+
+    }, function (error){console.log(error)});
+  }
+}]);
+
+app.controller('reporteColector', ['$scope', 'defaultService', function ($scope, defaultService) {
    console.log("iniciando controlador");
 
    
    defaultService.get('http://127.0.0.1:8000/service/filled/forms/report/colector/4/', function(data){
            //console.log(d)
-           console.log("datos recibidos del servidor: ");
+           console.log("datos reporte recibidos del servidor: ");
 
-           console.log(data);
+           //console.log(data);
            colectorfilledforms = data['data'];
            $scope.colectorid=colectorfilledforms[0].colector_id;
            filledforms=colectorfilledforms[0].filled_forms;
            $scope.filledforms=filledforms;
 
-           tableheader=[];        
+                    
+           tableheader=[];            
+           columns=new Array(); 
+           data=new Array();
+           tablecontent=new Object();
+
 
            for (form in filledforms){
               sections=filledforms[form].sections;
               for (section in sections){
                 inputs=sections[section].inputs;
+                datacolumns= new Object();  
                 for (input in inputs){
+                  column=new Object();
                   if(tableheader.indexOf(inputs[input].name)<0){
+                    column['field']=inputs[input].name;
+                    column['sortable']=true;
+                    column['title']=inputs[input].name;
+                    columns.push(column);
                     tableheader.push(inputs[input].name);
-                    console.log(tableheader);
+                  }
+                  respuestas=new Array();
+                  responses=inputs[input].responses;
+                  for (response in responses) {
+                    respuestas.push(responses[response].value);
+                    datacolumns[inputs[input].name]=responses[response].value;
                   }
                 }
               }
+              data.push(datacolumns);
             }
+            
+            tablecontent['columns']=columns;
+            tablecontent['data']=data;
+
             $scope.tableheaders=tableheader;
+           $('#table').bootstrapTable(tablecontent);
 
         }, function (error){console.log(error)});
-  
-
-   $scope.numero = 1234545;
-   $scope.nombre = "andres";
-   $scope.aceptar = function(){
-    alert("btn aceptar  " + $scope.numero);
-   }
-
-   var personas = [];
-
-   var persona = {};
-   persona['nombre'] = "jhon";
-   persona['cedula'] = 123456;
-   personas.push(persona);
-
-   var persona2 = {};
-   persona2['nombre'] = "andres";
-   persona2['cedula'] = 98745;
-
-   personas.push(persona2);
-
-   
-   //$scope.personas = personas;
-   //$scope.persona = persona;
-
-
 }]);
 
 
+
+
+app.controller('reporteFormulario', ['$scope', 'defaultService', function ($scope, defaultService) {
+
+     
+
+
+   
+   defaultService.get('http://127.0.0.1:8000/service/filled/forms/report/formname/formularioBasico/', function(data){
+           //console.log(d)
+           //console.log("datos recibidos del servidor: ");
+
+           //console.log(data);
+           colectorfilledforms = data['data'];
+           $scope.colectorid=colectorfilledforms[0].colector_id;
+           filledforms=colectorfilledforms[0].filled_forms;
+           $scope.filledforms=filledforms;
+
+                    
+           tableheader=[];            
+           columns=new Array(); 
+           data=new Array();
+           tablecontent=new Object();
+
+
+           for (form in filledforms){
+              sections=filledforms[form].sections;
+              for (section in sections){
+                inputs=sections[section].inputs;
+                datacolumns= new Object();  
+                for (input in inputs){
+                  column=new Object();
+                  if(tableheader.indexOf(inputs[input].name)<0){
+                    column['field']=inputs[input].name;
+                    column['sortable']=true;
+                    column['title']=inputs[input].name;
+                    columns.push(column);
+                    tableheader.push(inputs[input].name);
+                  }
+                  respuestas=new Array();
+                  responses=inputs[input].responses;
+                  for (response in responses) {
+                    respuestas.push(responses[response].value);
+                    datacolumns[inputs[input].name]=responses[response].value;
+                  }
+                }
+              }
+              data.push(datacolumns);
+            }
+            
+            tablecontent['columns']=columns;
+            tablecontent['data']=data;
+
+            $scope.tableheaders=tableheader;
+           $('#table').bootstrapTable(tablecontent);
+
+        }, function (error){console.log(error)});
+}]);
+
+//////////////////////////////////////////////////////////////
 
 app.controller('startApp', ['$scope', 'defaultService', function ($scope, defaultService) {
  console.log("start"); 

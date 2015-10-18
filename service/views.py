@@ -336,6 +336,108 @@ class SingleForm(View):
 
         return HttpResponse('Single form')
 
+#Guarda una estructura simple de las respuestas, colector_id, form_id, responses[id: , value: ]
+class FillResponsesForm(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(FillResponsesForm, self).dispatch(*args, **kwargs)
+
+    # validando la el formato del formulario enviado
+
+    def dataValidator(self, array_validation):
+
+        response = {}
+        response['error'] = False
+        response['validation_errors'] = []
+
+        # validacion del formulario
+
+        if not array_validation['colector_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append('colector_id is blank')
+
+        if not array_validation['form_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append('form_id is blank')
+
+        if len(array_validation['responses']) == 0:
+            response['error'] = True
+            response['validation_errors'].append('responses is blank')
+        else:
+
+            try:
+                for responseItem in array_validation['responses']:
+                    try:
+                        response_value=responseItem['value']
+                        input_id=responseItem['input_id']
+                    except Exception, e:
+                        response['error'] = True
+                        response['validation_errors'].append("any response don't contains value or input_id")
+                   
+            except Exception, e:
+                response['error'] = True
+                response['validation_errors'].append("any input don't contains responses")
+
+        return response
+
+    def post(self, request):
+        resp = {}
+        # validando data correcta enviada en body
+        try:
+            data = json.loads(request.body)
+            colector_id = data['colector_id']
+            form_id = data['form_id']
+            responses = data['responses']
+
+            array_validation = {}
+            array_validation['colector_id'] = colector_id
+            array_validation['form_id'] = form_id
+            array_validation['responses'] = responses
+
+            data_validator = self.dataValidator(array_validation)
+
+            if data_validator['error'] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = \
+                    data_validator['validation_errors']
+                resp['response_description'] = \
+                    str('the body data contain validation errors')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ","responses":" " }')
+
+                return HttpResponse(json.dumps(resp,
+                                    default=json_util.default),
+                                    content_type='application/json')
+            else:
+                resp['response_code'] = '200'
+                resp['response_description'] = str('OK')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+                return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
+
+            # construyendo json para insertar en mongodb
+
+
+        except Exception, e:
+
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = \
+                str('{"colector_id":"", "form_id":" ", "responses":"[]" }')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
 
 class FillForm(View):
 

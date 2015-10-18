@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from authentication.views import ColectorAuth, TokenAuth, TabletAuth
+from authentication.views import ColectorAuth, TokenAuth, TabletAuth, OneStepAuth
 urlpatterns = [
-   
     url(r'^colector/', ColectorAuth.as_view()),
     url(r'^token/', TokenAuth.as_view()),
     url(r'^tablet/', TabletAuth.as_view()),
+    url(r'^onestep/', OneStepAuth.as_view()),
 ]

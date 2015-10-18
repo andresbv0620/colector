@@ -10,6 +10,93 @@ from registro.models import Colector, Empresa, Tablet
 from auth_token_middleware.models import Token
 # Create your views here.
 
+# Se valida en un solo servicio el token y al colector con user y password
+class OneStepAuth(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(OneStepAuth, self).dispatch(*args, **kwargs)
+
+    def post(self, request):
+        resp = {}
+
+        # validando data del body
+        try:
+            data = json.loads(request.body)
+            
+            try:
+                tablet = Tablet.objects.get(id=int(data['tablet_id']))
+                try:
+                    empresa=tablet.empresa_set.all()
+                    try:
+                        token = Token.objects.get(empresa = empresa )
+                        resp['response_data'] = []
+                        
+                        data['token'] = str(token.valor)
+
+                        user = authenticate(username = data['username'], password = data['password'])
+                        #validando que exista un usuario
+                        if user is not None:
+                            try:
+                                #validando que exista un colector 
+                                colector = Colector.objects.get(usuario = user)
+                                resp['response_code'] = '200'
+                                resp['response_description'] = str('colector found and device id found')
+                                data['colector_name'] = colector.usuario.username
+                                data['colector_id'] = colector.usuario.id
+                                resp['response_data'].append(data)
+                                resp['body_received'] = str(request.body)
+                                resp['body_expected'] = str('{"username":" ", "password": " ", "tablet_id": " "}')
+                                return HttpResponse(json.dumps(resp), content_type= "application/json")
+                            except Colector.DoesNotExist:
+                                resp['response_code'] = '404'
+                                resp['response_description'] = str('colector not found')
+                                resp['body_received'] = str(request.body)
+                                resp['body_expected'] = str('{"username":" ", "password": " ", "tablet_id": " "}')
+                                return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+                        else:
+                            resp['response_code'] = '404'
+                            resp['response_description'] = str('incorrect username or password')
+                            resp['body_received'] = str(request.body)
+                            resp['body_expected'] = str('{"username":" ", "password": " ", "tablet_id": " "}')
+                            return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+
+                        resp['response_data'].append(data)
+                    except Token.DoesNotExist:
+                        resp['response_data'] = "Token no creado"
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+                    #return HttpResponse("empresa encontrada")
+
+                except Empresa.DoesNotExist:
+                    resp['response_code'] = '404'
+                    resp['response_description'] = str('company not found')
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] =str('{"username":" ", "password": " ", "tablet_id": " "}')
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+            except Tablet.DoesNotExist:
+                    resp['response_code'] = '404'
+                    resp['response_description'] = str('tablet not found')
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] =str('{"username":" ", "password": " ", "tablet_id": " "}')
+
+                    return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+
+        except  Exception as e:             
+            
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '+ str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"username":" ", "password": " ", "tablet_id": " "}')
+
+
+            return HttpResponse(json.dumps(resp), content_type= "application/json")
+
+
 class ColectorAuth(View):    
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -66,7 +153,6 @@ class ColectorAuth(View):
 
 
             return HttpResponse(json.dumps(resp), content_type= "application/json") 
-
 
 class TokenAuth(View):    
     @method_decorator(csrf_exempt)

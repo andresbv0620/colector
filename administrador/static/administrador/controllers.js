@@ -38,7 +38,7 @@
 app.controller('llenarFormulario',['$scope','$routeParams','defaultService','globales',function($scope,$routeParams,defaultService,globales){
   $scope.form_id=$routeParams.form_id;
   $scope.newFilledForm={}
-  defaultService.post('http://127.0.0.1:8000/service/form/single/','{"form_id":"'+$routeParams.form_id+'"}', function(data){
+  defaultService.post(globales.static_url+'../service/form/single/','{"form_id":"'+$routeParams.form_id+'"}', function(data){
      //console.log(d)
      $scope.formulario=data['response_data'][0];
      /*form_name=data['response_data'][0].name;
@@ -53,18 +53,18 @@ app.controller('llenarFormulario',['$scope','$routeParams','defaultService','glo
     formularioObject.form_id=formularioObject.form_id.toString();
 
     console.log(formularioObject);
-    defaultService.post('http://127.0.0.1:8000/service/fill/form/',formularioObject, function(data){
+    defaultService.post(globales.static_url+'../service/fill/form/',formularioObject, function(data){
       console.log(data);
 
     }, function (error){console.log(error)});
   }
 }]);
 
-app.controller('reporteColector', ['$scope', 'defaultService', function ($scope, defaultService) {
+app.controller('reporteColector', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
    console.log("iniciando controlador");
 
    
-   defaultService.get('http://127.0.0.1:8000/service/filled/forms/report/colector/4/', function(data){
+   defaultService.get(globales.static_url+'../service/filled/forms/report/colector/4/', function(data){
            //console.log(d)
            console.log("datos reporte recibidos del servidor: ");
 
@@ -118,13 +118,13 @@ app.controller('reporteColector', ['$scope', 'defaultService', function ($scope,
 
 
 
-app.controller('reporteFormulario', ['$scope', 'defaultService', function ($scope, defaultService) {
+app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
 
      
 
 
    
-   defaultService.get('http://127.0.0.1:8000/service/filled/forms/report/formname/formularioBasico/', function(data){
+   defaultService.get(globales.static_url+'../service/filled/forms/report/formname/formularioBasico/', function(data){
            //console.log(d)
            //console.log("datos recibidos del servidor: ");
 

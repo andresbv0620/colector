@@ -126,33 +126,44 @@ class GetForms(View):
                                     if e.form_asociado == None:
                                         pass
                                     else:
+                                        atributos=[]
+                                        objetos=[]
+                                        registroOpcion={}
+                                        
                                         asociate_form = {}
                                         asociate_form['name'] = e.form_asociado.nombre
                                         asociate_form['associate_id'] = e.form_asociado.id
                                         asociate_form['description'] = e.form_asociado.descripcion
                                         entrada['asociate_form'] = asociate_form
-                                        entrada['filled_form_attribute'] = []
+                                        entrada['options'] = []
                                         filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
                                             "filled_forms.form_description":0,
+                                            "filled_forms.form_id":0,
                                             "filled_forms.fecha_creacion":0,
                                             "filled_forms.sections.description":0,
                                             "filled_forms.sections.name":0,
                                             "filled_forms.sections.section_id":0,
                                             "filled_forms.sections.inputs.type":0,
                                             "filled_forms.sections.inputs.input_id":0,
-                                            "filled_forms.sections.inputs.description":0
+                                            "filled_forms.sections.inputs.description":0,
+                                            "colector_id":0,
+                                            "_id":0
 
                                             });
                                         nested_data={}
+                                        
                                         #agregar id a response y ya
 
                                         
                                         
                                         for filled in filled_forms:
-                                            print filled
-                                            # print filled.sections
+                                            
+                                            for record in filled["filled_forms"]:
+                                                print record
+                                                print "---------------------------------------------------------"
+                                                entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
                                             # for filled_section in filled.sections:
                                             #     for filled_input in filled_section.inputs:
                                             #         nested_data['label']=filled_input.name
@@ -162,7 +173,7 @@ class GetForms(View):
                                             form_aux = {}
                                             
                                             
-                                            entrada['filled_form_attribute'].append(filled) #(json.dumps(f,default=json_util.default))
+                                            
                                             
 
                                     ficha['inputs'].append(entrada)

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from registro.models import PermisoFormulario, Colector, Formulario
+from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada
 import json
 from bson import json_util
 import hashlib
@@ -413,8 +413,53 @@ class FillResponsesForm(View):
                                     default=json_util.default),
                                     content_type='application/json')
             else:
+                pass
+
+            # construyendo json para insertar en mongodb
+
+            try:
+
+                form = {}
+                form['fecha_creacion'] = datetime.utcnow()
+                form['record_id']=uuid.uuid4()
+                form['form_id'] = form_id
+                formulario = Formulario.objects.get(id = str(form['form_id']))
+                form['form_name'] = formulario.nombre
+                form['form_description'] = formulario.descripcion
+
+                for response in responses:
+                    input_id=response['input_id']
+                    entrada = Entrada.objects.get(id = str(input_id))
+                    response['label']=entrada.nombre
+
+                form['responses'] = responses
+
+                # return HttpResponse(json.dumps(data))
+
+                colector = \
+                    database.filled_forms.find_one({'colector_id': str(colector_id)},
+                        {'_id': 0})                
+
+                # validando si existe un colector con esta id
+
+                if colector == None:
+                    data = {}
+                    data['colector_id'] = colector_id
+                    data['filled_forms'] = []
+                    data['filled_forms'].append(form)
+                    
+                    database.filled_forms.insert(data)
+                    database.filled_forms.create_index("filled_forms.sections.inputs.responses")
+
+                else:
+
+                    database.filled_forms.update({'colector_id': str(colector_id)},
+                            {'$push': {'filled_forms': form}})
+
+                    # return HttpResponse("colector existe")
+
                 resp['response_code'] = '200'
-                resp['response_description'] = str('OK')
+                resp['response_description'] = str('form filled')
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
@@ -423,10 +468,19 @@ class FillResponsesForm(View):
 
                 return HttpResponse(json.dumps(resp),
                                     content_type='application/json')
+            except Exception, e:
 
-            # construyendo json para insertar en mongodb
+                resp['response_code'] = '400'
+                resp['response_description'] = \
+                    str('Error inserting data in mongodb' + str(e.args))
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
 
-
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
         except Exception, e:
 
             resp['response_code'] = '400'

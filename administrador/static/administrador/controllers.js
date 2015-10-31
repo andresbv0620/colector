@@ -119,10 +119,6 @@ app.controller('reporteColector', ['$scope', 'defaultService', 'globales', funct
 
 
 app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
-
-     
-
-
    
    defaultService.get(globales.static_url+'../service/filled/forms/report/formname/formularioBasico/', function(data){
            //console.log(d)
@@ -130,9 +126,11 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
 
            //console.log(data);
            colectorfilledforms = data['data'];
+
            $scope.colectorid=colectorfilledforms[0].colector_id;
            filledforms=colectorfilledforms[0].filled_forms;
            $scope.filledforms=filledforms;
+           console.log(filledforms);
 
                     
            tableheader=[];            
@@ -167,6 +165,63 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
             }
             
             tablecontent['columns']=columns;
+            tablecontent['data']=data;
+
+            $scope.tableheaders=tableheader;
+           $('#table').bootstrapTable(tablecontent);
+
+        }, function (error){console.log(error)});
+}]);
+
+app.controller('reporteFormulario2', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
+   
+   defaultService.get(globales.static_url+'../service/filled/forms/report/formname/formularioBasico/', function(data){
+           //console.log(d)
+           //console.log("datos recibidos del servidor: ");
+
+           //console.log(data);
+           colectorfilledforms = data['data'];
+
+           $scope.colectorid=colectorfilledforms[0].colector_id;
+           filledforms=colectorfilledforms[0].filled_forms;
+           $scope.filledforms=filledforms;
+           console.log(filledforms);
+
+                    
+           tableheader=[];            
+           columns=new Array(); 
+           data=new Array();
+           tablecontent=new Object();
+
+
+           for (form in filledforms){
+              responses=filledforms[form].responses;
+              datacolumns= new Object();  
+              column=new Object();
+              respuestas=new Array();
+              for (response in responses){
+                inputId=responses[response].inputs_id;
+                inputName=responses[response].value;
+                inputLabel=responses[response].label;
+                
+                  if(tableheader.indexOf(inputLabel)<0){
+                    column['field']=inputLabel;
+                    column['sortable']=true;
+                    column['title']=inputLabel;
+                    columns.push(column);
+                    tableheader.push(inputLabel);
+                  }
+                  
+                  respuestas.push(inputName);
+                  datacolumns[inputName]=responses[response].value;
+                  
+                
+              }
+              data.push(datacolumns);
+            }
+            
+            tablecontent['columns']=columns;
+
             tablecontent['data']=data;
 
             $scope.tableheaders=tableheader;

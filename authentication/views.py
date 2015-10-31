@@ -24,7 +24,7 @@ class OneStepAuth(View):
             data = json.loads(request.body)
             
             try:
-                tablet = Tablet.objects.get(id=int(data['tablet_id']))
+                tablet = Tablet.objects.get(codigo=data['tablet_id'])
                 try:
                     empresa=tablet.empresa_set.all()
                     try:
@@ -177,7 +177,6 @@ class TokenAuth(View):
                 resp['body_expected'] = str('{"company_name":" ", "secret_code": " "}')
 
                 try:
-
                     token = Token.objects.get(empresa = empresa )
                     resp['response_data'] = []
                     data = {}
@@ -270,7 +269,7 @@ class TabletAuth(View):
             #print data['password']
 
             try:
-                tablet = Tablet.objects.get(id=int(data['tablet_id']))
+                tablet = Tablet.objects.get(codigo=data['tablet_id'])
 
 
                 try:

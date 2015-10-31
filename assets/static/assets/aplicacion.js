@@ -30,6 +30,10 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 		controller:"reporteFormulario",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
 	})
+	.when('/reporte2/',{
+		controller:"reporteFormulario2",
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
+	})
 	.when('/llenar/:form_id',{
 		controller:"llenarFormulario",
 		templateUrl:globales.static_url+"/administrador/angular_templates/llenar_formulario.html"

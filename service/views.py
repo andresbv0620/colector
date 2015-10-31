@@ -136,6 +136,7 @@ class GetForms(View):
                                         asociate_form['description'] = e.form_asociado.descripcion
                                         entrada['asociate_form'] = asociate_form
                                         entrada['options'] = []
+                                        entrada['atributos'] = []
                                         filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
@@ -145,25 +146,54 @@ class GetForms(View):
                                             "filled_forms.sections.description":0,
                                             "filled_forms.sections.name":0,
                                             "filled_forms.sections.section_id":0,
-                                            "filled_forms.sections.inputs.type":0,
                                             "filled_forms.sections.inputs.input_id":0,
                                             "filled_forms.sections.inputs.description":0,
                                             "colector_id":0,
                                             "_id":0
 
                                             });
-                                        nested_data={}
                                         
-                                        #agregar id a response y ya
+
 
                                         
+                                        arrayChecker=[]
                                         
                                         for filled in filled_forms:
                                             
                                             for record in filled["filled_forms"]:
-                                                print record
-                                                print "---------------------------------------------------------"
+                                                
                                                 entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
+
+                                                #Crear nodo atributos para cargar los campos de formulario anidado en caso de un nuevo registro
+
+
+
+                                                for recordinput in record["responses"]:
+                                                    
+                                                    if recordinput["input_id"] in arrayChecker:
+                                                        pass
+                                                    else:
+                                                        objeto_atributos={}
+                                                        print recordinput["input_id"]
+                                                        arrayChecker.append(recordinput["input_id"])
+                                                        objeto_atributos["label"]=recordinput["label"]
+                                                        objeto_atributos["input_id"]=recordinput["input_id"]
+
+                                                        record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
+                                                        objeto_atributos["type"]=record_entrada.tipo
+
+                                                        entrada['atributos'].append(objeto_atributos)
+
+
+
+                                            print "---------------------------------------------------------"
+
+                                            print entrada['atributos']
+
+
+
+
+
                                             # for filled_section in filled.sections:
                                             #     for filled_input in filled_section.inputs:
                                             #         nested_data['label']=filled_input.name

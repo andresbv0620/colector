@@ -154,8 +154,6 @@ class GetForms(View):
                                             });
                                         
 
-
-                                        
                                         arrayChecker=[]
                                         
                                         for filled in filled_forms:
@@ -166,46 +164,24 @@ class GetForms(View):
 
                                                 #Crear nodo atributos para cargar los campos de formulario anidado en caso de un nuevo registro
 
-
-
                                                 for recordinput in record["responses"]:
                                                     
                                                     if recordinput["input_id"] in arrayChecker:
                                                         pass
                                                     else:
                                                         objeto_atributos={}
-                                                        print recordinput["input_id"]
                                                         arrayChecker.append(recordinput["input_id"])
                                                         objeto_atributos["label"]=recordinput["label"]
                                                         objeto_atributos["input_id"]=recordinput["input_id"]
-
                                                         record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
                                                         objeto_atributos["type"]=record_entrada.tipo
-
                                                         entrada['atributos'].append(objeto_atributos)
 
-
-
                                             print "---------------------------------------------------------"
-
                                             print entrada['atributos']
-
-
-
-
-
-                                            # for filled_section in filled.sections:
-                                            #     for filled_input in filled_section.inputs:
-                                            #         nested_data['label']=filled_input.name
-                                            #         for filled_response in filled_input.responses:
-                                            #             filled_response['label']=nested_data['label']
 
                                             form_aux = {}
                                             
-                                            
-                                            
-                                            
-
                                     ficha['inputs'].append(entrada)
 
                                     if len(e.respuesta.all()):

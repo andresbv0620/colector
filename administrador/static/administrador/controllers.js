@@ -115,9 +115,6 @@ app.controller('reporteColector', ['$scope', 'defaultService', 'globales', funct
         }, function (error){console.log(error)});
 }]);
 
-
-
-
 app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
    
    defaultService.get(globales.static_url+'../service/filled/forms/report/formname/formularioBasico/', function(data){
@@ -173,9 +170,9 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
         }, function (error){console.log(error)});
 }]);
 
-app.controller('reporteFormulario2', ['$scope', 'defaultService', 'globales', function ($scope, defaultService, globales) {
-   
-   defaultService.get(globales.static_url+'../service/filled/forms/report/formname/formularioBasico/', function(data){
+app.controller('reporteFormulario2', ['$scope', '$routeParams', 'defaultService', 'globales', function ($scope, $routeParams, defaultService, globales) {
+   $scope.form_name=$routeParams.form_name;
+   defaultService.get(globales.static_url+'../service/filled/forms/report/formname/'+$routeParams.form_name+'/', function(data){
            //console.log(d)
            //console.log("datos recibidos del servidor: ");
 
@@ -197,14 +194,15 @@ app.controller('reporteFormulario2', ['$scope', 'defaultService', 'globales', fu
            for (form in filledforms){
               responses=filledforms[form].responses;
               datacolumns= new Object();  
-              column=new Object();
+              
               respuestas=new Array();
               for (response in responses){
                 inputId=responses[response].inputs_id;
-                inputName=responses[response].value;
+                inputValue=responses[response].value;
                 inputLabel=responses[response].label;
                 
                   if(tableheader.indexOf(inputLabel)<0){
+                    column=new Object();
                     column['field']=inputLabel;
                     column['sortable']=true;
                     column['title']=inputLabel;
@@ -212,10 +210,8 @@ app.controller('reporteFormulario2', ['$scope', 'defaultService', 'globales', fu
                     tableheader.push(inputLabel);
                   }
                   
-                  respuestas.push(inputName);
-                  datacolumns[inputName]=responses[response].value;
-                  
-                
+                  respuestas.push(inputValue);
+                  datacolumns[inputLabel]=inputValue;
               }
               data.push(datacolumns);
             }

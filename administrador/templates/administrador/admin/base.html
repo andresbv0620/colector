@@ -373,12 +373,7 @@
                   <ul class="treeview-menu">
                     {% for formulario in formularios %}
                         <li>
-                          <a href="/login/"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
-                          <ul class="treeview-menu">
-                            <li><a href="#"><i class="fa fa-circle-o"></i> Colector</a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i> Nombre Formulario</a></li>
-                            <li><a href="#"><i class="fa fa-circle-o"></i> Fecha</a></li>
-                          </ul>
+                          <a href="#/reporte2/{{formulario}}/"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
                         </li>
                     {% endfor %}
                   </ul>

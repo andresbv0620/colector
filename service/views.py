@@ -18,7 +18,7 @@ database = servidor.colector
 
 # Create your views here.
 
-class AllowedForms(View):
+class AllowedForms(View):   
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -448,6 +448,7 @@ class FillResponsesForm(View):
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = str(input_id))
                     response['label']=entrada.nombre
+                    response['tipo']=entrada.tipo
 
                 form['responses'] = responses
 
@@ -510,6 +511,8 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
+
+#Guarda una estructura más compleja de los formularios, NO ESTA EN USO
 class FillForm(View):
 
     @method_decorator(csrf_exempt)

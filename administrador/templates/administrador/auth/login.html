@@ -25,13 +25,13 @@
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body class="hold-transition login-page">
+  <body class="hold-transition login-page" style="background-image:url(http://ww2.perast.cl/landing/assets/images/landing/app-01.jpg)">
     <div class="login-box">
       <div class="login-logo">
-        <a href="../../index2.html"><b>Colector</b> EMPRESAS</a>
+        <a href="../../index2.html" style="color:white"><b>Colector</b> EMPRESAS</a>
       </div><!-- /.login-logo -->
       <div class="login-box-body">
-        <p class="login-box-msg">Sign in to start your session</p>
+        <p class="login-box-msg">Ingrese su nombre de usuario y contraseña para iniciar sesión</p>
 
         {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
@@ -55,20 +55,20 @@
         {% csrf_token %}
         
           <div class="form-group has-feedback">
-            {{ form.username.label_tag }}
-            {{ form.username }}
+            <div>{{ form.username.label_tag }}</div>
+            <div>{{ form.username }}</div>
             <!-- <input type="email" class="form-control" placeholder="Email">
             <span class="glyphicon glyphicon-envelope form-control-feedback"></span>-->
           </div>
           <div class="form-group has-feedback">
-            {{ form.password.label_tag }}
-            {{ form.password }}
+            <div>{{ form.password.label_tag }}</div>
+            <div>{{ form.password }}</div>
             <!-- <input type="password" class="form-control" placeholder="Password"> 
             <span class="glyphicon glyphicon-lock form-control-feedback"></span>-->
           </div>
           <div class="row">
             <div class="col-xs-8">
-              <div class="checkbox icheck">
+              <div class="checkbox icheck" style="display:none">
                 <label>
                   <input type="checkbox"> Remember Me
                 </label>

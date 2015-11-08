@@ -170,65 +170,69 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
         }, function (error){console.log(error)});
 }]);
 
-app.controller('reporteFormulario2', ['$scope', '$routeParams', 'defaultService', 'globales', function ($scope, $routeParams, defaultService, globales) {
-   $scope.form_name=$routeParams.form_name;
-   defaultService.get(globales.static_url+'../service/filled/forms/report/formname/'+$routeParams.form_name+'/', function(data){
+app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService', 'globales', function ($scope, $routeParams, defaultService, globales) {
+   $scope.form_name=$routeParams.form_id;
+   defaultService.get(globales.static_url+'../service/filled/forms/report/formid/'+$routeParams.form_id+'/', function(data){
            console.log("datos recibidos del servidor: ");
-
-           console.log(data);
+           //console.log(data);
            colectorfilledforms = data['data'];
 
-           $scope.colectorid=colectorfilledforms[0].colector_id;
-           filledforms=colectorfilledforms[0].filled_forms;
-           $scope.filledforms=filledforms;
+           //$scope.colectorid=colectorfilledforms[0].colector_id;
+           
+           
            //console.log(filledforms);
-
                     
            tableheader=[];            
            columns=new Array(); 
            data=new Array();
            tablecontent=new Object();
 
-
-           for (form in filledforms){
-              responses=filledforms[form].responses;
-              datacolumns= new Object();  
-              
-              respuestas=new Array();
-              for (response in responses){
-                inputId=responses[response].inputs_id;
-                inputValue=responses[response].value;
-                inputLabel=responses[response].label;
-                inputType=responses[response].tipo;
-                  //Validamos para generar la fila de encabezados
-                  if(tableheader.indexOf(inputLabel)<0){
-                    column=new Object();
-                    column['field']=inputLabel;
-                    column['sortable']=true;
-                    column['title']=inputLabel;
-                    columns.push(column);
-                    tableheader.push(inputLabel);
-                  }
-
-                  //Se valida si es foto, para convertirla de base64
-
-                  if (inputType==6) {
-                    if (typeof datacolumns[inputLabel] !== "undefined") {
-                      datacolumns[inputLabel]=datacolumns[inputLabel]+'<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
-                    }else{
-                      datacolumns[inputLabel]='<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+           for (colectorDocument in colectorfilledforms){
+            filledforms=colectorfilledforms[colectorDocument].filled_forms;
+            //$scope.filledforms=filledforms;
+            console.log(filledforms);
+           
+             for (form in filledforms){
+              if(filledforms[form].form_id==$routeParams.form_id){
+                responses=filledforms[form].responses;
+                datacolumns= new Object();  
+                
+                respuestas=new Array();
+                for (response in responses){
+                  inputId=responses[response].inputs_id;
+                  inputValue=responses[response].value;
+                  inputLabel=responses[response].label;
+                  inputType=responses[response].tipo;
+                    //Validamos para generar la fila de encabezados
+                    if(tableheader.indexOf(inputLabel)<0){
+                      column=new Object();
+                      column['field']=inputLabel;
+                      column['sortable']=true;
+                      column['title']=inputLabel;
+                      columns.push(column);
+                      tableheader.push(inputLabel);
                     }
-                  }else{
-                    if (typeof datacolumns[inputLabel] !== "undefined") {
-                      datacolumns[inputLabel]=datacolumns[inputLabel]+','+inputValue;
+
+                    //Se valida si es foto, para convertirla de base64
+
+                    if (inputType==6) {
+                      if (typeof datacolumns[inputLabel] !== "undefined") {
+                        datacolumns[inputLabel]=datacolumns[inputLabel]+'<br><img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+                      }else{
+                        datacolumns[inputLabel]='<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+                      }
                     }else{
-                      datacolumns[inputLabel]=inputValue;
+                      if (typeof datacolumns[inputLabel] !== "undefined") {
+                        datacolumns[inputLabel]=datacolumns[inputLabel]+','+inputValue;
+                      }else{
+                        datacolumns[inputLabel]=inputValue;
+                      }
                     }
-                  }
+                }
+                data.push(datacolumns);
               }
-              data.push(datacolumns);
             }
-            
+           } 
             tablecontent['columns']=columns;
 
             tablecontent['data']=data;

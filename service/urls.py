@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^fill/form/(?P<id>.+)/$', FillForm.as_view()),
     url(r'^filled/forms/report/colector/(?P<id>.+)/$', 'service.views.ColectorIdReport'),
     url(r'^filled/forms/report/formname/(?P<name>.+)/$', 'service.views.FormNameReport'),
+    url(r'^filled/forms/report/formid/(?P<id>.+)/$', 'service.views.FormIdReport'),
     url(r'^filled/forms/report/colectorid/(?P<id>.+)/date/(?P<a>.+)/(?P<m>.+)/(?P<d>.+)/$', 'service.views.DateReport'),
     
 ]

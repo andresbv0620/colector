@@ -173,16 +173,15 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
 app.controller('reporteFormulario2', ['$scope', '$routeParams', 'defaultService', 'globales', function ($scope, $routeParams, defaultService, globales) {
    $scope.form_name=$routeParams.form_name;
    defaultService.get(globales.static_url+'../service/filled/forms/report/formname/'+$routeParams.form_name+'/', function(data){
-           //console.log(d)
-           //console.log("datos recibidos del servidor: ");
+           console.log("datos recibidos del servidor: ");
 
-           //console.log(data);
+           console.log(data);
            colectorfilledforms = data['data'];
 
            $scope.colectorid=colectorfilledforms[0].colector_id;
            filledforms=colectorfilledforms[0].filled_forms;
            $scope.filledforms=filledforms;
-           console.log(filledforms);
+           //console.log(filledforms);
 
                     
            tableheader=[];            
@@ -214,9 +213,17 @@ app.controller('reporteFormulario2', ['$scope', '$routeParams', 'defaultService'
                   //Se valida si es foto, para convertirla de base64
 
                   if (inputType==6) {
-                    datacolumns[inputLabel]='<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+                    if (typeof datacolumns[inputLabel] !== "undefined") {
+                      datacolumns[inputLabel]=datacolumns[inputLabel]+'<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+                    }else{
+                      datacolumns[inputLabel]='<img width="50px" height="50px" src="data:image/png;base64,'+inputValue+'" data-err-src="images/png/avatar.png"/>';
+                    }
                   }else{
-                    datacolumns[inputLabel]=inputValue;
+                    if (typeof datacolumns[inputLabel] !== "undefined") {
+                      datacolumns[inputLabel]=datacolumns[inputLabel]+','+inputValue;
+                    }else{
+                      datacolumns[inputLabel]=inputValue;
+                    }
                   }
               }
               data.push(datacolumns);
@@ -225,6 +232,7 @@ app.controller('reporteFormulario2', ['$scope', '$routeParams', 'defaultService'
             tablecontent['columns']=columns;
 
             tablecontent['data']=data;
+            
 
             $scope.tableheaders=tableheader;
            $('#table').bootstrapTable(tablecontent);

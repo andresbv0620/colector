@@ -121,7 +121,6 @@ class GetForms(View):
                                     entrada['name'] = e.nombre
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
-
                                     
                                     if e.form_asociado == None:
                                         pass
@@ -137,7 +136,7 @@ class GetForms(View):
                                         entrada['asociate_form'] = asociate_form
                                         entrada['options'] = []
                                         entrada['atributos'] = []
-                                        filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
+                                        document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
                                             "filled_forms.form_description":0,
@@ -156,13 +155,16 @@ class GetForms(View):
 
                                         arrayChecker=[]
                                         
-                                        for filled in filled_forms:
-                                            
+                                        for filled in document_filled_forms:
                                             for record in filled["filled_forms"]:
-                                                
+
+                                                print record
+
+                                                record["record_id"]=str(record["record_id"])
+
                                                 entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
 
-                                                #Crear nodo atributos para cargar los campos de formulario anidado en caso de un nuevo registro
+                                                #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
 
                                                 for recordinput in record["responses"]:
                                                     
@@ -175,10 +177,20 @@ class GetForms(View):
                                                         objeto_atributos["input_id"]=recordinput["input_id"]
                                                         record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
                                                         objeto_atributos["type"]=record_entrada.tipo
+                                                        
+                                                        entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
+                                                        if len(entrada_anidada.respuesta.all()):
+                                                            objeto_atributos["responses"]=[]
+                                                            for r in entrada_anidada.respuesta.all():
+                                                                respuestaAnidada={}
+                                                                respuestaAnidada['response_id'] = r.id
+                                                                respuestaAnidada['value'] = r.valor
+                                                                objeto_atributos["responses"].append(respuestaAnidada)
+
                                                         entrada['atributos'].append(objeto_atributos)
 
-                                            print "---------------------------------------------------------"
-                                            print entrada['atributos']
+                                            #print "---------------------------------------------------------"
+                                            #print entrada['atributos']
 
                                             form_aux = {}
                                             
@@ -438,7 +450,7 @@ class FillResponsesForm(View):
 
                 form = {}
                 form['fecha_creacion'] = datetime.utcnow()
-                form['record_id']=uuid.uuid4()
+                form['record_id']=str(uuid.uuid4())
                 form['form_id'] = form_id
                 formulario = Formulario.objects.get(id = str(form['form_id']))
                 form['form_name'] = formulario.nombre

@@ -94,9 +94,9 @@ ENTRADA_CHOICES = (
         (FOTO, 'FOTO'),
         (FECHA, 'FECHA'),
         (NUMERO, 'NUMERO'),
-        (SCAN, 'FOTO'),
-        (DINAMICA, 'FECHA'),
-        (GPS, 'NUMERO'),
+        (SCAN, 'SCAN'),
+        (DINAMICA, 'DINAMICA'),
+        (GPS, 'GPS'),
         
     )
 

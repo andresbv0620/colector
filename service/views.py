@@ -140,7 +140,6 @@ class GetForms(View):
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
                                             "filled_forms.form_description":0,
-                                            "filled_forms.form_id":0,
                                             "filled_forms.fecha_creacion":0,
                                             "filled_forms.sections.description":0,
                                             "filled_forms.sections.name":0,
@@ -151,46 +150,41 @@ class GetForms(View):
                                             "_id":0
 
                                             });
-                                        
-
                                         arrayChecker=[]
-                                        
                                         for filled in document_filled_forms:
                                             for record in filled["filled_forms"]:
+                                                if record['form_id']!=str(e.form_asociado.id):
+                                                    pass
+                                                else:
+                                                    record["record_id"]=str(record["record_id"])
 
-                                                print record
+                                                    entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
 
-                                                record["record_id"]=str(record["record_id"])
+                                                    #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
 
-                                                entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
-
-                                                #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
-
-                                                for recordinput in record["responses"]:
-                                                    
-                                                    if recordinput["input_id"] in arrayChecker:
-                                                        pass
-                                                    else:
-                                                        objeto_atributos={}
-                                                        arrayChecker.append(recordinput["input_id"])
-                                                        objeto_atributos["label"]=recordinput["label"]
-                                                        objeto_atributos["input_id"]=recordinput["input_id"]
-                                                        record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
-                                                        objeto_atributos["type"]=record_entrada.tipo
+                                                    for recordinput in record["responses"]:
                                                         
-                                                        entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
-                                                        if len(entrada_anidada.respuesta.all()):
-                                                            objeto_atributos["responses"]=[]
-                                                            for r in entrada_anidada.respuesta.all():
-                                                                respuestaAnidada={}
-                                                                respuestaAnidada['response_id'] = r.id
-                                                                respuestaAnidada['value'] = r.valor
-                                                                objeto_atributos["responses"].append(respuestaAnidada)
+                                                        if recordinput["input_id"] in arrayChecker:
+                                                            pass
+                                                        else:
+                                                            objeto_atributos={}
+                                                            arrayChecker.append(recordinput["input_id"])
+                                                            objeto_atributos["label"]=recordinput["label"]
+                                                            objeto_atributos["input_id"]=recordinput["input_id"]
+                                                            record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
+                                                            objeto_atributos["type"]=record_entrada.tipo
+                                                            
+                                                            entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
+                                                            if len(entrada_anidada.respuesta.all()):
+                                                                objeto_atributos["responses"]=[]
+                                                                for r in entrada_anidada.respuesta.all():
+                                                                    respuestaAnidada={}
+                                                                    respuestaAnidada['response_id'] = r.id
+                                                                    respuestaAnidada['value'] = r.valor
+                                                                    objeto_atributos["responses"].append(respuestaAnidada)
 
-                                                        entrada['atributos'].append(objeto_atributos)
+                                                            entrada['atributos'].append(objeto_atributos)
 
-                                            #print "---------------------------------------------------------"
-                                            #print entrada['atributos']
 
                                             form_aux = {}
                                             

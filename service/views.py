@@ -376,8 +376,25 @@ class FillResponsesForm(View):
 
         # validacion del formulario
 
-        if not array_validation['colector_id'].strip():
+        if not array_validation['latitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('latitud is blank')
 
+        if not array_validation['longitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('longitud is blank')
+
+        if not array_validation['horaini'].strip():
+            response['error'] = True
+            response['validation_errors'].append('horaini is blank')
+
+        if not array_validation['horafin'].strip():
+            response['error'] = True
+            response['validation_errors'].append('horafin is blank')
+
+
+
+        if not array_validation['colector_id'].strip():
             response['error'] = True
             response['validation_errors'].append('colector_id is blank')
 
@@ -411,11 +428,20 @@ class FillResponsesForm(View):
         # validando data correcta enviada en body
         try:
             data = json.loads(request.body)
+            longitud = data['longitud']
+            latitud = data['latitud']
+            horaini = data['horaini']
+            horafin = data['horafin']
             colector_id = data['colector_id']
             form_id = data['form_id']
             responses = data['responses']
+            
 
             array_validation = {}
+            array_validation['longitud'] = longitud
+            array_validation['latitud'] = latitud
+            array_validation['horaini'] = horaini
+            array_validation['horafin'] = horafin
             array_validation['colector_id'] = colector_id
             array_validation['form_id'] = form_id
             array_validation['responses'] = responses
@@ -445,6 +471,10 @@ class FillResponsesForm(View):
                 form = {}
                 form['fecha_creacion'] = datetime.utcnow()
                 form['record_id']=str(uuid.uuid4())
+                form['longitud'] = longitud
+                form['latitud'] = latitud
+                form['horaini'] = horaini
+                form['horafin'] = horafin
                 form['form_id'] = form_id
                 formulario = Formulario.objects.get(id = str(form['form_id']))
                 form['form_name'] = formulario.nombre

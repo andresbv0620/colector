@@ -197,6 +197,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
               if(filledforms[form].form_id==$routeParams.form_id){
 
                 ///////////Se asignan las coordenadas GPS del registro/////////////////
+                datacolumns= new Object(); //Objeto que va guardando las respuestas de cada registro
                 markers={};
                 markers['longitude']=filledforms[form].latitud;
                 markers['latitude']=filledforms[form].longitud;
@@ -204,29 +205,24 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                 horaini=filledforms[form].horaini;
                 var dini=new Date(0);
                 dini.setUTCSeconds(horaini);
-                datacolumns= new Object(); 
                 column=new Object();
                 column['field']="Inicio";
                 column['sortable']=true;
                 column['title']="Inicio";
                 columns.push(column);
                 datacolumns["Inicio"]=dini;
-                data.push(datacolumns);
 
                 horafin=filledforms[form].horafin;
                 var dfin=new Date(0);
                 dfin.setUTCSeconds(horafin);
-                datacolumns= new Object(); 
                 column=new Object();
                 column['field']="Final";
                 column['sortable']=true;
                 column['title']="Final";
                 columns.push(column);
                 datacolumns["Final"]=dfin;
-                data.push(datacolumns);
 
                 responses=filledforms[form].responses;
-                datacolumns= new Object();
                 respuestas=new Array();
                 for (response in responses){
                   inputId=responses[response].inputs_id;

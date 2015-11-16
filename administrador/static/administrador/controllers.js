@@ -202,23 +202,27 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                 markers['latitude']=filledforms[form].longitud;
                 ///////////Se asigna la hora de inicio y fin del registro////////////////
                 horaini=filledforms[form].horaini;
+                var dini=new Date(0);
+                dini.setUTCSeconds(horaini);
                 datacolumns= new Object(); 
                 column=new Object();
-                column['field']="horaini";
+                column['field']="Inicio";
                 column['sortable']=true;
-                column['title']="horaini";
+                column['title']="Inicio";
                 columns.push(column);
-                datacolumns[horaini]='<mydate>[['+horaini+' | date:"yyyy-MM-dd HH:mm:ss Z"]]</mydate>';
+                datacolumns["Inicio"]=dini;
                 data.push(datacolumns);
 
                 horafin=filledforms[form].horafin;
+                var dfin=new Date(0);
+                dfin.setUTCSeconds(horafin);
                 datacolumns= new Object(); 
                 column=new Object();
-                column['field']=horafin;
+                column['field']="Final";
                 column['sortable']=true;
-                column['title']=horafin;
+                column['title']="Final";
                 columns.push(column);
-                datacolumns[horafin]='<mydate>[['+horafin+' | date:"yyyy-MM-dd HH:mm:ss Z"]]</mydate>';
+                datacolumns["Final"]=dfin;
                 data.push(datacolumns);
 
                 responses=filledforms[form].responses;

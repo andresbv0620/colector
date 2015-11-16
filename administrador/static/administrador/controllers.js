@@ -195,11 +195,33 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
            
              for (form in filledforms){
               if(filledforms[form].form_id==$routeParams.form_id){
+
+                ///////////Se asignan las coordenadas GPS del registro/////////////////
                 markers={};
                 markers['longitude']=filledforms[form].latitud;
                 markers['latitude']=filledforms[form].longitud;
+                ///////////Se asigna la hora de inicio y fin del registro////////////////
+                horaini=filledforms[form].horaini;
+                datacolumns= new Object(); 
+                column=new Object();
+                column['field']="horaini";
+                column['sortable']=true;
+                column['title']="horaini";
+                columns.push(column);
+                datacolumns[horaini]='<mydate>[['+horaini+' | date:"yyyy-MM-dd HH:mm:ss Z"]]</mydate>';
+                data.push(datacolumns);
+
+                horafin=filledforms[form].horafin;
+                datacolumns= new Object(); 
+                column=new Object();
+                column['field']=horafin;
+                column['sortable']=true;
+                column['title']=horafin;
+                columns.push(column);
+                datacolumns[horafin]='<mydate>[['+horafin+' | date:"yyyy-MM-dd HH:mm:ss Z"]]</mydate>';
+                data.push(datacolumns);
+
                 responses=filledforms[form].responses;
-                datacolumns= new Object();  
                 
                 respuestas=new Array();
                 for (response in responses){
@@ -239,6 +261,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
               }
             }
            } 
+
             tablecontent['columns']=columns;
 
             tablecontent['data']=data;

@@ -196,8 +196,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
              for (form in filledforms){
               if(filledforms[form].form_id==$routeParams.form_id){
                 markers={};
-                markers['latitude']=filledforms[form].latitud;
-                markers['longitude']=filledforms[form].longitud;
+                markers['longitude']=filledforms[form].latitud;
+                markers['latitude']=filledforms[form].longitud;
                 responses=filledforms[form].responses;
                 datacolumns= new Object();  
                 

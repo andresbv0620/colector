@@ -188,6 +188,20 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
            tablecontent=new Object();
            markersArray= new Array();
 
+           ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+            column=new Object();
+            column['field']="Inicio";
+            column['sortable']=true;
+            column['title']="Inicio";
+            columns.push(column);
+
+            column=new Object();
+            column['field']="Final";
+            column['sortable']=true;
+            column['title']="Final";
+            columns.push(column);
+
+
            for (colectorDocument in colectorfilledforms){
             filledforms=colectorfilledforms[colectorDocument].filled_forms;
             //$scope.filledforms=filledforms;
@@ -201,25 +215,15 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                 markers={};
                 markers['longitude']=filledforms[form].latitud;
                 markers['latitude']=filledforms[form].longitud;
-                ///////////Se asigna la hora de inicio y fin del registro////////////////
+                ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
                 horaini=filledforms[form].horaini;
                 var dini=new Date(0);
-                dini.setUTCSeconds(horaini);
-                column=new Object();
-                column['field']="Inicio";
-                column['sortable']=true;
-                column['title']="Inicio";
-                columns.push(column);
+                dini.setUTCSeconds(horaini);                
                 datacolumns["Inicio"]=dini;
 
                 horafin=filledforms[form].horafin;
                 var dfin=new Date(0);
                 dfin.setUTCSeconds(horafin);
-                column=new Object();
-                column['field']="Final";
-                column['sortable']=true;
-                column['title']="Final";
-                columns.push(column);
                 datacolumns["Final"]=dfin;
 
                 responses=filledforms[form].responses;

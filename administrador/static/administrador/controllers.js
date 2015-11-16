@@ -186,6 +186,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
            columns=new Array(); 
            data=new Array();
            tablecontent=new Object();
+           markersArray= new Array();
 
            for (colectorDocument in colectorfilledforms){
             filledforms=colectorfilledforms[colectorDocument].filled_forms;
@@ -194,12 +195,16 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
            
              for (form in filledforms){
               if(filledforms[form].form_id==$routeParams.form_id){
+                markers={};
+                markers['latitude']=filledforms[form].latitud;
+                markers['longitude']=filledforms[form].longitud;
                 responses=filledforms[form].responses;
                 datacolumns= new Object();  
                 
                 respuestas=new Array();
                 for (response in responses){
                   inputId=responses[response].inputs_id;
+                  if(typeof markers['message']=="undefined"){markers['message']=responses[response].value;}
                   inputValue=responses[response].value;
                   inputLabel=responses[response].label;
                   inputType=responses[response].tipo;
@@ -230,6 +235,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     }
                 }
                 data.push(datacolumns);
+                markersArray.push(markers);
               }
             }
            } 
@@ -240,6 +246,23 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             $scope.tableheaders=tableheader;
            $('#table').bootstrapTable(tablecontent);
+
+
+           ///////////////////////////////MAPS REPORT////////////////////////
+           
+           $scope.map = { center: { latitude: 3.464903, longitude: -76.529232 }, zoom: 12 };
+
+           $scope.marker={
+            coords:{
+              latitude: 3.464903,
+              longitude: -76.529232
+            }
+           }
+
+           $scope.markerList=markersArray;
+
+
+
 
         }, function (error){console.log(error)});
 }]);

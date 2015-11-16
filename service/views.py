@@ -111,6 +111,8 @@ class GetForms(View):
                             ficha['section_id'] = f.id
                             ficha['name'] = f.nombre
                             ficha['description'] = f.descripcion
+                            print f.nombre
+
                             # validando que la ficha tenga entradas asociadas
                             if len(f.entrada.all()):
                                 ficha['inputs'] = []
@@ -201,10 +203,8 @@ class GetForms(View):
 
                                         entrada['responses'] = []
                             else:
-
                                 ficha['inputs'] = []
-
-                        formulario['sections'].append(ficha)
+                            formulario['sections'].append(ficha)
                     else:
                         formulario['sections'] = []
 

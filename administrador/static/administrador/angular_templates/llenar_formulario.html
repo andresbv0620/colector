@@ -1,16 +1,14 @@
 <div class="box box-warning">
     <div class="box-header with-border">
+        <h2>Diligenciar formulario</h2>
 
-        <h2 class="box-title">[[formulario.name]]</h2>
-        <h3>Form id [[form_id]] - [[formulario.description]]</h3>
     </div>
     <!-- /.box-header -->
     <div class="box-body">
         <form role="form" ng-submit="enviarFormulario()">
             <div class="box-header with-border" ng-repeat="section in formulario.sections">
-                <h3 class="box-title">[[section.name]]</h3>
-                <h4>[[section.description]]</h4>
-                <h4>[[section.id]]</h4>
+                <h3 class="box-title">[[section.name]]</h3><hr>
+
                 <!-- text input -->
                 <div class="form-group" ng-repeat="input in section.inputs">
                     <span ng-if="input.type==1">

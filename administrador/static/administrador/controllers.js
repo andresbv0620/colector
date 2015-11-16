@@ -226,7 +226,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                 data.push(datacolumns);
 
                 responses=filledforms[form].responses;
-                
+                datacolumns= new Object();
                 respuestas=new Array();
                 for (response in responses){
                   inputId=responses[response].inputs_id;

@@ -103,7 +103,7 @@
                     </p>
                   </li>
                   <!-- Menu Body -->
-                  <li class="user-body">
+                  <!-- <li class="user-body">
                     <div class="col-xs-4 text-center">
                       <a href="#">Followers</a>
                     </div>
@@ -113,16 +113,16 @@
                     <div class="col-xs-4 text-center">
                       <a href="#">Friends</a>
                     </div>
-                  </li>
+                  </li> -->
                   <!-- Menu Footer-->
-                  <li class="user-footer">
+                  <!-- <li class="user-footer">
                     <div class="pull-left">
                       <a href="#" class="btn btn-default btn-flat">Profile</a>
                     </div>
                     <div class="pull-right">
                       <a href="#" class="btn btn-default btn-flat">Sign out</a>
                     </div>
-                  </li>
+                  </li> -->
                 </ul>
               </li>
               <!-- Control Sidebar Toggle Button -->
@@ -178,22 +178,20 @@
               
             </li> -->
             <li class="treeview">
+
               <a href="#">
                 <i class="fa fa-pie-chart"></i>
-                <span>Report</span>
+                <span>Reports</span>
                 <i class="fa fa-angle-left pull-right"></i>
               </a>
               <ul class="treeview-menu">
-                <li>
-                  <a href="#"><i class="fa fa-circle-o"></i> Forms <i class="fa fa-angle-left pull-right"></i></a>
-                  <ul class="treeview-menu">
+                
                     {% for formulario in formularios %}
                         <li>
                           <a href="#/reporte/id/{{formulario.id}}/"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
                         </li>
                     {% endfor %}
-                  </ul>
-                </li>
+   
               </ul>
             </li>
             <!-- <li class="treeview">

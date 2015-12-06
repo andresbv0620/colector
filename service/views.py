@@ -485,9 +485,10 @@ class FillResponsesForm(View):
                     entrada = Entrada.objects.get(id = str(input_id))
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
-                    response_id=response['value']
-                    respuesta = Respuesta.objects.get(id = str(response_id))
-                    response['responselabel']=respuesta.valor
+                    if entrada.tipo == "4":
+                        response_id=response['value']
+                        respuesta = Respuesta.objects.get(id = str(response_id))
+                        response['value']=respuesta.valor
 
                 form['responses'] = responses
 

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada
+from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta
 import json
 from bson import json_util
 import hashlib
@@ -485,6 +485,9 @@ class FillResponsesForm(View):
                     entrada = Entrada.objects.get(id = str(input_id))
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
+                    response_id=response['value']
+                    respuesta = Respuesta.objects.get(id = str(response_id))
+                    response['responselabel']=respuesta.valor
 
                 form['responses'] = responses
 
@@ -744,7 +747,7 @@ class FillForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
-
+#Reporte SIN USO
 class FilledFormsReport(View):
 
     @method_decorator(csrf_exempt)
@@ -778,7 +781,7 @@ class FilledFormsReport(View):
                                 default=json_util.default),
                                 content_type='application/json')
 
-
+#Reporte Colector_id
 def ColectorIdReport(request, id):
     filled_forms = database.filled_forms.find({'colector_id': str(id)},
             {'_id': 0})
@@ -804,7 +807,7 @@ def ColectorIdReport(request, id):
                             default=json_util.default),
                             content_type='application/json')
 
-
+#Reporte por nombre formulario, NO ES NECESARIO
 def FormNameReport(request, name):
     filled_forms = \
         database.filled_forms.find({'filled_forms.form_name': str(name)},
@@ -831,7 +834,7 @@ def FormNameReport(request, name):
                             default=json_util.default),
                             content_type='application/json')
 
-
+#Reporte por form id
 def FormIdReport(request, id):
     filled_forms = \
         database.filled_forms.find({'filled_forms.form_id': str(id)},
@@ -858,7 +861,7 @@ def FormIdReport(request, id):
                             default=json_util.default),
                             content_type='application/json')
 
-
+#Reporte por fecha
 def DateReport(
     request,
     id,

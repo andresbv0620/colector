@@ -289,16 +289,16 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
         $scope.map = {
             center: {
-                latitude: 40.741258,
-                longitude: -73.989568
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
             },
             zoom: 12
         };
 
         $scope.marker = {
             coords: {
-                latitude: 3.464903,
-                longitude: -76.529232
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
             }
         }
 

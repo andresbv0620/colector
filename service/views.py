@@ -96,6 +96,7 @@ class GetForms(View):
                 # parseando formularios a json
                 resp['response_data'] = []
 
+                #Se genera el listado de formularios con su respectiva informacion
                 for p in permiso_formularios:
 
                     formulario = {}
@@ -106,16 +107,18 @@ class GetForms(View):
                     # validando que el formulario tenga fichas asociadas
                     if len(p.formulario.ficha.all()):
                         formulario['sections'] = []
+                        #Se genera el listado de fichas o secciones
                         for f in p.formulario.ficha.all():
                             ficha = {}
                             ficha['section_id'] = f.id
                             ficha['name'] = f.nombre
                             ficha['description'] = f.descripcion
-                            print f.nombre
+                            #print f.nombre
 
                             # validando que la ficha tenga entradas asociadas
                             if len(f.entrada.all()):
                                 ficha['inputs'] = []
+                                #Se genera la lista de inputs o entradas
                                 for e in f.entrada.all():
 
                                     entrada = {}
@@ -123,7 +126,7 @@ class GetForms(View):
                                     entrada['name'] = e.nombre
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
-                                    
+                                    #Se valida si tiene algun formulario asociado para precargar datos
                                     if e.form_asociado == None:
                                         pass
                                     else:
@@ -239,7 +242,6 @@ class GetForms(View):
                                 content_type='application/json')
 
         return HttpResponse('Single form')
-
 
 
 class SingleForm(View):

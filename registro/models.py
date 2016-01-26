@@ -83,6 +83,7 @@ NUMERO = '8'
 SCAN = '9'
 DINAMICA = '10'
 GPS = '11'
+FORMULA='12'
 
 
 ENTRADA_CHOICES = (
@@ -97,6 +98,7 @@ ENTRADA_CHOICES = (
         (SCAN, 'SCAN'),
         (DINAMICA, 'DINAMICA'),
         (GPS, 'GPS'),
+        (FORMULA, 'FORMULA'),
         
     )
 

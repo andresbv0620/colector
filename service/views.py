@@ -163,7 +163,31 @@ class GetForms(View):
                                                 else:
                                                     record["record_id"]=str(record["record_id"])
 
+                                                    #La siguiente linea crea el nodo formula para hacer el calculo del valor de cada producto SOLO EN ORDEN VENTA
+                                                    #Se debe ajustar para que sea dinamico y sea extensible a otras funcionalidades
+                                                    #Deja estatico el valor del iva en 0,16
+                                                    
+                                                    #print record["responses"]
+                                                    #Se itera sobre la opcion para sacar las variables de cada formula
+                                                    precioProducto=0
+                                                    ivaProducto=0
+                                                    for option_response in record["responses"]:
+                                                        
+                                                        if option_response["label"]=="_PRECIO":
+                                                            precioProducto=option_response["value"]
+                                                                                                                   
+
+                                                        if option_response["label"]=="_IVA":
+                                                            ivaProducto=option_response["value"]
+                                                                                                                    
+
+                                                    record["formula"]=str(precioProducto)+'*{cantidad}+'+str(precioProducto)+'*{cantidad}*'+str(ivaProducto)
+
+                                                    
+
+                                                    #Crea el nodo opciones en base a el registro en mongodb
                                                     entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
+
 
                                                     #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
 

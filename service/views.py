@@ -181,7 +181,7 @@ class GetForms(View):
                                                             ivaProducto=option_response["value"]
                                                                                                                     
 
-                                                    record["formula"]='('+str(precioProducto)+'*{cantidad})+('+str(precioProducto)+'*{cantidad}*'+str(ivaProducto)+')'
+                                                    record["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
 
                                                     
 

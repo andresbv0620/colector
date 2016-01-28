@@ -82,8 +82,9 @@ FECHA = '7'
 NUMERO = '8'
 SCAN = '9'
 DINAMICA = '10'
-GPS = '11'
-FORMULA='12'
+DINAMICAMULTIPLE = '11'
+GPS='12'
+FORMULA='13'
 
 
 ENTRADA_CHOICES = (
@@ -96,7 +97,8 @@ ENTRADA_CHOICES = (
         (FECHA, 'FECHA'),
         (NUMERO, 'NUMERO'),
         (SCAN, 'SCAN'),
-        (DINAMICA, 'DINAMICA'),
+        (DINAMICA, 'DINAMICA UNICA'),
+        (DINAMICAMULTIPLE, 'DINAMICA MULTIPLE'),
         (GPS, 'GPS'),
         (FORMULA, 'FORMULA'),
         

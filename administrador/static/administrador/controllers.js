@@ -220,8 +220,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     ///////////Se asignan las coordenadas GPS del registro/////////////////
                     datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                     markers = {};
-                    markers['longitude'] = filledforms[form].latitud;
-                    markers['latitude'] = filledforms[form].longitud;
+                    markers['longitude'] = filledforms[form].longitud;
+                    markers['latitude'] = filledforms[form].latitud;
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
                     horaini = filledforms[form].horaini;
                     var dini = new Date(0);

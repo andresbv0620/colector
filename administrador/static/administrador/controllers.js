@@ -187,7 +187,6 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
         //$scope.colectorid=colectorfilledforms[0].colector_id;
 
-
         //console.log(filledforms);
 
         tableheader = [];
@@ -198,9 +197,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
         ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
         column = new Object();
-        column['field'] = "Inicio";
+        column['field'] = "Start";
         column['sortable'] = true;
-        column['title'] = "Inicio";
+        column['title'] = "Start";
         columns.push(column);
 
         column = new Object();
@@ -227,7 +226,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     horaini = filledforms[form].horaini;
                     var dini = new Date(0);
                     dini.setUTCSeconds(horaini);
-                    datacolumns["Inicio"] = dini;
+                    datacolumns["Start"] = dini;
 
                     horafin = filledforms[form].horafin;
                     var dfin = new Date(0);

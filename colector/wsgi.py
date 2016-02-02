@@ -18,8 +18,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "colector.settings")
 from django.core.wsgi import get_wsgi_application
 
 #Se agrega para servir static files
-from dj_static import Cling
-application = Cling(get_wsgi_application())
+#from dj_static import Cling
+#application = Cling(get_wsgi_application())
 
 #comentar para usar dj_static
-#application = get_wsgi_application()
+application = get_wsgi_application()

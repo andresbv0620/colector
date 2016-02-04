@@ -270,7 +270,6 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                     totalf=inputValue;
                                 }
 
-
                                 //Sumador de totales de columna
                                 blackm=0;
                                 blackf=0;
@@ -280,8 +279,6 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                 asianorpacificf=0;
                                 americanindianm=0;
                                 americanindianf=0;
-
-
 
                             }
                         }
@@ -295,14 +292,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         } 
 
-                        //Reporte para el resto de tipos de entrada
-                        if ((inputType!=6)||(inputType!=8)) {
-                            if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                            } else {
-                                datacolumns[inputLabel] = inputValue;
-                            }
-                        }
+                        
                     }
 
                     /////////////Calculo non monority//////

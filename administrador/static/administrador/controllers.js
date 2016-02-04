@@ -259,17 +259,18 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                 //Calculo reporte para password
                                 //Suma de monorities por fila
                                 if ((inputLabel=="Black M")||(inputLabel=="Hispanic M")||(inputLabel=="Asian or Pacific Islander M")||(inputLabel=="American Indian or Alaskan Native M")){
-                                    minoritym=minoritym+inputValue;
+                                    minoritym=minoritym+parseInt(inputValue);
+                                    console.log("minoritym sumador: "+minoritym)
                                 }
                                 if ((inputLabel=="Black F")||(inputLabel=="Hispanic F")||(inputLabel=="Asian or Pacific Islander F")||(inputLabel=="American Indian or Alaskan Native F")){
-                                    minorityf=minorityf+inputValue;
+                                    minorityf=minorityf+parseInt(inputValue);
                                 }
 
                                 if ((inputLabel=="TOTAL EMPLOYEES M")){
-                                    totalm=inputValue;
+                                    totalm=parseInt(inputValue);
                                 }
                                 if ((inputLabel=="TOTAL EMPLOYEES F")){
-                                    totalf=inputValue;
+                                    totalf=parseInt(inputValue);
                                 }
 
                                 //Sumador de totales de columna

@@ -286,7 +286,14 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         } 
 
-                        
+                        //Reporte para el resto de tipos de entrada
+                        if ((inputType==1)||(inputType==2)||(inputType==3)||(inputType==4)||(inputType==5)||(inputType==7)||(inputType==9)||(inputType==10)||(inputType==11)||(inputType==12)) {
+                            if (typeof datacolumns[inputLabel] !== "undefined") {
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
+                            } else {
+                                datacolumns[inputLabel] = inputValue;
+                            }
+                        }
                     }
 
                     /////////////Calculo non monority//////

@@ -385,27 +385,10 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         tablecontent['columns'] = columns;
         tablecontent['data'] = data;
 
-        //$scope.tableheaders = tableheader;
+        $scope.tableheaders = tableheader;
         $('#table').bootstrapTable(tablecontent);
 
 
-        ////Tabla 2 resumen reportes////
-        tablecontent2=new Object();
-        data2=new Object();
-        datacolumns2=new Object();
-        datacolumns2["Total Black M"] = blackm;
-        data2.push(datacolumns2);
-
-        column = new Object();
-        column['field'] = "Total Black M";
-        column['sortable'] = true;
-        column['title'] = "Total Black M";
-        columns.push(column);
-
-        tablecontent2['columns'] = columns;
-        tablecontent2['data'] = data2;
-
-        $('#table2').bootstrapTable(tablecontent2);
         ///////////////////////////////MAPS REPORT////////////////////////
 
         $scope.map = {

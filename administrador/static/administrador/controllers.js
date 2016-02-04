@@ -213,8 +213,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
             //Cada registro o fila en la tabla
             for (form in filledforms) {
                 //inicializo variables para cada fila
-                minoritym=0;
-                minorityf=0;
+                
                 totalm=0;
                 totalf=0;
 
@@ -229,6 +228,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     
                     responses = filledforms[form].responses;
                     respuestas = new Array();
+
+                    minoritym=0;
+                    minorityf=0;
                     //Cada respuesta o columna en una fila
                     for (response in responses) {
                         inputId = responses[response].inputs_id;
@@ -292,12 +294,19 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         } 
 
-                        
+                        //Reporte para el resto de tipos de entrada
+                        if ((inputType!=6)||(inputType!=8)) {
+                            if (typeof datacolumns[inputLabel] !== "undefined") {
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
+                            } else {
+                                datacolumns[inputLabel] = inputValue;
+                            }
+                        }
                     }
 
                     /////////////Calculo non monority//////
-                    datacolumns["Non Minority M"]=totalm-minoritym;
-                    datacolumns["Non Minority F"]=totalf-minorityf;
+                    datacolumns["Non Minority M"]=minoritym;
+                    datacolumns["Non Minority F"]=minorityf;
 
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
                     horaini = filledforms[form].horaini;

@@ -195,8 +195,6 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         tablecontent = new Object();
         markersArray = new Array();
 
-
-
         
 
         for (colectorDocument in colectorfilledforms) {
@@ -250,7 +248,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             tableheader.push(inputLabel);
                         }
 
-                        //Se valida si es numero
+                        //Reporte numero, Se valida si es numero
                         if (inputType == 8) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
@@ -288,14 +286,17 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         }
 
-                        //Se valida si es foto, para convertirla de base64
+                        //Reporte para foto, Se valida si es foto, para convertirla de base64
                         if (inputType == 6) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + '<br><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             } else {
                                 datacolumns[inputLabel] = '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             }
-                        } else {
+                        } 
+
+                        //Reporte para el resto de tipos de entrada
+                        if ((inputType!=6)||(inputType!=8)) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
                             } else {

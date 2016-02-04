@@ -195,46 +195,43 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         tablecontent = new Object();
         markersArray = new Array();
 
-        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
-        column = new Object();
-        column['field'] = "Start";
-        column['sortable'] = true;
-        column['title'] = "Start";
-        columns.push(column);
 
-        column = new Object();
-        column['field'] = "Final";
-        column['sortable'] = true;
-        column['title'] = "Final";
-        columns.push(column);
 
+        
 
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
             //$scope.filledforms=filledforms;
             console.log(filledforms);
+            blackm=0;
+            blackf=0;
+            hispanicm=0;
+            hispanicf=0;
+            asianorpacificm=0;
+            asianorpacificf=0;
+            americanindianm=0;
+            americanindianf=0;
 
+            //Cada registro o fila en la tabla
             for (form in filledforms) {
+                //inicializo variables para cada fila
+                minoritym=0;
+                minorityf=0;
+                totalm=0;
+                totalf=0;
+
                 if (filledforms[form].form_id == $routeParams.form_id) {
 
                     ///////////Se asignan las coordenadas GPS del registro/////////////////
                     datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
+                    //markers objeto usado para el mapa
                     markers = {};
                     markers['longitude'] = filledforms[form].latitud;
                     markers['latitude'] = filledforms[form].longitud;
-                    ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
-                    horaini = filledforms[form].horaini;
-                    var dini = new Date(0);
-                    dini.setUTCSeconds(horaini);
-                    datacolumns["Start"] = dini;
-
-                    horafin = filledforms[form].horafin;
-                    var dfin = new Date(0);
-                    dfin.setUTCSeconds(horafin);
-                    datacolumns["Final"] = dfin;
-
+                    
                     responses = filledforms[form].responses;
                     respuestas = new Array();
+                    //Cada respuesta o columna en una fila
                     for (response in responses) {
                         inputId = responses[response].inputs_id;
                         if (typeof markers['message'] == "undefined") {
@@ -253,8 +250,45 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             tableheader.push(inputLabel);
                         }
 
-                        //Se valida si es foto, para convertirla de base64
+                        //Se valida si es numero
+                        if (inputType == 8) {
+                            if (typeof datacolumns[inputLabel] !== "undefined") {
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
+                            } else {
+                                datacolumns[inputLabel] = inputValue;
+                                //Calculo reporte para password
+                                //Suma de monorities por fila
+                                if ((inputLabel=="Black M")||(inputLabel=="Hispanic M")||(inputLabel=="Asian or Pacific Islander M")||(inputLabel=="American Indian or Alaskan Native M")){
+                                    minoritym=minoritym+inputValue;
+                                }
+                                if ((inputLabel=="Black F")||(inputLabel=="Hispanic F")||(inputLabel=="Asian or Pacific Islander F")||(inputLabel=="American Indian or Alaskan Native F")){
+                                    minorityf=minorityf+inputValue;
+                                }
 
+                                if ((inputLabel=="TOTAL EMPLOYEES M")){
+                                    totalm=inputValue;
+                                }
+                                if ((inputLabel=="TOTAL EMPLOYEES F")){
+                                    totalf=inputValue;
+                                }
+
+
+                                //Sumador de totales de columna
+                                blackm=0;
+                                blackf=0;
+                                hispanicm=0;
+                                hispanicf=0;
+                                asianorpacificm=0;
+                                asianorpacificf=0;
+                                americanindianm=0;
+                                americanindianf=0;
+
+
+
+                            }
+                        }
+
+                        //Se valida si es foto, para convertirla de base64
                         if (inputType == 6) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + '<br><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
@@ -269,16 +303,59 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         }
                     }
+
+                    /////////////Calculo non monority//////
+                    datacolumns["Non Minority M"]=totalm-minoritym;
+                    datacolumns["Non Minority F"]=totalf-minorityf;
+
+                    ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
+                    horaini = filledforms[form].horaini;
+                    var dini = new Date(0);
+                    dini.setUTCSeconds(horaini);
+                    datacolumns["Start"] = dini;
+
+                    horafin = filledforms[form].horafin;
+                    var dfin = new Date(0);
+                    dfin.setUTCSeconds(horafin);
+                    datacolumns["Final"] = dfin;
+
+                    //Se guardan las respuestas de la fila en el objeto data
                     data.push(datacolumns);
                     markersArray.push(markers);
                 }
             }
         }
 
+
+        ////Non Minority header calculos
+        column = new Object();
+        column['field'] = "Non Minority M";
+        column['sortable'] = true;
+        column['title'] = "Non Minority M";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Non Minority F";
+        column['sortable'] = true;
+        column['title'] = "Non Minority F";
+        columns.push(column);
+
+
+        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        column = new Object();
+        column['field'] = "Start";
+        column['sortable'] = true;
+        column['title'] = "Start";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Final";
+        column['sortable'] = true;
+        column['title'] = "Final";
+        columns.push(column);
+
         tablecontent['columns'] = columns;
-
         tablecontent['data'] = data;
-
 
         $scope.tableheaders = tableheader;
         $('#table').bootstrapTable(tablecontent);

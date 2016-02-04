@@ -252,6 +252,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
                         //Reporte numero, Se valida si es numero
                         if (inputType == 8) {
+                            inputValue=parseInt(inputValue);
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
                             } else {
@@ -259,29 +260,19 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                 //Calculo reporte para password
                                 //Suma de monorities por fila
                                 if ((inputLabel=="Black M")||(inputLabel=="Hispanic M")||(inputLabel=="Asian or Pacific Islander M")||(inputLabel=="American Indian or Alaskan Native M")){
-                                    minoritym=minoritym+parseInt(inputValue);
-                                    console.log("minoritym sumador: "+minoritym)
+                                    minoritym=minoritym+inputValue;
+                                    console.log("minoritym sumador: "+minoritym);
                                 }
                                 if ((inputLabel=="Black F")||(inputLabel=="Hispanic F")||(inputLabel=="Asian or Pacific Islander F")||(inputLabel=="American Indian or Alaskan Native F")){
-                                    minorityf=minorityf+parseInt(inputValue);
+                                    minorityf=minorityf+inputValue;
                                 }
 
                                 if ((inputLabel=="TOTAL EMPLOYEES M")){
-                                    totalm=parseInt(inputValue);
+                                    totalm=inputValue;
                                 }
                                 if ((inputLabel=="TOTAL EMPLOYEES F")){
-                                    totalf=parseInt(inputValue);
+                                    totalf=inputValue;
                                 }
-
-                                //Sumador de totales de columna
-                                blackm=0;
-                                blackf=0;
-                                hispanicm=0;
-                                hispanicf=0;
-                                asianorpacificm=0;
-                                asianorpacificf=0;
-                                americanindianm=0;
-                                americanindianf=0;
 
                             }
                         }
@@ -295,14 +286,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             }
                         } 
 
-                        //Reporte para el resto de tipos de entrada
-                        if ((inputType!=6)||(inputType!=8)) {
-                            if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                            } else {
-                                datacolumns[inputLabel] = inputValue;
-                            }
-                        }
+                        
                     }
 
                     /////////////Calculo non monority//////

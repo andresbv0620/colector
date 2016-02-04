@@ -212,10 +212,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //Cada registro o fila en la tabla
             for (form in filledforms) {
-                //inicializo variables para cada fila
                 
-                totalm=0;
-                totalf=0;
 
                 if (filledforms[form].form_id == $routeParams.form_id) {
 
@@ -229,8 +226,12 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     responses = filledforms[form].responses;
                     respuestas = new Array();
 
+                    //inicializo variables para cada fila
+                    totalm=0;
+                    totalf=0;
                     minoritym=0;
                     minorityf=0;
+
                     //Cada respuesta o columna en una fila
                     for (response in responses) {
                         inputId = responses[response].inputs_id;
@@ -274,6 +275,41 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                     totalf=inputValue;
                                 }
 
+
+                                //////////////////////////TOTALES COLUMNAS/////////////////////
+
+                                if (inputLabel=="Black M"){
+                                    blackm=blackm+inputValue;
+                                }
+                                if(inputLabel=="Hispanic M"){
+                                    hispanicm=hispanicm+inputValue;
+
+                                }
+                                if(inputLabel=="Asian or Pacific Islander M"){
+                                    asianorpacificm=asianorpacificm+inputValue;
+
+                                }
+                                if(inputLabel=="American Indian or Alaskan Native M"){
+                                    americanindianm=americanindianm+inputValue;
+                                }
+
+                                if (inputLabel=="Black F"){
+                                    blackf=blackf+inputValue;
+
+                                }
+                                if(inputLabel=="Hispanic F"){
+                                    hispanicf=hispanicf+inputValue;
+
+                                }
+                                if(inputLabel=="Asian or Pacific Islander F"){
+                                    asianorpacificf=asianorpacificf+inputValue;
+
+                                }
+                                if(inputLabel=="American Indian or Alaskan Native F"){
+                                    americanindianf=americanindianf+inputValue;
+
+                                }
+
                             }
                         }
 
@@ -297,8 +333,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     }
 
                     /////////////Calculo non monority//////
-                    datacolumns["Non Minority M"]=minoritym;
-                    datacolumns["Non Minority F"]=minorityf;
+                    datacolumns["Non Minority M"]=totalm-minoritym;
+                    datacolumns["Non Minority F"]=totalf-minorityf;
 
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
                     horaini = filledforms[form].horaini;
@@ -353,6 +389,23 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         $('#table').bootstrapTable(tablecontent);
 
 
+        ////Tabla 2 resumen reportes////
+        data2=new Object();
+        datacolumns2=new Object();
+        datacolumns2["Total Black M"] = blackm;
+        data2.push(datacolumns2);
+
+        column = new Object();
+        column['field'] = "Total Black M";
+        column['sortable'] = true;
+        column['title'] = "Total Black M";
+        columns.push(column);
+
+        tablecontent2['columns'] = columns;
+        tablecontent2['data'] = data2;
+
+
+        $('#table2').bootstrapTable(tablecontent2);
         ///////////////////////////////MAPS REPORT////////////////////////
 
         $scope.map = {

@@ -253,7 +253,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
                         //Reporte numero, Se valida si es numero
                         if (inputType == 8) {
-                            inputValue=parseInt(inputValue);
+                            inputValue=parseFloat(inputValue);
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
                             } else {

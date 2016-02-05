@@ -464,8 +464,8 @@ class FillResponsesForm(View):
             
 
             array_validation = {}
-            array_validation['longitud'] = longitud
-            array_validation['latitud'] = latitud
+            #array_validation['longitud'] = longitud
+            #array_validation['latitud'] = latitud
             array_validation['horaini'] = horaini
             array_validation['horafin'] = horafin
             array_validation['colector_id'] = colector_id

@@ -85,6 +85,8 @@ DINAMICA = '10'
 DINAMICAMULTIPLE = '11'
 GPS='12'
 FORMULA='13'
+FIRMA='14'
+DECIMAL='15'
 
 
 ENTRADA_CHOICES = (
@@ -101,6 +103,8 @@ ENTRADA_CHOICES = (
         (DINAMICAMULTIPLE, 'DINAMICA MULTIPLE'),
         (GPS, 'GPS'),
         (FORMULA, 'FORMULA'),
+        (FIRMA, 'FIRMA'),
+        (DECIMAL, 'DECIMAL'),
         
     )
 

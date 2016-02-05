@@ -402,13 +402,13 @@ class FillResponsesForm(View):
 
         # validacion del formulario
 
-        # if not array_validation['latitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('latitud is blank')
+        if not array_validation['latitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('latitud is blank')
 
-        # if not array_validation['longitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('longitud is blank')
+        if not array_validation['longitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('longitud is blank')
 
         if not array_validation['horaini'].strip():
             response['error'] = True
@@ -464,8 +464,8 @@ class FillResponsesForm(View):
             
 
             array_validation = {}
-            #array_validation['longitud'] = longitud
-            #array_validation['latitud'] = latitud
+            array_validation['longitud'] = longitud
+            array_validation['latitud'] = latitud
             array_validation['horaini'] = horaini
             array_validation['horafin'] = horafin
             array_validation['colector_id'] = colector_id

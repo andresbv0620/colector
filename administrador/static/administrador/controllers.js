@@ -180,6 +180,7 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
 
 app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService', 'globales', function($scope, $routeParams, defaultService, globales) {
     $scope.form_name = $routeParams.form_id;
+    $scope.loading = true;
     defaultService.get(globales.static_url + '../service/filled/forms/report/formid/' + $routeParams.form_id + '/', function(data) {
         console.log("datos recibidos del servidor: ");
         //console.log(data);
@@ -316,9 +317,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         //Reporte para foto, Se valida si es foto, para convertirla de base64
                         if (inputType == 6) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<br><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<div class="enlarge"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png" /></span></div>';
                             } else {
-                                datacolumns[inputLabel] = '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
+                                datacolumns[inputLabel] = '<div class="enlarge"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png" /></span></div>';
                             }
                         } 
 
@@ -407,6 +408,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         }
 
         $scope.markerList = markersArray;
+
+        ////Cambio el estado del loading para que no se muestre una vez cargado todo success
+        $scope.loading = false;
 
 
 

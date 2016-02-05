@@ -1,6 +1,4 @@
 var app = angular.module('app', ['ngRoute','uiGmapgoogle-maps']);
-//d208ffcfcb94431aa49cb47758927ad7
-
 
 app.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');

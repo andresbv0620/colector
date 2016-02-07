@@ -224,6 +224,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     markers['longitude'] = filledforms[form].latitud;
                     markers['latitude'] = filledforms[form].longitud;
                     
+                    datacolumns["Ver Mapa"]="Ver Mapa";
+
                     responses = filledforms[form].responses;
                     respuestas = new Array();
 
@@ -317,9 +319,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         //Reporte para foto, Se valida si es foto, para convertirla de base64
                         if (inputType == 6) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<div class="enlarge"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png" /></span></div>';
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             } else {
-                                datacolumns[inputLabel] = '<div class="enlarge"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png" /></span></div>';
+                                datacolumns[inputLabel] = '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             }
                         } 
 
@@ -383,8 +385,24 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         column['title'] = "Final";
         columns.push(column);
 
+        //////////////MAPA EN CADA REGISTRO///////////////////
+
+        column = new Object();
+        column['field'] = "Ver Mapa";
+        column['sortable'] = true;
+        column['title'] = "Ver Mapa";
+        columns.push(column);
+
+
+
         tablecontent['columns'] = columns;
         tablecontent['data'] = data;
+
+        
+
+
+
+
 
         $scope.tableheaders = tableheader;
         $('#table').bootstrapTable(tablecontent);

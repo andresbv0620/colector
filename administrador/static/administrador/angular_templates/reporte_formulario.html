@@ -1,14 +1,34 @@
 <div class="box-body">
 <div ng-show="loading" class="loading"><img alt="Las buenas cosas toman tiempo: " src="http://content.iress.co.uk/hubfs/wemakeithappen/img/Preloader.gif">LOADING...</div>
 
+	<h1>Exportar</h1>
+        <div id="toolbar">
+            <select class="form-control">
+                <option value="">Export Basic</option>
+                <option value="all">Export All</option>
+                <option value="selected">Export Selected</option>
+            </select>
+        </div>
+
 	<table id="table"
-	data-toggle="table" 
-	data-sort-name="NOMBRE" 
+	data-toggle="table"
+	data-show-export="true"
+    data-toolbar="#toolbar" 
 	data-sort-order="desc" 
 	data-show-colums="true"
 	data-show-toggle="true"></table>
+	
+<script>
+    var $table = $('#table');
+    $(function () {
+        $('#toolbar').find('select').change(function () {
+            $table.bootstrapTable('refreshOptions', {
+                exportDataType: $(this).val()
+            });
+        });
+    })
+</script>
 
-	<table id="table2" data-sort-name="NOMBRE" data-sort-order="desc"></table>
 
 	<style type="text/css">
 	.angular-google-map-container { height: 400px; }
@@ -18,7 +38,6 @@
                     zoom='map.zoom'
                     dragging='true'
                     refresh='true'>
-
 
 
 		<ui-gmap-marker idKey='$index' ng-repeat='marker in markerList' coords='marker'>

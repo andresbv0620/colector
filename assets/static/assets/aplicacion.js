@@ -36,6 +36,10 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 		controller:"reporteFormularioId",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
 	})
+	.when('/reporte/id/:form_id/:longitud/:latitud',{
+		controller:"reporteMapa",
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
+	})
 
 
 }]);

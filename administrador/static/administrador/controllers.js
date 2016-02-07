@@ -316,7 +316,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         }
 
                         //Reporte para foto, Se valida si es foto, para convertirla de base64
-                        if ((inputType == 6)||(inputType==10)) {
+                        if ((inputType == 6)||(inputType==14)) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             } else {
@@ -325,7 +325,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         } 
 
                         //Reporte para el resto de tipos de entrada
-                        if ((inputType==1)||(inputType==2)||(inputType==3)||(inputType==4)||(inputType==5)||(inputType==7)||(inputType==9)||(inputType==11)||(inputType==12)) {
+                        if ((inputType==1)||(inputType==2)||(inputType==3)||(inputType==4)||(inputType==5)||(inputType==7)||(inputType==9)||(inputType==10)||(inputType==11)||(inputType==12)) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
                             } else {

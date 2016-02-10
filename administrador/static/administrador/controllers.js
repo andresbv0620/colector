@@ -468,7 +468,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //1 Fila adicional J (journeyman)
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "<h3>Total Journeyman</h3>";
+            datacolumns["Level"] = "<h2>Total Journeyman</h2>";
             datacolumns["Black M"] =blackmj;
             datacolumns["Black F"] =blackfj;
             datacolumns["Hispanic M"] =hispanicmj;
@@ -499,7 +499,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //2 Fila adicional J (journeyman)
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "<h3>Total Apprentice|Trainee</h3>";
+            datacolumns["Level"] = "<h2>Total Apprentice|Trainee</h2>";
             datacolumns["Black M"] =blackmt;
             datacolumns["Black F"] =blackft;
             datacolumns["Hispanic M"] =hispanicmt;
@@ -530,7 +530,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //3 Fila adicional
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "<h3>Total Workforce</h3>";
+            datacolumns["Level"] = "<h2>Total Workforce</h2>";
             datacolumns["Black M"] =blackm;
             datacolumns["Black F"] =blackf;
             datacolumns["Hispanic M"] =hispanicm;
@@ -555,7 +555,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
             datacolumns["Female %"]=Number((porfemale).toFixed(1));
             datacolumns["Total Minority M"]=totalminoritym;
             datacolumns["Total Minority F"]=totalminorityf;
-            datacolumns["Start"]="<h3>"+totalminoritym+totalminorityf+"</h3>";
+            datacolumns["View Map"]="<h2>Total = "+totalminoritym+totalminorityf+"</h2>";
 
             //Se guardan las respuestas de la fila en el objeto data
             data.push(datacolumns);

@@ -577,6 +577,184 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
+#ELIMINA UN REGISTRO
+class DeleteResponsesForm(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(DeleteResponsesForm, self).dispatch(*args, **kwargs)
+
+    # validando la el formato del formulario enviado
+
+    def dataValidator(self, array_validation):
+
+        response = {}
+        response['error'] = False
+        response['validation_errors'] = []
+
+        # validacion del formulario
+
+        if not array_validation['latitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('latitud is blank')
+
+        if not array_validation['longitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('longitud is blank')
+
+        if not array_validation['horaini'].strip():
+            response['error'] = True
+            response['validation_errors'].append('horaini is blank')
+
+        if not array_validation['horafin'].strip():
+            response['error'] = True
+            response['validation_errors'].append('horafin is blank')
+
+
+
+        if not array_validation['colector_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('colector_id is blank')
+
+        if not array_validation['form_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append('form_id is blank')
+
+        if len(array_validation['responses']) == 0:
+            response['error'] = True
+            response['validation_errors'].append('responses is blank')
+        else:
+
+            try:
+                for responseItem in array_validation['responses']:
+                    try:
+                        response_value=responseItem['value']
+                        input_id=responseItem['input_id']
+                    except Exception, e:
+                        response['error'] = True
+                        response['validation_errors'].append("any response don't contains value or input_id")
+                   
+            except Exception, e:
+                response['error'] = True
+                response['validation_errors'].append("any input don't contains responses")
+
+        return response
+
+    def post(self, request):
+        resp = {}
+        # validando data correcta enviada en body
+        try:
+            data = json.loads(request.body)
+            colector_id = data['colector_id']
+            form_id = data['form_id']
+            responses = data['responses']
+            
+
+            data_validator = self.dataValidator(array_validation)
+
+            if data_validator['error'] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = \
+                    data_validator['validation_errors']
+                resp['response_description'] = \
+                    str('the body data contain validation errors')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ","responses":" " }')
+
+                return HttpResponse(json.dumps(resp,
+                                    default=json_util.default),
+                                    content_type='application/json')
+            else:
+                pass
+
+            # construyendo json para insertar en mongodb
+
+            try:
+
+                form = {}
+                form['fecha_creacion'] = datetime.utcnow()
+                form['record_id']=str(uuid.uuid4())
+                form['longitud'] = longitud
+                form['latitud'] = latitud
+                form['horaini'] = horaini
+                form['horafin'] = horafin
+                form['form_id'] = form_id
+                formulario = Formulario.objects.get(id = str(form['form_id']))
+                form['form_name'] = formulario.nombre
+                form['form_description'] = formulario.descripcion
+
+                for response in responses:
+                    input_id=response['input_id']
+                    entrada = Entrada.objects.get(id = str(input_id))
+                    response['label']=entrada.nombre
+                    response['tipo']=entrada.tipo
+                    if entrada.tipo == "4" or entrada.tipo == "5":
+                        response_id=response['value']
+                        respuesta = Respuesta.objects.get(id = str(response_id))
+                        response['value']=respuesta.valor
+
+                form['responses'] = responses
+
+                # return HttpResponse(json.dumps(data))
+
+                colector = \
+                    database.filled_forms.find_one({'colector_id': str(colector_id)},
+                        {'_id': 0})                
+
+                # validando si existe un colector con esta id
+
+                if colector == None:
+                    data = {}
+                    data['colector_id'] = colector_id
+                    data['filled_forms'] = []
+                    data['filled_forms'].append(form)
+                    
+                    database.filled_forms.insert(data)
+                    database.filled_forms.create_index("filled_forms.sections.inputs.responses")
+
+                else:
+
+                    database.filled_forms.update({'colector_id': str(colector_id)},
+                            {'$push': {'filled_forms': form}})
+
+                    # return HttpResponse("colector existe")
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form filled')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+                return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
+            except Exception, e:
+
+                resp['response_code'] = '400'
+                resp['response_description'] = \
+                    str('Error inserting data in mongodb' + str(e.args))
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+        except Exception, e:
+
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = \
+                str('{"colector_id":"", "form_id":" ", "responses":"[]" }')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
 
 #Guarda una estructura más compleja de los formularios, NO ESTA EN USO
 class FillForm(View):

@@ -197,10 +197,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         tablecontent = new Object();
         markersArray = new Array();
 
+        ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
             //$scope.filledforms=filledforms;
             console.log(filledforms);
+
+            //Inicialiar variables totales
             blackm=0;
             blackf=0;
             hispanicm=0;
@@ -210,10 +213,35 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
             americanindianm=0;
             americanindianf=0;
 
+            //Totales por level, jorneyman | apprentice,trainee
+            blackmj=0;
+            blackfj=0;
+            hispanicmj=0;
+            hispanicfj=0;
+            asianorpacificmj=0;
+            asianorpacificfj=0;
+            americanindianmj=0;
+            americanindianfj=0;
+
+            blackmt=0;
+            blackft=0;
+            hispanicmt=0;
+            hispanicft=0;
+            asianorpacificmt=0;
+            asianorpacificft=0;
+            americanindianmt=0;
+            americanindianft=0;
+
+            totalmj=0;
+            totalfj=0;
+            totalmt=0;
+            totalft=0;
+
+
+
             //Cada registro o fila en la tabla
             for (form in filledforms) {
-                
-
+                //If que filtra solo el reporte del form_id seleccionado
                 if (filledforms[form].form_id == $routeParams.form_id) {
 
                     ///////////Se asignan las coordenadas GPS del registro/////////////////
@@ -223,7 +251,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     markers['longitude'] = filledforms[form].latitud;
                     markers['latitude'] = filledforms[form].longitud;
                     
-                    datacolumns["Ver Mapa"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>Ver Mapa</a>";
+                    datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
                     responses = filledforms[form].responses;
                     respuestas = new Array();
@@ -234,6 +262,9 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     minoritym=0;
                     minorityf=0;
 
+                    //Determinar el tipo de fila level=journeyman | trainee
+                    levelrow="";
+
                     //Cada respuesta o columna en una fila
                     for (response in responses) {
                         inputId = responses[response].inputs_id;
@@ -243,6 +274,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         inputValue = responses[response].value;
                         inputLabel = responses[response].label;
                         inputType = responses[response].tipo;
+
+                        //Determinar el tipo de fila level=journeyman | trainee
+                        if (inputLabel=="Level") {
+                            levelrow=inputValue;
+                        }
+                        
+
                         //Validamos para generar la fila de encabezados
                         if (tableheader.indexOf(inputLabel) < 0) {
                             column = new Object();
@@ -252,6 +290,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                             columns.push(column);
                             tableheader.push(inputLabel);
                         }
+
+
 
                         //Reporte numero, Se valida si es numero
                         if (inputType == 8) {
@@ -264,51 +304,101 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                 //Suma de monorities por fila
                                 if ((inputLabel=="Black M")||(inputLabel=="Hispanic M")||(inputLabel=="Asian or Pacific Islander M")||(inputLabel=="American Indian or Alaskan Native M")){
                                     minoritym=minoritym+inputValue;
-                                    console.log("minoritym sumador: "+minoritym);
                                 }
                                 if ((inputLabel=="Black F")||(inputLabel=="Hispanic F")||(inputLabel=="Asian or Pacific Islander F")||(inputLabel=="American Indian or Alaskan Native F")){
                                     minorityf=minorityf+inputValue;
                                 }
 
-                                if ((inputLabel=="TOTAL EMPLOYEES M")){
-                                    totalm=inputValue;
-                                }
-                                if ((inputLabel=="TOTAL EMPLOYEES F")){
-                                    totalf=inputValue;
-                                }
-
 
                                 //////////////////////////TOTALES COLUMNAS/////////////////////
 
+                                if ((inputLabel=="TOTAL EMPLOYEES M")){
+                                    totalm=inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        totalmj=totalmj+inputValue;
+                                    }else{
+                                        totalmt=totalmt+inputValue;
+                                    }
+                                }
+                                if ((inputLabel=="TOTAL EMPLOYEES F")){
+                                    totalf=inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        totalfj=totalfj+inputValue;
+                                    }else{
+                                        totalft=totalft+inputValue;
+                                    }
+                                }
+
                                 if (inputLabel=="Black M"){
                                     blackm=blackm+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        blackmj=blackmj+inputValue;
+                                    }else{
+                                        blackmt=blackmt+inputValue;
+                                    }
                                 }
                                 if(inputLabel=="Hispanic M"){
                                     hispanicm=hispanicm+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        hispanicmj=hispanicmj+inputValue;
+                                    }else{
+                                        hispanicmt=hispanicmt+inputValue;
+                                    }
 
                                 }
                                 if(inputLabel=="Asian or Pacific Islander M"){
                                     asianorpacificm=asianorpacificm+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        asianorpacificmj=asianorpacificmj+inputValue;
+                                    }else{
+                                        asianorpacificmt=asianorpacificmt+inputValue;
+                                    }
 
                                 }
                                 if(inputLabel=="American Indian or Alaskan Native M"){
                                     americanindianm=americanindianm+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        americanindianmj=americanindianmj+inputValue;
+                                    }else{
+                                        americanindianmt=americanindianmt+inputValue;
+                                    }
                                 }
 
                                 if (inputLabel=="Black F"){
                                     blackf=blackf+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        blackfj=blackfj+inputValue;
+                                    }else{
+                                        blackft=blackft+inputValue;
+                                    }
 
                                 }
                                 if(inputLabel=="Hispanic F"){
                                     hispanicf=hispanicf+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        hispanicfj=hispanicfj+inputValue;
+                                    }else{
+                                        hispanicft=hispanicft+inputValue;
+                                    }
 
                                 }
                                 if(inputLabel=="Asian or Pacific Islander F"){
                                     asianorpacificf=asianorpacificf+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        asianorpacificfj=asianorpacificfj+inputValue;
+                                    }else{
+                                        asianorpacificft=asianorpacificft+inputValue;
+                                    }
 
                                 }
                                 if(inputLabel=="American Indian or Alaskan Native F"){
                                     americanindianf=americanindianf+inputValue;
+                                    if (levelrow=="Journeyman") {
+                                        americanindianfj=americanindianfj+inputValue;
+                                    }else{
+                                        americanindianft=americanindianft+inputValue;
+                                    }
+
 
                                 }
 
@@ -332,12 +422,16 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                                 datacolumns[inputLabel] = inputValue;
                             }
                         }
-                    }
+                    }//Fin for para mostrar cada respuesta (columna) de una fila
 
-                    /////////////Calculo non monority//////
+                    /////////////COLUMNAS ADICIONALES en la fila Calculo non monority//////
                     datacolumns["Non Minority M"]=totalm-minoritym;
                     datacolumns["Non Minority F"]=totalf-minorityf;
-
+                    datacolumns["Minority %"]=(minoritym+minorityf)/(totalm+totalf);
+                    datacolumns["Female %"]=(totalf)/(totalm+totalf);
+                    datacolumns["Total Minority M"]=minoritym;
+                    datacolumns["Total Minority F"]=minorityf;
+                    
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
                     horaini = filledforms[form].horaini;
                     var dini = new Date(0);
@@ -352,9 +446,93 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     //Se guardan las respuestas de la fila en el objeto data
                     data.push(datacolumns);
                     markersArray.push(markers);
-                }
-            }
+                }//Fin If que filtra solo el reporte del form_id seleccionado
+            }///////////Fin for filas o registros/////////////////////
+            //FILAS ADICIONALES, Sumatorias y totales de columnas
+
+            //1 Fila adicional J (journeyman)
+            datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
+            datacolumns["Level"] = "Total Journeyman";
+            datacolumns["Black M"] =blackmj;
+            datacolumns["Black F"] =blackfj;
+            datacolumns["Hispanic M"] =hispanicmj;
+            datacolumns["Hispanic F"] =hispanicfj;
+            datacolumns["Asian or Pacific Islander M"] =asianorpacificmj;
+            datacolumns["Asian or Pacific Islander F"] =asianorpacificfj;
+            datacolumns["American Indian or Alaskan Native M"] =americanindianmj;
+            datacolumns["American Indian or Alaskan Native F"] =americanindianfj;
+            datacolumns["TOTAL EMPLOYEES M"] =totalmj;
+            datacolumns["TOTAL EMPLOYEES F"] =totalfj;
+            totalminoritymj=blackmj+hispanicmj+asianorpacificmj+americanindianmj;
+            totalminorityfj=blackfj+hispanicfj+asianorpacificfj+americanindianfj;
+
+            datacolumns["Non Minority M"] =totalmj-totalminoritymj;
+            datacolumns["Non Minority F"] =totalfj-totalminorityfj;
+            datacolumns["Minority %"] =(totalminoritymj+totalminorityfj)/(totalmj+totalfj);
+            datacolumns["Female %"]=totalfj/(totalmj+totalfj);
+            datacolumns["Total Minority M"]=totalminoritymj;
+            datacolumns["Total Minority F"]=totalminorityfj;
+
+            //Se guardan las respuestas de la fila en el objeto data
+            data.push(datacolumns);
+
+            //2 Fila adicional J (journeyman)
+            datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
+            datacolumns["Level"] = "Total Apprentice|Trainee";
+            datacolumns["Black M"] =blackmt;
+            datacolumns["Black F"] =blackft;
+            datacolumns["Hispanic M"] =hispanicmt;
+            datacolumns["Hispanic F"] =hispanicft;
+            datacolumns["Asian or Pacific Islander M"] =asianorpacificmt;
+            datacolumns["Asian or Pacific Islander F"] =asianorpacificft;
+            datacolumns["American Indian or Alaskan Native M"] =americanindianmt;
+            datacolumns["American Indian or Alaskan Native F"] =americanindianft;
+            datacolumns["TOTAL EMPLOYEES M"] =totalmt;
+            datacolumns["TOTAL EMPLOYEES F"] =totalft;
+            totalminoritymt=blackmt+hispanicmt+asianorpacificmt+americanindianmt;
+            totalminorityft=blackft+hispanicft+asianorpacificft+americanindianft;
+
+            datacolumns["Non Minority M"] =totalmt-totalminoritymt;
+            datacolumns["Non Minority F"] =totalft-totalminorityft;
+            datacolumns["Minority %"] =(totalminoritymt+totalminorityft)/(totalmt+totalft);
+            datacolumns["Female %"]=totalft/(totalmt+totalft);
+            datacolumns["Total Minority M"]=totalminoritymt;
+            datacolumns["Total Minority F"]=totalminorityft;
+
+            //Se guardan las respuestas de la fila en el objeto data
+            data.push(datacolumns);
+
+            //3 Fila adicional
+            datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
+            datacolumns["Level"] = "Total Workforce";
+            datacolumns["Black M"] =blackm;
+            datacolumns["Black F"] =blackf;
+            datacolumns["Hispanic M"] =hispanicm;
+            datacolumns["Hispanic F"] =hispanicf;
+            datacolumns["Asian or Pacific Islander M"] =asianorpacificm;
+            datacolumns["Asian or Pacific Islander F"] =asianorpacificf;
+            datacolumns["American Indian or Alaskan Native M"] =americanindianm;
+            datacolumns["American Indian or Alaskan Native F"] =americanindianf;
+            datacolumns["TOTAL EMPLOYEES M"] =totalmt+totalmj;
+            datacolumns["TOTAL EMPLOYEES F"] =totalft+totalfj;
+            totalminoritym=blackm+hispanicm+asianorpacificm+americanindianm;
+            totalminorityf=blackf+hispanicf+asianorpacificf+americanindianf;
+
+            datacolumns["Non Minority M"] =(totalmt+totalmj)-totalminoritym;
+            datacolumns["Non Minority F"] =(totalft+totalfj)-totalminorityf;
+            datacolumns["Minority %"] =(totalminoritym+totalminorityf)/(totalmt+totalmj+totalft+totalfj);
+            datacolumns["Female %"]=(totalft+totalfj)/(totalmt+totalmj+totalft+totalfj);
+            datacolumns["Total Minority M"]=totalminoritym;
+            datacolumns["Total Minority F"]=totalminorityf;
+            datacolumns["Start"]="<h3>"+totalminoritym+totalminorityf+"</h3>";
+
+            //Se guardan las respuestas de la fila en el objeto data
+            data.push(datacolumns);
+
         }
+
+
+        /////ENCABEZADOS ADICIONALES////
 
 
         ////Non Minority header calculos
@@ -368,6 +546,30 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         column['field'] = "Non Minority F";
         column['sortable'] = true;
         column['title'] = "Non Minority F";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Minority %";
+        column['sortable'] = true;
+        column['title'] = "Minority %";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Female %";
+        column['sortable'] = true;
+        column['title'] = "Female %";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Total Minority M";
+        column['sortable'] = true;
+        column['title'] = "Total Minority M";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "Total Minority F";
+        column['sortable'] = true;
+        column['title'] = "Total Minority F";
         columns.push(column);
 
 
@@ -387,20 +589,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         //////////////MAPA EN CADA REGISTRO///////////////////
 
         column = new Object();
-        column['field'] = "Ver Mapa";
+        column['field'] = "View Map";
         column['sortable'] = true;
-        column['title'] = "Ver Mapa";
+        column['title'] = "View Map";
         columns.push(column);
-
-
 
         tablecontent['columns'] = columns;
         tablecontent['data'] = data;
-
-        
-
-
-
 
 
         $scope.tableheaders = tableheader;
@@ -428,9 +623,6 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
         ////Cambio el estado del loading para que no se muestre una vez cargado todo success
         $scope.loading = false;
-
-
-
 
     }, function(error) {
         console.log(error)
@@ -508,7 +700,7 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
                     markers['longitude'] = filledforms[form].latitud;
                     markers['latitude'] = filledforms[form].longitud;
                     
-                    datacolumns["Ver Mapa"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>Ver Mapa</a>";
+                    datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
                     responses = filledforms[form].responses;
                     respuestas = new Array();
@@ -672,9 +864,9 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
         //////////////MAPA EN CADA REGISTRO///////////////////
 
         column = new Object();
-        column['field'] = "Ver Mapa";
+        column['field'] = "View Map";
         column['sortable'] = true;
-        column['title'] = "Ver Mapa";
+        column['title'] = "View Map";
         columns.push(column);
 
 

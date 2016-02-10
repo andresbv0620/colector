@@ -87,8 +87,6 @@ GPS='12'
 FORMULA='13'
 FIRMA='14'
 DECIMAL='15'
-
-
 ENTRADA_CHOICES = (
         (TEXTO, 'TEXTO'),
         (PARRAFO, 'PARRAFO'),
@@ -108,12 +106,23 @@ ENTRADA_CHOICES = (
         
     )
 
+SI = 'SI'
+NO = 'NO'
+REQUIRED_CHOICES = (
+        (SI, 'SI'),
+        (NO, 'NO'),
+    )
+
 class Entrada(models.Model):
+	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=50, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
 	form_asociado = models.ForeignKey('Formulario', blank = True, null = True)
-	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
+	requerido = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=SI)
+	defecto  = models.CharField(max_length=50, blank = True , unique=False)
+	maximo	= models.CharField(max_length=50, blank = True , unique=False)
+	minimo = models.CharField(max_length=50, blank = True , unique=False)
 	def __unicode__(self):
 		return self.nombre
 

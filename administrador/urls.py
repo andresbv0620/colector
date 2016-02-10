@@ -23,7 +23,7 @@ url(r'^$', 'administrador.views.reporte'),
 
 url(r'^devolver/json/$', DevolverJson.as_view()),
 url(r'^login/$', 'django.contrib.auth.views.login', {'template_name': 'administrador/auth/login.html'}),
-url(r'^logout/$', 'django.contrib.auth.views.logout'),
+url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name': 'administrador/auth/login.html'}),
 url(r'^dashboard/$', views.dashboard),
 url(r'^reporte/$', views.reporte),
 url(r'^index/$', views.index),

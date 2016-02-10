@@ -102,11 +102,11 @@
                     <img src="{% static 'administrador/admin/dist/img/user2-160x160.jpg' %}" class="img-circle" alt="User Image">
                     <p>
                       {{user}} - {{token}}
-                      <small>Member since Nov. 2012</small>
+                      <small>Member since 2016</small>
                     </p>
                   </li>
                   <!-- Menu Body -->
-                  <!-- <li class="user-body">
+                  <!--<li class="user-body">
                     <div class="col-xs-4 text-center">
                       <a href="#">Followers</a>
                     </div>
@@ -118,14 +118,14 @@
                     </div>
                   </li> -->
                   <!-- Menu Footer-->
-                  <!-- <li class="user-footer">
-                    <div class="pull-left">
+                  <li class="user-footer">
+                    <!-- <div class="pull-left">
                       <a href="#" class="btn btn-default btn-flat">Profile</a>
-                    </div>
+                    </div> -->
                     <div class="pull-right">
-                      <a href="#" class="btn btn-default btn-flat">Sign out</a>
+                      <a href="/logout/" class="btn btn-default btn-flat">Sign out</a>
                     </div>
-                  </li> -->
+                  </li>
                 </ul>
               </li>
               <!-- Control Sidebar Toggle Button -->
@@ -233,7 +233,7 @@
         <div class="pull-right hidden-xs">
           <b>Version</b> 1.2.0
         </div>
-        <strong>Copyright &copy; 2014-2015 <a href="http://colector.co">Colector</a>.</strong> All rights reserved.
+        <strong>Copyright &copy; 2014-2016 <a href="http://colector.co">Colector</a>.</strong> All rights reserved.
       </footer>
 
       <!-- Control Sidebar -->
@@ -405,7 +405,7 @@
 
 
 
-<!-- jQuery 2.1.4 -->
+    <!-- jQuery 2.1.4 -->
     <script src="{% static 'administrador/admin/plugins/jQuery/jquery-2.2.0.js' %}"></script>
     <!-- jQuery UI 1.11.4 -->
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
@@ -436,44 +436,34 @@
     <script src="{% static 'administrador/admin/plugins/slimScroll/jquery.slimscroll.min.js' %}"></script>
     <!-- FastClick -->
     <script src="{% static 'administrador/admin/plugins/fastclick/fastclick.min.js' %}"></script>
-
     <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
     <script src="{% static 'administrador/admin/dist/js/pages/dashboard.js' %}"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="{% static 'administrador/admin/dist/js/demo.js' %}"></script>
+    <!--Necesarios para que funcionen los reportes-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+          <!-- Include all compiled plugins (below), or include individual files as needed -->
 
-<!--Necesarios para que funcionen los reportes-->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-      <!-- Include all compiled plugins (below), or include individual files as needed -->
-
-<!-- TABLE Latest compiled and minified JavaScript -->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js"></script>-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.js"></script>
-<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.js"></script>
-
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/extensions/export/bootstrap-table-export.js"></script>
+    <!-- TABLE Latest compiled and minified JavaScript -->
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.js"></script>-->
+    <script src="{% static 'administrador/admin/bootstrap-table/src/bootstrap-table.js' %}"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/extensions/export/bootstrap-table-export.js"></script>-->
+    <script src="{% static 'administrador/admin/bootstrap-table/src/extensions/export/bootstrap-table-export.js' %}"></script>
     <script src="//rawgit.com/hhurz/tableExport.jquery.plugin/master/tableExport.js"></script>
-  
 
-
-
-
-
-
-  <!-- AdminLTE App -->
+    <!-- AdminLTE App -->
     <script>
-  var AdminLTEOptions = {
-    //Enable sidebar expand on hover effect for sidebar mini
-    //This option is forced to true if both the fixed layout and sidebar mini
-    //are used together
-    sidebarExpandOnHover: true,
-    //BoxRefresh Plugin
-    enableBoxRefresh: true,
-    //Bootstrap.js tooltip
-    enableBSToppltip: true
-  };
-</script>
+    var AdminLTEOptions = {
+        //Enable sidebar expand on hover effect for sidebar mini
+        //This option is forced to true if both the fixed layout and sidebar mini
+        //are used together
+        sidebarExpandOnHover: true,
+        //BoxRefresh Plugin
+        enableBoxRefresh: true,
+        //Bootstrap.js tooltip
+        enableBSToppltip: true
+      };
+    </script>
     <script src="{% static 'administrador/admin/dist/js/app.js' %}"></script>
 
 </body>

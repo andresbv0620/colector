@@ -25,30 +25,30 @@
         <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
   </head>
-  <body class="hold-transition login-page" style="background-image:url(http://ww2.perast.cl/landing/assets/images/landing/app-01.jpg)">
+  <body class="hold-transition login-page" style="background-image:url()">
     <div class="login-box">
       <div class="login-logo">
         <a href="../../index2.html" style="color:white"><b>Colector</b> EMPRESAS</a>
       </div><!-- /.login-logo -->
       <div class="login-box-body">
-        <p class="login-box-msg">Ingrese su nombre de usuario y contraseña para iniciar sesión</p>
+        <p class="login-box-msg">Please provide your username and password</p>
 
         {% if form.errors %}
-<p>Your username and password didn't match. Please try again.</p>
-{% endif %}
+        <p>Your username and password didn't match. Please try again.</p>
+        {% endif %}
 
-{% if next %}
-    {% if user.is_authenticated %}
-    <p>Your account doesn't have access to this page. To proceed,
-    please login with an account that has access.</p>
-    {% else %}
-    <p>Please login to see this page.</p>
-    {% endif %}
-{% endif %}
+        {% if next %}
+            {% if user.is_authenticated %}
+            <p>Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+            {% else %}
+            <p>Please login to see this page.</p>
+            {% endif %}
+        {% endif %}
 
 
- {# Assumes you setup the password_reset view in your URLconf #}
-{#<p><a href="{% url 'password_reset' %}">Lost password?</a></p>#}
+         {# Assumes you setup the password_reset view in your URLconf #}
+        {#<p><a href="{% url 'password_reset' %}">Lost password?</a></p>#}
 
 
         <form method="post" action="{% url 'django.contrib.auth.views.login' %}">
@@ -94,11 +94,11 @@
     </div><!-- /.login-box -->
 
     <!-- jQuery 2.1.4 -->
-    <script src="../../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+    <script src="{% static 'administrador/admin/plugins/jQuery/jquery-2.2.0.js' %}"></script>
     <!-- Bootstrap 3.3.5 -->
-    <script src="../../bootstrap/js/bootstrap.min.js"></script>
+    <script src="{% static 'administrador/admin/bootstrap/js/bootstrap.min.js' %}"></script>
     <!-- iCheck -->
-    <script src="../../plugins/iCheck/icheck.min.js"></script>
+    <!--<script src="../../plugins/iCheck/icheck.min.js"></script>
     <script>
       $(function () {
         $('input').iCheck({
@@ -107,6 +107,6 @@
           increaseArea: '20%' // optional
         });
       });
-    </script>
+    </script>-->
   </body>
 </html>

@@ -197,6 +197,19 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         tablecontent = new Object();
         markersArray = new Array();
 
+        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        /*column = new Object();
+        column['field'] = "Start";
+        column['sortable'] = true;
+        column['title'] = "Start";
+        columns.push(column);*/
+
+        column = new Object();
+        column['field'] = "Date";
+        column['sortable'] = true;
+        column['title'] = "Date";
+        columns.push(column);
+
         ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
@@ -427,21 +440,24 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     /////////////COLUMNAS ADICIONALES en la fila Calculo non monority//////
                     datacolumns["Non Minority M"]=totalm-minoritym;
                     datacolumns["Non Minority F"]=totalf-minorityf;
-                    datacolumns["Minority %"]=(minoritym+minorityf)/(totalm+totalf);
-                    datacolumns["Female %"]=(totalf)/(totalm+totalf);
+
+
+                    datacolumns["Minority %"]=Number((((minoritym+minorityf)/(totalm+totalf))*100).toFixed(1));
+
+                    datacolumns["Female %"]=Number((((totalf)/(totalm+totalf))*100).toFixed(1));
                     datacolumns["Total Minority M"]=minoritym;
                     datacolumns["Total Minority F"]=minorityf;
                     
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
-                    horaini = filledforms[form].horaini;
+                    /*horaini = filledforms[form].horaini;
                     var dini = new Date(0);
                     dini.setUTCSeconds(horaini);
-                    datacolumns["Start"] = dini;
+                    datacolumns["Start"] = dini;*/
 
                     horafin = filledforms[form].horafin;
                     var dfin = new Date(0);
                     dfin.setUTCSeconds(horafin);
-                    datacolumns["Final"] = dfin;
+                    datacolumns["Date"] = dfin;
 
                     //Se guardan las respuestas de la fila en el objeto data
                     data.push(datacolumns);
@@ -452,7 +468,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //1 Fila adicional J (journeyman)
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "Total Journeyman";
+            datacolumns["Level"] = "<h3>Total Journeyman</h3>";
             datacolumns["Black M"] =blackmj;
             datacolumns["Black F"] =blackfj;
             datacolumns["Hispanic M"] =hispanicmj;
@@ -468,8 +484,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             datacolumns["Non Minority M"] =totalmj-totalminoritymj;
             datacolumns["Non Minority F"] =totalfj-totalminorityfj;
-            datacolumns["Minority %"] =(totalminoritymj+totalminorityfj)/(totalmj+totalfj);
-            datacolumns["Female %"]=totalfj/(totalmj+totalfj);
+            
+            porminorityj=((totalminoritymj+totalminorityfj)/(totalmj+totalfj))*100;
+            datacolumns["Minority %"] =Number((porminorityj).toFixed(1));
+            
+            porfemalej=(totalfj/(totalmj+totalfj))*100;
+            datacolumns["Female %"]=Number((porfemalej).toFixed(1));
+
             datacolumns["Total Minority M"]=totalminoritymj;
             datacolumns["Total Minority F"]=totalminorityfj;
 
@@ -478,7 +499,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //2 Fila adicional J (journeyman)
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "Total Apprentice|Trainee";
+            datacolumns["Level"] = "<h3>Total Apprentice|Trainee</h3>";
             datacolumns["Black M"] =blackmt;
             datacolumns["Black F"] =blackft;
             datacolumns["Hispanic M"] =hispanicmt;
@@ -494,8 +515,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             datacolumns["Non Minority M"] =totalmt-totalminoritymt;
             datacolumns["Non Minority F"] =totalft-totalminorityft;
-            datacolumns["Minority %"] =(totalminoritymt+totalminorityft)/(totalmt+totalft);
-            datacolumns["Female %"]=totalft/(totalmt+totalft);
+
+            porminorityt=((totalminoritymt+totalminorityft)/(totalmt+totalft))*100;
+            datacolumns["Minority %"] =Number((porminorityt).toFixed(1));
+            
+            porfemalet=(totalft/(totalmt+totalft))*100;
+            datacolumns["Female %"]=Number((porfemalet).toFixed(1));
+            
             datacolumns["Total Minority M"]=totalminoritymt;
             datacolumns["Total Minority F"]=totalminorityft;
 
@@ -504,7 +530,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             //3 Fila adicional
             datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-            datacolumns["Level"] = "Total Workforce";
+            datacolumns["Level"] = "<h3>Total Workforce</h3>";
             datacolumns["Black M"] =blackm;
             datacolumns["Black F"] =blackf;
             datacolumns["Hispanic M"] =hispanicm;
@@ -520,8 +546,13 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
 
             datacolumns["Non Minority M"] =(totalmt+totalmj)-totalminoritym;
             datacolumns["Non Minority F"] =(totalft+totalfj)-totalminorityf;
-            datacolumns["Minority %"] =(totalminoritym+totalminorityf)/(totalmt+totalmj+totalft+totalfj);
-            datacolumns["Female %"]=(totalft+totalfj)/(totalmt+totalmj+totalft+totalfj);
+            
+            
+            porminority=((totalminoritym+totalminorityf)/(totalmt+totalmj+totalft+totalfj))*100;
+            datacolumns["Minority %"] =Number((porminority).toFixed(1));
+
+            porfemale=((totalft+totalfj)/(totalmt+totalmj+totalft+totalfj))*100;
+            datacolumns["Female %"]=Number((porfemale).toFixed(1));
             datacolumns["Total Minority M"]=totalminoritym;
             datacolumns["Total Minority F"]=totalminorityf;
             datacolumns["Start"]="<h3>"+totalminoritym+totalminorityf+"</h3>";
@@ -573,18 +604,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
         columns.push(column);
 
 
-        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
-        column = new Object();
-        column['field'] = "Start";
-        column['sortable'] = true;
-        column['title'] = "Start";
-        columns.push(column);
-
-        column = new Object();
-        column['field'] = "Final";
-        column['sortable'] = true;
-        column['title'] = "Final";
-        columns.push(column);
+        
 
         //////////////MAPA EN CADA REGISTRO///////////////////
 
@@ -655,245 +675,6 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
 
         $scope.markerList = markersArray;
 
-
-
-
-
-    defaultService.get(globales.static_url + '../service/filled/forms/report/formid/' + $routeParams.form_id + '/', function(data) {
-        console.log("datos recibidos del servidor: ");
-        //console.log(data);
-        colectorfilledforms = data['data'];
-
-        //$scope.colectorid=colectorfilledforms[0].colector_id;
-
-        //console.log(filledforms);
-
-        tableheader = [];
-        columns = new Array();
-        data = new Array();
-        tablecontent = new Object();
-        markersArray = new Array();
-
-        for (colectorDocument in colectorfilledforms) {
-            filledforms = colectorfilledforms[colectorDocument].filled_forms;
-            //$scope.filledforms=filledforms;
-            console.log(filledforms);
-            blackm=0;
-            blackf=0;
-            hispanicm=0;
-            hispanicf=0;
-            asianorpacificm=0;
-            asianorpacificf=0;
-            americanindianm=0;
-            americanindianf=0;
-
-            //Cada registro o fila en la tabla
-            for (form in filledforms) {
-                
-
-                if (filledforms[form].form_id == $routeParams.form_id) {
-
-                    ///////////Se asignan las coordenadas GPS del registro/////////////////
-                    datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-                    //markers objeto usado para el mapa
-                    markers = {};
-                    markers['longitude'] = filledforms[form].latitud;
-                    markers['latitude'] = filledforms[form].longitud;
-                    
-                    datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
-
-                    responses = filledforms[form].responses;
-                    respuestas = new Array();
-
-                    //inicializo variables para cada fila
-                    totalm=0;
-                    totalf=0;
-                    minoritym=0;
-                    minorityf=0;
-
-                    //Cada respuesta o columna en una fila
-                    for (response in responses) {
-                        inputId = responses[response].inputs_id;
-                        if (typeof markers['message'] == "undefined") {
-                            markers['message'] = responses[response].value;
-                        }
-                        inputValue = responses[response].value;
-                        inputLabel = responses[response].label;
-                        inputType = responses[response].tipo;
-                        //Validamos para generar la fila de encabezados
-                        if (tableheader.indexOf(inputLabel) < 0) {
-                            column = new Object();
-                            column['field'] = inputLabel;
-                            column['sortable'] = true;
-                            column['title'] = inputLabel;
-                            columns.push(column);
-                            tableheader.push(inputLabel);
-                        }
-
-                        //Reporte numero, Se valida si es numero
-                        if (inputType == 8) {
-                            inputValue=parseFloat(inputValue);
-                            if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                            } else {
-                                datacolumns[inputLabel] = inputValue;
-                                //Calculo reporte para password
-                                //Suma de monorities por fila
-                                if ((inputLabel=="Black M")||(inputLabel=="Hispanic M")||(inputLabel=="Asian or Pacific Islander M")||(inputLabel=="American Indian or Alaskan Native M")){
-                                    minoritym=minoritym+inputValue;
-                                    console.log("minoritym sumador: "+minoritym);
-                                }
-                                if ((inputLabel=="Black F")||(inputLabel=="Hispanic F")||(inputLabel=="Asian or Pacific Islander F")||(inputLabel=="American Indian or Alaskan Native F")){
-                                    minorityf=minorityf+inputValue;
-                                }
-
-                                if ((inputLabel=="TOTAL EMPLOYEES M")){
-                                    totalm=inputValue;
-                                }
-                                if ((inputLabel=="TOTAL EMPLOYEES F")){
-                                    totalf=inputValue;
-                                }
-
-
-                                //////////////////////////TOTALES COLUMNAS/////////////////////
-
-                                if (inputLabel=="Black M"){
-                                    blackm=blackm+inputValue;
-                                }
-                                if(inputLabel=="Hispanic M"){
-                                    hispanicm=hispanicm+inputValue;
-
-                                }
-                                if(inputLabel=="Asian or Pacific Islander M"){
-                                    asianorpacificm=asianorpacificm+inputValue;
-
-                                }
-                                if(inputLabel=="American Indian or Alaskan Native M"){
-                                    americanindianm=americanindianm+inputValue;
-                                }
-
-                                if (inputLabel=="Black F"){
-                                    blackf=blackf+inputValue;
-
-                                }
-                                if(inputLabel=="Hispanic F"){
-                                    hispanicf=hispanicf+inputValue;
-
-                                }
-                                if(inputLabel=="Asian or Pacific Islander F"){
-                                    asianorpacificf=asianorpacificf+inputValue;
-
-                                }
-                                if(inputLabel=="American Indian or Alaskan Native F"){
-                                    americanindianf=americanindianf+inputValue;
-
-                                }
-
-                            }
-                        }
-
-                        //Reporte para foto, Se valida si es foto, para convertirla de base64
-                        if (inputType == 6) {
-                            if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
-                            } else {
-                                datacolumns[inputLabel] = '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
-                            }
-                        } 
-
-                        //Reporte para el resto de tipos de entrada
-                        if ((inputType==1)||(inputType==2)||(inputType==3)||(inputType==4)||(inputType==5)||(inputType==7)||(inputType==9)||(inputType==10)||(inputType==11)||(inputType==12)) {
-                            if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                            } else {
-                                datacolumns[inputLabel] = inputValue;
-                            }
-                        }
-                    }
-
-                    /////////////Calculo non monority//////
-                    datacolumns["Non Minority M"]=totalm-minoritym;
-                    datacolumns["Non Minority F"]=totalf-minorityf;
-
-                    ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
-                    horaini = filledforms[form].horaini;
-                    var dini = new Date(0);
-                    dini.setUTCSeconds(horaini);
-                    datacolumns["Start"] = dini;
-
-                    horafin = filledforms[form].horafin;
-                    var dfin = new Date(0);
-                    dfin.setUTCSeconds(horafin);
-                    datacolumns["Final"] = dfin;
-
-                    //Se guardan las respuestas de la fila en el objeto data
-                    data.push(datacolumns);
-                    markersArray.push(markers);
-                }
-            }
-        }
-
-
-        ////Non Minority header calculos
-        column = new Object();
-        column['field'] = "Non Minority M";
-        column['sortable'] = true;
-        column['title'] = "Non Minority M";
-        columns.push(column);
-
-        column = new Object();
-        column['field'] = "Non Minority F";
-        column['sortable'] = true;
-        column['title'] = "Non Minority F";
-        columns.push(column);
-
-
-        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
-        column = new Object();
-        column['field'] = "Start";
-        column['sortable'] = true;
-        column['title'] = "Start";
-        columns.push(column);
-
-        column = new Object();
-        column['field'] = "Final";
-        column['sortable'] = true;
-        column['title'] = "Final";
-        columns.push(column);
-
-        //////////////MAPA EN CADA REGISTRO///////////////////
-
-        column = new Object();
-        column['field'] = "View Map";
-        column['sortable'] = true;
-        column['title'] = "View Map";
-        columns.push(column);
-
-
-
-        tablecontent['columns'] = columns;
-        tablecontent['data'] = data;
-
-        
-
-
-
-
-
-        $scope.tableheaders = tableheader;
-        $('#table').bootstrapTable(tablecontent);
-
-
-        
-        ////Cambio el estado del loading para que no se muestre una vez cargado todo success
-        $scope.loading = false;
-
-
-
-
-    }, function(error) {
-        console.log(error)
-    });
 }]);
 
 //////////////////////////////////////////////////////////////

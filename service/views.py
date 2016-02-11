@@ -103,6 +103,7 @@ class GetForms(View):
                     formulario['form_name'] = p.formulario.nombre
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
+                    formulario['precargado'] = p.formulario.precargado
 
                     # validando que el formulario tenga fichas asociadas
                     if len(p.formulario.ficha.all()):

@@ -48,11 +48,18 @@ class Plan(models.Model):
 	def __unicode__(self):
 		return self.nombre
 
+SI = 'SI'
+NO = 'NO'
+IF_CHOICES = (
+        (SI, 'SI'),
+        (NO, 'NO'),
+    )
 
 class Formulario(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=50, blank = True )
 	ficha = models.ManyToManyField('Ficha',  blank = True)
+	precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
 	
 	def __unicode__(self):
 		return self.nombre

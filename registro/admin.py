@@ -39,7 +39,7 @@ class FichaAdmin(admin.ModelAdmin):
     filter_horizontal = ('entrada',  )
 
 class EntradaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion',  'tipo' )    
+    list_display = ('id', 'nombre', 'descripcion',  'tipo' )    
     list_filter = ('tipo',)
     search_fields = ['nombre', 'descripcion' ]
     filter_horizontal = ('respuesta',  )

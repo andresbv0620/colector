@@ -127,9 +127,11 @@ class GetForms(View):
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
                                     entrada['required'] = e.requerido
-                                    entrada['default'] = e.defecto
+                                    entrada['defecto'] = e.defecto
                                     entrada['max'] = e.maximo
                                     entrada['min'] = e.minimo
+                                    entrada['validacion'] = e.validacion
+                                    entrada['precargado'] = e.precargado
                                     #Se valida si tiene algun formulario asociado para precargar datos
                                     if e.form_asociado == None:
                                         pass

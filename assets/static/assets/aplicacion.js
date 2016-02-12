@@ -40,6 +40,10 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 		controller:"reporteMapa",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
 	})
+	.when('/reporte/id/:form_id/record/delete/:record_id',{
+		controller:"deleteRecord",
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
+	})
 
 
 }]);

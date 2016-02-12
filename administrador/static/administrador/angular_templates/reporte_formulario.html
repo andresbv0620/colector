@@ -1,7 +1,16 @@
 <div class="box-body">
+<div class="text-center">
+	<h2>Employment Utilization Report</h2>
+</div>
+<table id="table2"
+	data-toggle="table"
+	data-escape="false"
+	data-show-toggle="true"></table>
 <div ng-show="loading" class="loading"><img alt="Las buenas cosas toman tiempo: " src="http://content.iress.co.uk/hubfs/wemakeithappen/img/Preloader.gif">LOADING...</div>
-
-	<h1>Export</h1>
+<div class="text-center">
+	<h3>Work Hours of Employment</h3>
+</div>
+	<h4>Export</h4>
         <div id="toolbar">
             <select class="form-control">
                 <option value="">Export Basic</option>
@@ -19,6 +28,8 @@
 	data-search="true"
     data-id-field="id"
     data-escape="false"
+    
+    data-row-style="rowStyle"
 	data-show-toggle="true"></table>
 	
 <script>

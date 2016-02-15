@@ -1022,6 +1022,7 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
                 longitude: longitud
             }
         }
+        $scope.markerList = markersArray;
 
     $scope.loading = false;
 

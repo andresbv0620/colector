@@ -230,8 +230,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                         //markers objeto usado para el mapa
                         markers = {};
-                        markers['longitude'] = filledforms[form].latitud;
-                        markers['latitude'] = filledforms[form].longitud;
+                        markers['longitude'] = filledforms[form].longitud;
+                        markers['latitude'] = filledforms[form].latitud;
                         
                         datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
@@ -411,8 +411,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                         datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                         //markers objeto usado para el mapa
                         markers = {};
-                        markers['longitude'] = filledforms[form].latitud;
-                        markers['latitude'] = filledforms[form].longitud;
+                        markers['longitude'] = filledforms[form].longitud;
+                        markers['latitude'] = filledforms[form].latitud;
                         
                         datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
@@ -852,8 +852,8 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                     //markers objeto usado para el mapa
                     markers = {};
-                    markers['longitude'] = filledforms[form].latitud;
-                    markers['latitude'] = filledforms[form].longitud;
+                    markers['longitude'] = filledforms[form].longitud;
+                    markers['latitude'] = filledforms[form].latitud;
                     
                     datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
@@ -1009,8 +1009,8 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
     ///////////////////////////////MAPS REPORT////////////////////////
     markersArray = new Array();
     markers = {};
-    markers['longitude'] = latitud;
-    markers['latitude'] = longitud;
+    markers['longitude'] = longitud;
+    markers['latitude'] = latitud;
     markersArray.push(markers);
 
         $scope.map = {
@@ -1095,8 +1095,8 @@ app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'glo
                         datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                         //markers objeto usado para el mapa
                         markers = {};
-                        markers['longitude'] = filledforms[form].latitud;
-                        markers['latitude'] = filledforms[form].longitud;
+                        markers['longitude'] = filledforms[form].longitud;
+                        markers['latitude'] = filledforms[form].latitud;
                         
                         datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 

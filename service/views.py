@@ -598,7 +598,7 @@ class DeleteResponsesForm(View):
         try:
             data = json.loads(request.body)
             colector_id = data['colector_id']
-            record_id = data['record_id']            
+            record_id = data['record_id']
             # construyendo json para insertar en mongodb
 
             try:

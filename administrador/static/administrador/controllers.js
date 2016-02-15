@@ -855,7 +855,7 @@ app.controller('reporteFormularioId', ['$scope', '$routeParams', 'defaultService
                     markers['longitude'] = filledforms[form].latitud;
                     markers['latitude'] = filledforms[form].longitud;
                     
-                    datacolumns["View Map"]="<a target='_blank' href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
+                    datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
                     responses = filledforms[form].responses;
                     respuestas = new Array();
@@ -1007,6 +1007,11 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
     $scope.loading = true;
 
     ///////////////////////////////MAPS REPORT////////////////////////
+    markersArray = new Array();
+    markers = {};
+    markers['longitude'] = filledforms[form].latitud;
+    markers['latitude'] = filledforms[form].longitud;
+    markersArray.push(markers);
 
         $scope.map = {
             center: {
@@ -1093,7 +1098,7 @@ app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'glo
                         markers['longitude'] = filledforms[form].latitud;
                         markers['latitude'] = filledforms[form].longitud;
                         
-                        datacolumns["View Map"]="<a target='_blank' href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
+                        datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 
                         responses = filledforms[form].responses;
                         respuestas = new Array();

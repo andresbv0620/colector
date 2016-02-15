@@ -1015,16 +1015,16 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
 
         $scope.map = {
             center: {
-                latitude: markers['longitude'],
-                longitude: markers['latitude']
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
             },
             zoom: 12
         };
 
         $scope.marker = {
             coords: {
-                latitude: markers['longitude'],
-                longitude: markers['latitude']
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
             }
         }
         $scope.markerList = markersArray;

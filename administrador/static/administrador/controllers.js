@@ -1009,8 +1009,8 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
     ///////////////////////////////MAPS REPORT////////////////////////
     markersArray = new Array();
     markers = {};
-    markers['longitude'] = filledforms[form].latitud;
-    markers['latitude'] = filledforms[form].longitud;
+    markers['longitude'] = latitud;
+    markers['latitude'] = longitud;
     markersArray.push(markers);
 
         $scope.map = {

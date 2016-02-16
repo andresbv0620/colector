@@ -133,7 +133,6 @@ class Entrada(models.Model):
 	maximo	= models.CharField(max_length=50, blank = True , unique=False)
 	minimo = models.CharField(max_length=50, blank = True , unique=False)
 	validacion = models.CharField(max_length=50, blank = True , unique=False)
-	precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
 
 
 	def __unicode__(self):

@@ -41,6 +41,7 @@ INSTALLED_APPS = (
     'service',
     'administrador',
     'assets',
+    'sortedm2m',
 
     
 )

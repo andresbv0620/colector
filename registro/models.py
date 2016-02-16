@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from sortedm2m.fields import SortedManyToManyField
 # Create your models here.
 
 class Empresa(models.Model):
@@ -75,6 +76,7 @@ class PermisoFormulario(models.Model):
 class Ficha(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=50, blank = True )
+	#entrada = SortedManyToManyField('Entrada')
 	entrada = models.ManyToManyField('Entrada',  blank = True)
 	def __unicode__(self):
 		return self.nombre

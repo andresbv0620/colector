@@ -132,7 +132,7 @@ class GetForms(View):
                                     entrada['max'] = e.maximo
                                     entrada['min'] = e.minimo
                                     entrada['validacion'] = e.validacion
-                                    entrada['precargado'] = e.precargado
+                                    #entrada['precargado'] = e.precargado
                                     #entrada['orden'] = e.sort_value
 
                                     #Se valida si tiene algun formulario asociado para precargar datos

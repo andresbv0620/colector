@@ -58,7 +58,7 @@ IF_CHOICES = (
 
 class Formulario(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
-	descripcion = models.TextField(max_length=50, blank = True )
+	descripcion = models.TextField(max_length=100, blank = True )
 	ficha = models.ManyToManyField('Ficha',  blank = True)
 	precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
 	
@@ -75,7 +75,7 @@ class PermisoFormulario(models.Model):
 
 class Ficha(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
-	descripcion = models.TextField(max_length=50, blank = True )
+	descripcion = models.TextField(max_length=100, blank = True )
 	#entrada = SortedManyToManyField('Entrada')
 	entrada = models.ManyToManyField('Entrada',  blank = True)
 	def __unicode__(self):
@@ -125,7 +125,7 @@ REQUIRED_CHOICES = (
 class Entrada(models.Model):
 	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
-	descripcion = models.TextField(max_length=50, blank = True )
+	descripcion = models.TextField(max_length=100, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
 	form_asociado = models.ForeignKey('Formulario', blank = True, null = True)
 	requerido = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=SI)
@@ -133,14 +133,14 @@ class Entrada(models.Model):
 	maximo	= models.CharField(max_length=50, blank = True , unique=False)
 	minimo = models.CharField(max_length=50, blank = True , unique=False)
 	validacion = models.CharField(max_length=50, blank = True , unique=False)
-	#precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
+	precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
 
 
 	def __unicode__(self):
 		return self.nombre
 
 class Respuesta(models.Model):
-	valor  = models.CharField(max_length=50, blank = True , unique=True)
+	valor  = models.CharField(max_length=100, blank = True , unique=True)
 
 	def __unicode__(self):
 		return self.valor

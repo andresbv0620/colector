@@ -52,6 +52,12 @@ class FormularioDiligenciadoAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'empresa',  'gps', 'fecha_creacion' )    
     list_filter = ('empresa',)
     search_fields = ['nombre', 'empresa',  ]
+
+class PermisoFormularioAdmin(admin.ModelAdmin):
+    list_display = ('formulario',)    
+    list_filter = ('colectores',)
+    search_fields = ['formulario', 'colectores',  ]
+    filter_horizontal = ('colectores',  )
     
 
 admin.site.register(Empresa, EmpresaAdmin)
@@ -63,4 +69,4 @@ admin.site.register(Entrada, EntradaAdmin)
 admin.site.register(Respuesta, RespuestaAdmin)
 admin.site.register(FormularioDiligenciado, FormularioDiligenciadoAdmin)
 admin.site.register(Tablet)
-admin.site.register(PermisoFormulario)
+admin.site.register(PermisoFormulario, PermisoFormularioAdmin)

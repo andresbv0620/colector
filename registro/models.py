@@ -77,7 +77,9 @@ class Ficha(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=100, blank = True )
 	#entrada = SortedManyToManyField('Entrada')
-	entrada = models.ManyToManyField('Entrada',  blank = True)
+	#entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
+	entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
+	
 	def __unicode__(self):
 		return self.nombre
 
@@ -115,12 +117,6 @@ ENTRADA_CHOICES = (
         
     )
 
-SI = 'SI'
-NO = 'NO'
-REQUIRED_CHOICES = (
-        (SI, 'SI'),
-        (NO, 'NO'),
-    )
 
 class Entrada(models.Model):
 	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
@@ -128,16 +124,56 @@ class Entrada(models.Model):
 	descripcion = models.TextField(max_length=100, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
 	form_asociado = models.ForeignKey('Formulario', blank = True, null = True)
-	requerido = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=SI)
-	defecto  = models.CharField(max_length=50, blank = True , unique=False)
-	maximo	= models.CharField(max_length=50, blank = True , unique=False)
-	minimo = models.CharField(max_length=50, blank = True , unique=False)
-	validacion = models.CharField(max_length=50, blank = True , unique=False)
-	precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
+	#precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
 
 
 	def __unicode__(self):
 		return self.nombre
+
+class AsignacionEntrada(models.Model):
+    ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE)
+    entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE)
+    orden	= models.PositiveIntegerField()
+    requerido = models.BooleanField(default=False)
+    oculto = models.BooleanField(default=False)
+    solo_lectura = models.BooleanField(default=False)
+    defecto  = models.CharField(max_length=50, blank = True , unique=False)
+    defecto_previo = models.BooleanField(default=False)
+    maximo	= models.PositiveIntegerField(blank = True, null = True)
+    minimo = models.PositiveIntegerField(blank = True, null = True)
+    validacion = models.CharField(max_length=50, blank = True , unique=False)
+    regla_visibilidad = models.OneToOneField('ReglaVisibilidad', blank = True, null = True, unique = False)
+
+    class Meta:
+        ordering = ('orden',)
+
+Iguala = 'igual_a'
+Noiguala = 'no_igual_a'
+Contiene = 'contiene'
+Empiezacon = 'empieza_con'
+Mayorque = 'mayor_que'
+Menorque = 'menor_que'
+Esvacio = 'es_vacio'
+Noesvacio = 'no_es_vacio'
+OPERADOR_CHOICES = (
+		(Iguala,'Igual a'),
+		(Noiguala,'No igual a'),
+		(Contiene,'Contiene'),
+		(Empiezacon,'Empieza con'),
+		(Mayorque,'Mayor que'),
+		(Menorque,'Menor que'),
+		(Esvacio,'Es vacio'),
+		(Noesvacio,'No es vacio'),
+    )
+
+class ReglaVisibilidad(models.Model):
+	elemento  = models.ForeignKey(Entrada, on_delete=models.CASCADE, blank = False, null = False)
+	operador = models.CharField(max_length=50,choices=OPERADOR_CHOICES, blank = False, null = False, unique = False)
+	valor  = models.CharField(max_length=100, blank = False, null = False, unique = False)
+
+	def __unicode__(self):
+		return self.valor
+    
 
 class Respuesta(models.Model):
 	valor  = models.CharField(max_length=100, blank = True , unique=True)
@@ -146,7 +182,7 @@ class Respuesta(models.Model):
 		return self.valor
 
 #class FormularioDiligenciado(models.Model):
-	#nombre  = models.CharField(max_length=50, blank = True , unique=True)
+	#nombre  = modelsself.CharField(max_length=50, blank = True , unique=True)
 	#empresa = models.ForeignKey('Empresa', null = True,  blank = True)
 	#colector = models.ForeignKey('Colector', null = True,  blank = True)
 	#entrada = models.ForeignKey('Entrada', null = True,  blank = True)

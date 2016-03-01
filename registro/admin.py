@@ -1,6 +1,7 @@
 from django.contrib import admin
-from registro.models import Empresa, Colector, Plan, Formulario, PermisoFormulario
+from registro.models import Empresa, Colector, Plan, Formulario, PermisoFormulario 
 from registro.models import Ficha, Entrada, Respuesta, FormularioDiligenciado, Tablet
+from registro.models import AsignacionEntrada, ReglaVisibilidad
 # Register your models here.
 
 class EmpresaAdmin(admin.ModelAdmin):
@@ -33,10 +34,15 @@ class FormularioAdmin(admin.ModelAdmin):
     search_fields = ['nombre', ]
     filter_horizontal = ('ficha',  )
 
+class AsignacionEntradaInline(admin.TabularInline):
+    model = AsignacionEntrada
+    extra = 1
+
 class FichaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', )    
     search_fields = ['nombre', ]
-    filter_horizontal = ('entrada',  )
+    #filter_horizontal = ('entrada',  )
+    inlines = (AsignacionEntradaInline,)
 
 class EntradaAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'descripcion',  'tipo' )    
@@ -58,6 +64,9 @@ class PermisoFormularioAdmin(admin.ModelAdmin):
     list_filter = ('colectores',)
     search_fields = ['formulario', 'colectores',  ]
     filter_horizontal = ('colectores',  )
+
+
+
     
 
 admin.site.register(Empresa, EmpresaAdmin)
@@ -66,6 +75,7 @@ admin.site.register(Plan, PlanAdmin)
 admin.site.register(Formulario, FormularioAdmin)
 admin.site.register(Ficha, FichaAdmin)
 admin.site.register(Entrada, EntradaAdmin)
+admin.site.register(ReglaVisibilidad)
 admin.site.register(Respuesta, RespuestaAdmin)
 admin.site.register(FormularioDiligenciado, FormularioDiligenciadoAdmin)
 admin.site.register(Tablet)

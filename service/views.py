@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta
+from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad
 import json
 from bson import json_util
 import hashlib
@@ -127,13 +127,22 @@ class GetForms(View):
                                     entrada['name'] = e.nombre
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
-                                    entrada['required'] = e.requerido
-                                    entrada['defecto'] = e.defecto
-                                    entrada['max'] = e.maximo
-                                    entrada['min'] = e.minimo
-                                    entrada['validacion'] = e.validacion
-                                    #entrada['precargado'] = e.precargado
-                                    #entrada['orden'] = e.sort_value
+                                    #Datos tabla intermedia de relacion ficha entrada
+                                    asignacionentrada = e.asignacionentrada_set.get(ficha=f)
+                                    entrada['orden'] = asignacionentrada.orden
+                                    entrada['requerido'] = asignacionentrada.requerido
+                                    entrada['oculto'] = asignacionentrada.oculto
+                                    entrada['solo_lectura'] = asignacionentrada.solo_lectura
+                                    entrada['defecto'] = asignacionentrada.defecto
+                                    entrada['defecto_previo'] = asignacionentrada.defecto_previo
+                                    entrada['maximo'] = asignacionentrada.maximo
+                                    entrada['minimo'] = asignacionentrada.minimo
+                                    entrada['validacion'] = asignacionentrada.validacion
+                                    #reglavisibilidad = ReglaVisibilidad.objects.get(asignacionentrada=asignacionentrada)
+                                    print asignacionentrada.regla_visibilidad.valor
+
+                                    #entrada['regla_visibilidad'] = asignacionentrada.regla_visibilidad
+
 
                                     #Se valida si tiene algun formulario asociado para precargar datos
                                     if e.form_asociado == None:

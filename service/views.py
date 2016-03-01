@@ -976,7 +976,7 @@ def DateReportStart(
     ):
 
     d = datetime(int(a), int(m), int(d), 0)
-    
+
     filled_forms = database.filled_forms.find({'colector_id': str(id),
             'filled_forms.fecha_creacion': {'$gte': d}}, {'_id': 0})
     resp = {}
@@ -989,7 +989,7 @@ def DateReportStart(
                             content_type='application/json')
     else:
 
-        # print filled_forms.count()
+        # print filled_forms.count().
 
         forms = []
         for f in filled_forms:

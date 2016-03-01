@@ -17,9 +17,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from service.views import AllowedForms, SingleForm, FillForm, ColectorIdReport, FormNameReport, GetForms
 from service.views import FormIdReport, FillResponsesForm, DeleteResponsesForm
-urlpatterns = [    
+urlpatterns = [
 
-    
+
 
     url(r'^colector/allowed/forms/', AllowedForms.as_view()),
     url(r'^form/all/', GetForms.as_view()),
@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^filled/forms/report/colector/(?P<id>.+)/$', 'service.views.ColectorIdReport'),
     url(r'^filled/forms/report/formname/(?P<name>.+)/$', 'service.views.FormNameReport'),
     url(r'^filled/forms/report/formid/(?P<id>.+)/$', 'service.views.FormIdReport'),
-    url(r'^filled/forms/report/colectorid/(?P<id>.+)/date/(?P<a>.+)/(?P<m>.+)/(?P<d>.+)/$', 'service.views.DateReport'),
-    
+    url(r'^filled/forms/report/colectorid/(?P<id>.+)/start/date/(?P<a>.+)/(?P<m>.+)/(?P<d>.+)/$', 'service.views.DateReportStart'),
+    url(r'^filled/forms/report/colectorid/(?P<id>.+)/end/date/(?P<a>.+)/(?P<m>.+)/(?P<d>.+)/$', 'service.views.DateReportEnd'),
+    url(r'^filled/forms/report/colectorid/(?P<id>.+)/between/date/(?P<a>.+)/(?P<m>.+)/(?P<d>.+)/date/(?P<a2>.+)/(?P<m2>.+)/(?P<d2>.+)/$', 'service.views.DateReportBetween'),
+
 ]

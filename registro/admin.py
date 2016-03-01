@@ -1,6 +1,6 @@
 from django.contrib import admin
 from registro.models import Empresa, Colector, Plan, Formulario, PermisoFormulario
-from registro.models import Ficha, Entrada, Respuesta, FormularioDiligenciado, Tablet
+from registro.models import Ficha, Entrada, Respuesta, FormularioDiligenciado, Tablet, OrdenEntradaFormulario
 # Register your models here.
 
 class EmpresaAdmin(admin.ModelAdmin):
@@ -21,25 +21,25 @@ class Colectordmin(admin.ModelAdmin):
 
     get_nombre.short_description = 'usuario'
     get_email.short_description = 'email'
-    
+
 class PlanAdmin(admin.ModelAdmin):
 	list_display = ('nombre', 'almacenamiento', 'cantidad_colectores', 'valor','activo', 'fecha_creacion', )
 	list_filter = ('nombre', 'activo',)
 	search_fields = ['nombre', 'fecha_creacion',]
-    
+
 
 class FormularioAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion', )    
+    list_display = ('nombre', 'descripcion', )
     search_fields = ['nombre', ]
     filter_horizontal = ('ficha',  )
 
 class FichaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion', )    
+    list_display = ('nombre', 'descripcion', )
     search_fields = ['nombre', ]
     filter_horizontal = ('entrada',  )
 
 class EntradaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre', 'descripcion',  'tipo' )    
+    list_display = ('id', 'nombre', 'descripcion',  'tipo' )
     list_filter = ('tipo',)
     search_fields = ['nombre', 'descripcion' ]
     filter_horizontal = ('respuesta',  )
@@ -49,16 +49,16 @@ class RespuestaAdmin(admin.ModelAdmin):
     search_fields = ['valor', ]
 
 class FormularioDiligenciadoAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'empresa',  'gps', 'fecha_creacion' )    
+    list_display = ('nombre', 'empresa',  'gps', 'fecha_creacion' )
     list_filter = ('empresa',)
     search_fields = ['nombre', 'empresa',  ]
 
 class PermisoFormularioAdmin(admin.ModelAdmin):
-    list_display = ('formulario',)    
+    list_display = ('formulario',)
     list_filter = ('colectores',)
     search_fields = ['formulario', 'colectores',  ]
     filter_horizontal = ('colectores',  )
-    
+
 
 admin.site.register(Empresa, EmpresaAdmin)
 admin.site.register(Colector, Colectordmin)
@@ -70,3 +70,4 @@ admin.site.register(Respuesta, RespuestaAdmin)
 admin.site.register(FormularioDiligenciado, FormularioDiligenciadoAdmin)
 admin.site.register(Tablet)
 admin.site.register(PermisoFormulario, PermisoFormularioAdmin)
+admin.site.register(OrdenEntradaFormulario)

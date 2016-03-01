@@ -43,7 +43,7 @@ INSTALLED_APPS = (
     'assets',
     'sortedm2m',
 
-    
+
 )
 
 LOGIN_URL='/login/'
@@ -58,7 +58,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    'auth_token_middleware.middleware.AuthToken'
+    #'auth_token_middleware.middleware.AuthToken'
 )
 
 ROOT_URLCONF = 'colector.urls'
@@ -85,12 +85,13 @@ WSGI_APPLICATION = 'colector.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'colector',
-        'USER': 'colectoruser',
-        'PASSWORD': 'patacore',
+        'USER': 'postgres',
+        'PASSWORD': '123456',
         'HOST': 'localhost',
         'PORT': '',
 

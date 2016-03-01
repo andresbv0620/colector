@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from sortedm2m.fields import SortedManyToManyField
+
 # Create your models here.
 
 class Empresa(models.Model):
@@ -21,8 +22,8 @@ class Empresa(models.Model):
 	formulario = models.ManyToManyField('Formulario',  blank = True)
 	tablets = models.ManyToManyField('Tablet',  blank = True)
 
-		
-	
+
+
 	def __unicode__(self):
 		return self.nombre
 
@@ -30,7 +31,7 @@ class Tablet(models.Model):
 	codigo = models.CharField(max_length=50, blank = True , unique=True)
 
 	def __unicode__(self):
-		return self.codigo 
+		return self.codigo
 
 
 class Colector(models.Model):
@@ -43,7 +44,7 @@ class Plan(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	almacenamiento  = models.CharField(max_length=50, blank = True , unique=True)
 	cantidad_colectores  = models.IntegerField(blank = True , unique=True)
-	valor  = models.CharField(max_length=50, blank = True , unique=True) 
+	valor  = models.CharField(max_length=50, blank = True , unique=True)
 	activo = models.BooleanField(default = False)
 	fecha_creacion = models.DateTimeField(auto_now=True)
 	def __unicode__(self):
@@ -61,7 +62,7 @@ class Formulario(models.Model):
 	descripcion = models.TextField(max_length=100, blank = True )
 	ficha = models.ManyToManyField('Ficha',  blank = True)
 	precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
-	
+
 	def __unicode__(self):
 		return self.nombre
 
@@ -112,7 +113,7 @@ ENTRADA_CHOICES = (
         (FORMULA, 'FORMULA'),
         (FIRMA, 'FIRMA'),
         (DECIMAL, 'DECIMAL'),
-        
+
     )
 
 SI = 'SI'
@@ -134,6 +135,7 @@ class Entrada(models.Model):
 	minimo = models.CharField(max_length=50, blank = True , unique=False)
 	validacion = models.CharField(max_length=50, blank = True , unique=False)
 	precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
+	peso =  models.IntegerField( null = True,  blank = True)
 
 
 	def __unicode__(self):
@@ -171,3 +173,11 @@ class FormularioDiligenciado(models.Model):
 		return self.nombre
 
 
+class OrdenEntradaFormulario(models.Model):
+	entrada = models.ForeignKey('Entrada', null = True,  blank = True)
+	ficha = models.ForeignKey('Ficha', null = True,  blank = True)
+	formulario = models.ForeignKey('Formulario', null = True,  blank = True)
+	fecha_creacion = models.DateTimeField(auto_now=True)
+
+	def __unicode__(self):
+		return self.entrada

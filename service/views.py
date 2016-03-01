@@ -18,7 +18,7 @@ database = servidor.colector
 
 # Create your views here.
 
-class AllowedForms(View):   
+class AllowedForms(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -142,7 +142,7 @@ class GetForms(View):
                                         atributos=[]
                                         objetos=[]
                                         registroOpcion={}
-                                        
+
                                         asociate_form = {}
                                         asociate_form['name'] = e.form_asociado.nombre
                                         asociate_form['associate_id'] = e.form_asociado.id
@@ -175,24 +175,24 @@ class GetForms(View):
                                                     #La siguiente linea crea el nodo formula para hacer el calculo del valor de cada producto SOLO EN ORDEN VENTA
                                                     #Se debe ajustar para que sea dinamico y sea extensible a otras funcionalidades
                                                     #Deja estatico el valor del iva en 0,16
-                                                    
+
                                                     #print record["responses"]
                                                     #Se itera sobre la opcion para sacar las variables de cada formula
                                                     precioProducto=0
                                                     ivaProducto=0
                                                     for option_response in record["responses"]:
-                                                        
+
                                                         if option_response["label"]=="_PRECIO":
                                                             precioProducto=option_response["value"]
-                                                                                                                   
+
 
                                                         if option_response["label"]=="_IVA":
                                                             ivaProducto=option_response["value"]
-                                                                                                                    
+
 
                                                     record["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
 
-                                                    
+
 
                                                     #Crea el nodo opciones en base a el registro en mongodb
                                                     entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
@@ -201,7 +201,7 @@ class GetForms(View):
                                                     #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
 
                                                     for recordinput in record["responses"]:
-                                                        
+
                                                         if recordinput["input_id"] in arrayChecker:
                                                             pass
                                                         else:
@@ -211,7 +211,7 @@ class GetForms(View):
                                                             objeto_atributos["input_id"]=recordinput["input_id"]
                                                             record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
                                                             objeto_atributos["type"]=record_entrada.tipo
-                                                            
+
                                                             entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
                                                             if len(entrada_anidada.respuesta.all()):
                                                                 objeto_atributos["responses"]=[]
@@ -225,7 +225,7 @@ class GetForms(View):
 
 
                                             form_aux = {}
-                                            
+
                                     ficha['inputs'].append(entrada)
 
                                     if len(e.respuesta.all()):
@@ -250,8 +250,8 @@ class GetForms(View):
                 resp['response_description'] = str('forms found')
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = str('{"colector_id":" "}')
-                
-                
+
+
 
                 return HttpResponse(json.dumps(resp,default=json_util.default),
                                     content_type='application/json')
@@ -324,7 +324,7 @@ class SingleForm(View):
                                 entrada['description'] = e.descripcion
                                 entrada['type'] = e.tipo
 
-                                
+
                                 if e.form_asociado == None:
                                     pass
                                 else:
@@ -338,9 +338,9 @@ class SingleForm(View):
                                     for f in filled_forms:
                                         form_aux = {}
                                         print f
-                                        
+
                                         entrada['filled_forms'].append(f) #(json.dumps(f,default=json_util.default))
-                                        
+
 
                                 ficha['inputs'].append(entrada)
 
@@ -451,7 +451,7 @@ class FillResponsesForm(View):
                     except Exception, e:
                         response['error'] = True
                         response['validation_errors'].append("any response don't contains value or input_id")
-                   
+
             except Exception, e:
                 response['error'] = True
                 response['validation_errors'].append("any input don't contains responses")
@@ -470,7 +470,7 @@ class FillResponsesForm(View):
             colector_id = data['colector_id']
             form_id = data['form_id']
             responses = data['responses']
-            
+
 
             array_validation = {}
             array_validation['longitud'] = longitud
@@ -531,7 +531,7 @@ class FillResponsesForm(View):
 
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                        {'_id': 0})
 
                 # validando si existe un colector con esta id
 
@@ -540,7 +540,7 @@ class FillResponsesForm(View):
                     data['colector_id'] = colector_id
                     data['filled_forms'] = []
                     data['filled_forms'].append(form)
-                    
+
                     database.filled_forms.insert(data)
                     database.filled_forms.create_index("filled_forms.sections.inputs.responses")
 
@@ -606,7 +606,7 @@ class DeleteResponsesForm(View):
             try:
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                        {'_id': 0})
 
                 # validando si existe un colector con esta id
 
@@ -794,7 +794,7 @@ class FillForm(View):
 
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                        {'_id': 0})
 
                 # validando si existe un colector con esta id
 
@@ -803,7 +803,7 @@ class FillForm(View):
                     data['colector_id'] = colector_id
                     data['filled_forms'] = []
                     data['filled_forms'].append(form)
-                    
+
                     database.filled_forms.insert(data)
                     database.filled_forms.create_index("filled_forms.sections.inputs.responses")
 
@@ -965,7 +965,9 @@ def FormIdReport(request, id):
                             content_type='application/json')
 
 #Reporte por fecha
-def DateReport(
+
+@csrf_exempt
+def DateReportStart(
     request,
     id,
     a,
@@ -974,6 +976,7 @@ def DateReport(
     ):
 
     d = datetime(int(a), int(m), int(d), 0)
+    
     filled_forms = database.filled_forms.find({'colector_id': str(id),
             'filled_forms.fecha_creacion': {'$gte': d}}, {'_id': 0})
     resp = {}
@@ -998,6 +1001,77 @@ def DateReport(
                             default=json_util.default),
                             content_type='application/json')
 
+@csrf_exempt
+def DateReportEnd(
+    request,
+    id,
+    a,
+    m,
+    d,
+    ):
+
+    d = datetime(int(a), int(m), int(d), 0)
+
+    filled_forms = database.filled_forms.find({'colector_id': str(id),
+            'filled_forms.fecha_creacion': {'$lte':d}}, {'_id': 0})
+    resp = {}
+
+    if filled_forms.count() == 0:
+        resp['response_code'] = '404'
+        resp['response_description'] = 'date not found'
+        return HttpResponse(json.dumps(resp,
+                            default=json_util.default),
+                            content_type='application/json')
+    else:
+
+        # print filled_forms.count()
+
+        forms = []
+        for f in filled_forms:
+            forms.append(f)
+        resp['response_code'] = '200'
+        resp['response_description'] = 'date found'
+        resp['data'] = forms
+        return HttpResponse(json.dumps(resp,
+                            default=json_util.default),
+                            content_type='application/json')
 
 
-            
+@csrf_exempt
+def DateReportBetween(
+    request,
+    id,
+    a,
+    m,
+    d,
+    a2,
+    m2,
+    d2,
+    ):
+
+    d = datetime(int(a), int(m), int(d), 0)
+    d2 = datetime(int(a2), int(m2), int(d2), 0)
+
+    filled_forms = database.filled_forms.find({'colector_id': str(id),
+            'filled_forms.fecha_creacion':  {'$gte': d, '$lte':d2} }, {'_id': 0})
+    resp = {}
+
+    if filled_forms.count() == 0:
+        resp['response_code'] = '404'
+        resp['response_description'] = 'date not found'
+        return HttpResponse(json.dumps(resp,
+                            default=json_util.default),
+                            content_type='application/json')
+    else:
+
+        # print filled_forms.count()
+
+        forms = []
+        for f in filled_forms:
+            forms.append(f)
+        resp['response_code'] = '200'
+        resp['response_description'] = 'date found'
+        resp['data'] = forms
+        return HttpResponse(json.dumps(resp,
+                            default=json_util.default),
+                            content_type='application/json')

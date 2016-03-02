@@ -164,6 +164,14 @@ class GetForms(View):
                                         asociate_form['name'] = formasociado.form_asociado.nombre
                                         asociate_form['associate_id'] = formasociado.form_asociado.id
                                         asociate_form['description'] = formasociado.form_asociado.descripcion
+                                        asociate_form['seleccionar_existentes'] = formasociado.seleccionar_existentes
+                                        asociate_form['crear_nuevo'] = formasociado.crear_nuevo
+                                        asociate_form['actualizar_existente'] = formasociado.actualizar_existente
+                                        asociate_form['seleccionar_multiples'] = formasociado.seleccionar_multiples
+                                        asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
+                                        asociate_form['entrada_destino'] = formasociado.entrada_destino.id
+
+
                                         entrada['asociate_form'] = asociate_form
                                         entrada['options'] = []
                                         entrada['atributos'] = []

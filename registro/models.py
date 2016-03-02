@@ -142,10 +142,13 @@ class AsignacionEntrada(models.Model):
     maximo	= models.PositiveIntegerField(blank = True, null = True)
     minimo = models.PositiveIntegerField(blank = True, null = True)
     validacion = models.CharField(max_length=50, blank = True , unique=False)
-    regla_visibilidad = models.OneToOneField('ReglaVisibilidad', blank = True, null = True, unique = False)
+    regla_visibilidad = models.ForeignKey('ReglaVisibilidad', related_name='visibilizar', blank = True, null = True, unique = False)
 
     class Meta:
         ordering = ('orden',)
+
+    def __unicode__(self):
+		return "Asignacion de regla %s" % self.regla_visibilidad
 
 Iguala = 'igual_a'
 Noiguala = 'no_igual_a'
@@ -169,10 +172,10 @@ OPERADOR_CHOICES = (
 class ReglaVisibilidad(models.Model):
 	elemento  = models.ForeignKey(Entrada, on_delete=models.CASCADE, blank = False, null = False)
 	operador = models.CharField(max_length=50,choices=OPERADOR_CHOICES, blank = False, null = False, unique = False)
-	valor  = models.CharField(max_length=100, blank = False, null = False, unique = False)
+	valor = models.CharField(max_length=100, blank = False, null = False, unique = False)
 
 	def __unicode__(self):
-		return self.valor
+		return "%s "%self.elemento+self.operador+" "+self.valor
     
 
 class Respuesta(models.Model):

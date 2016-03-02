@@ -138,10 +138,16 @@ class GetForms(View):
                                     entrada['maximo'] = asignacionentrada.maximo
                                     entrada['minimo'] = asignacionentrada.minimo
                                     entrada['validacion'] = asignacionentrada.validacion
-                                    #reglavisibilidad = ReglaVisibilidad.objects.get(asignacionentrada=asignacionentrada)
-                                    print asignacionentrada.regla_visibilidad.valor
 
-                                    #entrada['regla_visibilidad'] = asignacionentrada.regla_visibilidad
+                                    if (asignacionentrada.regla_visibilidad):
+                                        reglavisibilidadobject ={}
+                                        reglavisibilidad = ReglaVisibilidad.objects.get(visibilizar=asignacionentrada)
+                                        reglavisibilidadobject['elemento'] = reglavisibilidad.elemento.id
+                                        reglavisibilidadobject['operador'] = reglavisibilidad.operador
+                                        reglavisibilidadobject['valor'] = reglavisibilidad.valor
+
+                                        entrada['regla_visibilidad'] = reglavisibilidadobject
+                                  
 
 
                                     #Se valida si tiene algun formulario asociado para precargar datos

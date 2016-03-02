@@ -123,7 +123,7 @@ class Entrada(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=100, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
-	form_asociado = models.ForeignKey('Formulario', blank = True, null = True)
+	
 	#precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
 
 
@@ -143,12 +143,13 @@ class AsignacionEntrada(models.Model):
     minimo = models.PositiveIntegerField(blank = True, null = True)
     validacion = models.CharField(max_length=50, blank = True , unique=False)
     regla_visibilidad = models.ForeignKey('ReglaVisibilidad', related_name='visibilizar', blank = True, null = True, unique = False)
+    formulario_asociado = models.ForeignKey('FormularioAsociado', related_name='formasociado', blank = True, null = True, unique = False)
 
     class Meta:
         ordering = ('orden',)
 
     def __unicode__(self):
-		return "Asignacion de regla %s" % self.regla_visibilidad
+		return "Asignacion de entrada %s" % self.entrada + " a %s" % self.ficha
 
 Iguala = 'igual_a'
 Noiguala = 'no_igual_a'
@@ -176,6 +177,18 @@ class ReglaVisibilidad(models.Model):
 
 	def __unicode__(self):
 		return "%s "%self.elemento+self.operador+" "+self.valor
+
+class FormularioAsociado(models.Model):
+	form_asociado = models.ForeignKey(Formulario, on_delete=models.CASCADE, blank = False, null = False)
+	seleccionar_existentes = models.BooleanField(default=False)
+	crear_nuevo = models.BooleanField(default=False)
+	actualizar_existente = models.BooleanField(default=False)
+	seleccionar_multiples = models.BooleanField(default=False)
+	entrada_fuente = models.ForeignKey(Entrada, related_name='entradafuente', on_delete=models.CASCADE, blank = True, null = True)
+	entrada_destino = models.ForeignKey(Entrada, related_name='entradadestino', on_delete=models.CASCADE, blank = True, null = True)
+
+	def __unicode__(self):
+		return "%s "%self.form_asociado
     
 
 class Respuesta(models.Model):

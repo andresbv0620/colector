@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad
+from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad, FormularioAsociado
 import json
 from bson import json_util
 import hashlib
@@ -151,21 +151,23 @@ class GetForms(View):
 
 
                                     #Se valida si tiene algun formulario asociado para precargar datos
-                                    if e.form_asociado == None:
+                                    if asignacionentrada.formulario_asociado == None:
                                         pass
                                     else:
                                         atributos=[]
                                         objetos=[]
-                                        registroOpcion={}
-                                        
+                                        registroOpcion={}                                        
                                         asociate_form = {}
-                                        asociate_form['name'] = e.form_asociado.nombre
-                                        asociate_form['associate_id'] = e.form_asociado.id
-                                        asociate_form['description'] = e.form_asociado.descripcion
+                                        formasociado = FormularioAsociado.objects.get(formasociado=asignacionentrada)
+
+
+                                        asociate_form['name'] = formasociado.form_asociado.nombre
+                                        asociate_form['associate_id'] = formasociado.form_asociado.id
+                                        asociate_form['description'] = formasociado.form_asociado.descripcion
                                         entrada['asociate_form'] = asociate_form
                                         entrada['options'] = []
                                         entrada['atributos'] = []
-                                        document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(e.form_asociado.id)},
+                                        document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(formasociado.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
                                             "filled_forms.form_description":0,
@@ -182,7 +184,7 @@ class GetForms(View):
                                         arrayChecker=[]
                                         for filled in document_filled_forms:
                                             for record in filled["filled_forms"]:
-                                                if record['form_id']!=str(e.form_asociado.id):
+                                                if record['form_id']!=str(formasociado.form_asociado.id):
                                                     pass
                                                 else:
                                                     record["record_id"]=str(record["record_id"])

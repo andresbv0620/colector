@@ -1,7 +1,7 @@
 from django.contrib import admin
 from registro.models import Empresa, Colector, Plan, Formulario, PermisoFormulario 
 from registro.models import Ficha, Entrada, Respuesta, FormularioDiligenciado, Tablet
-from registro.models import AsignacionEntrada, ReglaVisibilidad
+from registro.models import AsignacionEntrada, ReglaVisibilidad, FormularioAsociado
 # Register your models here.
 
 class EmpresaAdmin(admin.ModelAdmin):
@@ -50,6 +50,22 @@ class EntradaAdmin(admin.ModelAdmin):
     search_fields = ['nombre', 'descripcion' ]
     filter_horizontal = ('respuesta',  )
 
+class FormularioAsociadoAdmin(admin.ModelAdmin):
+    fieldsets = (
+        (None, {'fields': ('form_asociado',)}),
+        (None, {'fields': (('seleccionar_existentes', 'crear_nuevo', 'actualizar_existente',  'seleccionar_multiples'),)} ),
+        ('Auto Llenar Campos', {
+            'classes': ('collapse', ),
+            'fields': ('entrada_fuente', 'entrada_destino',)
+            }),
+        )    
+    list_filter = ('form_asociado',)
+    search_fields = ['form_asociado', ]
+
+class ReglaVisibilidadAdmin(admin.ModelAdmin):
+    list_filter = ['visibilizar__ficha__entrada']
+    search_fields = ['valor', ]
+
 class RespuestaAdmin(admin.ModelAdmin):
     list_display = ('valor', )
     search_fields = ['valor', ]
@@ -75,7 +91,8 @@ admin.site.register(Plan, PlanAdmin)
 admin.site.register(Formulario, FormularioAdmin)
 admin.site.register(Ficha, FichaAdmin)
 admin.site.register(Entrada, EntradaAdmin)
-admin.site.register(ReglaVisibilidad)
+admin.site.register(ReglaVisibilidad, ReglaVisibilidadAdmin)
+admin.site.register(FormularioAsociado, FormularioAsociadoAdmin)
 admin.site.register(Respuesta, RespuestaAdmin)
 admin.site.register(FormularioDiligenciado, FormularioDiligenciadoAdmin)
 admin.site.register(Tablet)

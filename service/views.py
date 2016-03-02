@@ -139,7 +139,13 @@ class GetForms(View):
                                     entrada['minimo'] = asignacionentrada.minimo
                                     entrada['validacion'] = asignacionentrada.validacion
 
-                                    if (asignacionentrada.regla_visibilidad):
+                                    if (asignacionentrada.regla_visibilidad == None):
+                                        entrada['regla_visibilidad'] ={
+                                        "operador": "",
+                                        "valor": "",
+                                        "elemento": ""
+                                        }
+                                    else:
                                         reglavisibilidadobject ={}
                                         reglavisibilidad = ReglaVisibilidad.objects.get(visibilizar=asignacionentrada)
                                         reglavisibilidadobject['elemento'] = reglavisibilidad.elemento.id
@@ -147,12 +153,21 @@ class GetForms(View):
                                         reglavisibilidadobject['valor'] = reglavisibilidad.valor
 
                                         entrada['regla_visibilidad'] = reglavisibilidadobject
-                                  
 
 
                                     #Se valida si tiene algun formulario asociado para precargar datos
                                     if asignacionentrada.formulario_asociado == None:
-                                        pass
+                                        entrada['asociate_form']={
+                                        "actualizar_existente": "",
+                                        "name": "",
+                                        "associate_id": "",
+                                        "entrada_destino": "",
+                                        "entrada_fuente": "",
+                                        "crear_nuevo": "",
+                                        "seleccionar_existentes": "",
+                                        "seleccionar_multiples": "",
+                                        "description": ""
+                                        }
                                     else:
                                         atributos=[]
                                         objetos=[]

@@ -183,8 +183,8 @@ class GetForms(View):
                                         asociate_form['crear_nuevo'] = formasociado.crear_nuevo
                                         asociate_form['actualizar_existente'] = formasociado.actualizar_existente
                                         asociate_form['seleccionar_multiples'] = formasociado.seleccionar_multiples
-                                        asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
-                                        asociate_form['entrada_destino'] = formasociado.entrada_destino.id
+                                        #asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
+                                        #asociate_form['entrada_destino'] = formasociado.entrada_destino.id
 
 
                                         entrada['asociate_form'] = asociate_form

@@ -140,11 +140,7 @@ class GetForms(View):
                                     entrada['validacion'] = asignacionentrada.validacion
 
                                     if (asignacionentrada.regla_visibilidad == None):
-                                        entrada['valorvisibility'] =[{
-                                        "operador": "",
-                                        "valor": "",
-                                        "elemento": ""
-                                        }]
+                                        entrada['valorvisibility'] =[]
                                     else:
                                         entrada['valorvisibility']=[]
                                         reglavisibilidadobject ={}
@@ -158,17 +154,7 @@ class GetForms(View):
 
                                     #Se valida si tiene algun formulario asociado para precargar datos
                                     if asignacionentrada.formulario_asociado == None:
-                                        entrada['asociate_form']={
-                                        "actualizar_existente": "",
-                                        "name": "",
-                                        "associate_id": "",
-                                        "entrada_destino": "",
-                                        "entrada_fuente": "",
-                                        "crear_nuevo": "",
-                                        "seleccionar_existentes": "",
-                                        "seleccionar_multiples": "",
-                                        "description": ""
-                                        }
+                                        entrada['asociate_form']=[]
                                     else:
                                         atributos=[]
                                         objetos=[]

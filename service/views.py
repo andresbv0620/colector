@@ -156,6 +156,7 @@ class GetForms(View):
                                     if asignacionentrada.formulario_asociado == None:
                                         entrada['asociate_form']=[]
                                     else:
+                                        entrada['asociate_form']=[]
                                         atributos=[]
                                         objetos=[]
                                         registroOpcion={}                                        
@@ -174,7 +175,7 @@ class GetForms(View):
                                         #asociate_form['entrada_destino'] = formasociado.entrada_destino.id
 
 
-                                        entrada['asociate_form'] = asociate_form
+                                        entrada['asociate_form'].append(asociate_form)
                                         entrada['options'] = []
                                         entrada['atributos'] = []
                                         document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(formasociado.form_asociado.id)},

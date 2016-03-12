@@ -140,19 +140,20 @@ class GetForms(View):
                                     entrada['validacion'] = asignacionentrada.validacion
 
                                     if (asignacionentrada.regla_visibilidad == None):
-                                        entrada['regla_visibilidad'] ={
+                                        entrada['valorvisibility'] =[{
                                         "operador": "",
                                         "valor": "",
                                         "elemento": ""
-                                        }
+                                        }]
                                     else:
+                                        entrada['valorvisibility']=[]
                                         reglavisibilidadobject ={}
                                         reglavisibilidad = ReglaVisibilidad.objects.get(visibilizar=asignacionentrada)
                                         reglavisibilidadobject['elemento'] = reglavisibilidad.elemento.id
                                         reglavisibilidadobject['operador'] = reglavisibilidad.operador
                                         reglavisibilidadobject['valor'] = reglavisibilidad.valor
 
-                                        entrada['regla_visibilidad'] = reglavisibilidadobject
+                                        entrada['valorvisibility'].append(reglavisibilidadobject)
 
 
                                     #Se valida si tiene algun formulario asociado para precargar datos

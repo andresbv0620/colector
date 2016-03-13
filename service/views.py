@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad, FormularioAsociado
+from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad, FormularioAsociado, AsignacionEntrada
 import json
 from bson import json_util
 import hashlib
@@ -120,7 +120,7 @@ class GetForms(View):
                             if len(f.entrada.all()):
                                 ficha['inputs'] = []
                                 #Se genera la lista de inputs o entradas
-                                for e in f.entrada.all():
+                                for e in f.entrada.all().order_by('asignacionentrada'):
 
                                     entrada = {}
                                     entrada['input_id'] = e.id

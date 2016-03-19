@@ -192,7 +192,7 @@ class FormularioAsociado(models.Model):
     
 
 class Respuesta(models.Model):
-	valor  = models.CharField(max_length=100, blank = True , unique=True)
+	valor  = models.CharField(max_length=500, blank = True , unique=True)
 
 	def __unicode__(self):
 		return self.valor

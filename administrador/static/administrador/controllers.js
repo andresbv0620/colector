@@ -181,42 +181,6 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
 //////////////Reporte por formid////////////////////////7
 app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
     
-
-  $scope.items = ['item1', 'item2', 'item3'];
-  $scope.selected.item=['item1', 'item2', 'item3'];
-
-  $scope.animationsEnabled = true;
-
-  $scope.open = function (size) {
-
-    var modalInstance = $uibModal.open({
-      animation: $scope.animationsEnabled,
-      templateUrl: 'myModalContent.html',
-      controller: 'ModalInstanceCtrl',
-      size: size,
-      resolve: {
-        items: function () {
-          return $scope.selected.item;
-        }
-      }
-    });
-
-    modalInstance.result.then(function (selectedItem) {
-      $scope.selected = selectedItem;
-    }, function () {
-      $log.info('Modal dismissed at: ' + new Date());
-    });
-  };
-
-  $scope.toggleAnimation = function () {
-    $scope.animationsEnabled = !$scope.animationsEnabled;
-  };
-
-
-
-
-
-
     $scope.loading = true;
 
     ////////////////////////////////LLAMADO AL SERVICIO QUE DEVUELVE FORMULARIOS DILIGENCIADOS/////////////////////////////////////////////
@@ -306,7 +270,7 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                             if (typeof datacolumns[inputLabel] !== "undefined") {
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
                             } else {
-                                datacolumns[inputLabel] = '<a href="#" ng-click="$event.preventDefault(); selected.item = ' + inputValue + '"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></a>';
+                                datacolumns[inputLabel] = '<a class="thumb" ng-click="alerta()"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>';
                             }
                         } 
 
@@ -389,22 +353,8 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
     });
 
 }]);
+///////////////////////////////////////////////////////
 
-app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items) {
-
-  $scope.items = items;
-  $scope.selected = {
-    item: $scope.items[0]
-  };
-
-  $scope.ok = function () {
-    $uibModalInstance.close($scope.selected.item);
-  };
-
-  $scope.cancel = function () {
-    $uibModalInstance.dismiss('cancel');
-  };
-});
 
 ///////////////////Reporte Mapa/////////////////////////////
 app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'globales', function($scope, $routeParams, defaultService, globales) {

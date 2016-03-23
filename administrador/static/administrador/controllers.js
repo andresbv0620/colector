@@ -268,7 +268,7 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                         //Reporte para foto, Se valida si es foto, para convertirla de base64
                         if ((inputType == 6)||(inputType==14)) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<a class="thumb" ng-click="alerta()"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>';
                             } else {
                                 datacolumns[inputLabel] = '<a class="thumb" ng-click="alerta()"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>';
                             }
@@ -296,7 +296,7 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                     dfin.setUTCSeconds(horafin);
                     datacolumns["Fin"] = dfin;
 
-                    datacolumns["Delete"] = '<a href="#/reporte/id/'+$routeParams.form_id+'/record/delete/'+filledforms[form].record_id+'">Delete</a>';
+                    datacolumns["Delete"] = '<a id="delete_row" href="#/reporte/id/'+$routeParams.form_id+'/record/delete/'+filledforms[form].record_id+'">Delete</a>';
 
                     //Se guardan las respuestas de la fila en el objeto data
                     data.push(datacolumns);
@@ -393,212 +393,76 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
 
 
 //////////////////////////DELETE RECORD////////////////////////////777
-
-app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'globales', function($scope, $routeParams, defaultService, globales) {
+app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'globales','$location', function($scope, $routeParams, defaultService, globales, $location) {
     colector_id = globales.user_id;
     record_id = $routeParams.record_id;
+    form_id = $routeParams.form_id;
+    $scope.notificacion = "Esta a punto de eliminar un registro";
     $scope.loading = true;
-    defaultService.post(globales.static_url + '../service/form/delete/' + record_id + '/', '{"colector_id":"' + colector_id + '","record_id":"'+record_id+'"}', function(data) {
-       $scope.notificacion = "The record has been deleted";
-    }, function(error) {
-        console.log(error)
-    });
-    //////////Se resta para obtener el anterior y en el siguiente llamado se le suma para volver al actual////////////
-    formidanterior=$routeParams.form_id-1;
-    $scope.loading = true;
-
-               ////////////////////////////////LLAMADO AL SERVICIO QUE DEVUELVE FORMULARIOS DILIGENCIADOS/////////////////////////////////////////////
-        defaultService.get(globales.static_url + '../service/filled/forms/report/formid/' + $routeParams.form_id + '/', function(data) {
-            console.log("datos recibidos del servidor: ");
-            //console.log(data);
-            colectorfilledforms = data['data'];
-
-            //$scope.colectorid=colectorfilledforms[0].colector_id;
-
-            //console.log(filledforms);
-
-            tableheader = [];
-            columns = new Array();
-            data = new Array();
-            tablecontent = new Object();
-            markersArray = new Array();
-
-            ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
-            /*column = new Object();
-            column['field'] = "Start";
-            column['sortable'] = true;
-            column['title'] = "Start";
-            columns.push(column);*/
-
-            column = new Object();
-            column['field'] = "Date";
-            column['sortable'] = true;
-            column['title'] = "Date";
-            columns.push(column);
-
-            ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
-            for (colectorDocument in colectorfilledforms) {
-                filledforms = colectorfilledforms[colectorDocument].filled_forms;
-                //$scope.filledforms=filledforms;
-                console.log(filledforms);
-
-                //Cada registro o fila en la tabla
-                for (form in filledforms) {
-                    //If que filtra solo el reporte del form_id seleccionado
-                    if (filledforms[form].form_id == $routeParams.form_id) {
-                        $scope.formname=filledforms[form].form_name;
-
-                        ///////////Se asignan las coordenadas GPS del registro/////////////////
-                        datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
-                        //markers objeto usado para el mapa
-                        markers = {};
-                        markers['longitude'] = filledforms[form].longitud;
-                        markers['latitude'] = filledforms[form].latitud;
-                        
-                        datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
-
-                        responses = filledforms[form].responses;
-                        respuestas = new Array();
-
-
-                        //Cada respuesta o columna en una fila
-                        for (response in responses) {
-                            inputId = responses[response].inputs_id;
-                            if (typeof markers['message'] == "undefined") {
-                                markers['message'] = responses[response].value;
-                            }
-                            inputValue = responses[response].value;
-                            inputLabel = responses[response].label;
-                            inputType = responses[response].tipo;
-
-                            
-
-                            //Validamos para generar la fila de encabezados
-                            if (tableheader.indexOf(inputLabel) < 0) {
-                                column = new Object();
-                                column['field'] = inputLabel;
-                                column['sortable'] = true;
-                                column['title'] = inputLabel;
-                                columns.push(column);
-                                tableheader.push(inputLabel);
-                            }
-
-
-
-                            //Reporte numero, Se valida si es numero
-                            if (inputType == 8) {
-                                inputValue=parseFloat(inputValue);
-                                if (typeof datacolumns[inputLabel] !== "undefined") {
-                                    datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                                } else {
-                                    datacolumns[inputLabel] = inputValue;
-
-                                }
-                            }
-
-                            //Reporte para foto, Se valida si es foto, para convertirla de base64
-                            if ((inputType == 6)||(inputType==14)) {
-                                if (typeof datacolumns[inputLabel] !== "undefined") {
-                                    datacolumns[inputLabel] = datacolumns[inputLabel] + '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
-                                } else {
-                                    datacolumns[inputLabel] = '<img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/>';
-                                }
-                            } 
-
-                            //Reporte para el resto de tipos de entrada
-                            if ((inputType==1)||(inputType==2)||(inputType==3)||(inputType==4)||(inputType==5)||(inputType==7)||(inputType==9)||(inputType==10)||(inputType==11)||(inputType==12)) {
-                                if (typeof datacolumns[inputLabel] !== "undefined") {
-                                    datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
-                                } else {
-                                    datacolumns[inputLabel] = inputValue;
-                                }
-                            }
-                        }//Fin for para mostrar cada respuesta (columna) de una fila
-
-                        /////////////COLUMNAS ADICIONALES en la fila Calculo non monority//////
-                       
-                        
-                        ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
-                        /*horaini = filledforms[form].horaini;
-                        var dini = new Date(0);
-                        dini.setUTCSeconds(horaini);
-                        datacolumns["Start"] = dini;*/
-
-                        horafin = filledforms[form].horafin;
-                        var dfin = new Date(0);
-                        dfin.setUTCSeconds(horafin);
-                        datacolumns["Date"] = dfin;
-
-                        datacolumns["Delete"] = '<a href="#/reporte/id/'+$routeParams.form_id+'/record/delete/'+filledforms[form].record_id+'">Delete</a>';
-
-                        //Se guardan las respuestas de la fila en el objeto data
-                        data.push(datacolumns);
-                        markersArray.push(markers);
-                    }//Fin If que filtra solo el reporte del form_id seleccionado
-                }///////////Fin for filas o registros/////////////////////
-                //FILAS ADICIONALES, Sumatorias y totales de columnas
-
-                
-
-            }
-
-
-            /////ENCABEZADOS ADICIONALES////
-
-
-            column = new Object();
-            column['field'] = "Delete";
-            column['sortable'] = true;
-            column['title'] = "Delete";
-            columns.push(column);
-
-
-            
-
-            //////////////MAPA EN CADA REGISTRO///////////////////
-
-            column = new Object();
-            column['field'] = "View Map";
-            column['sortable'] = true;
-            column['title'] = "View Map";
-            columns.push(column);
-
-            tablecontent['columns'] = columns;
-            tablecontent['data'] = data;
-
-
-            $scope.tableheaders = tableheader;
-            $('#table').bootstrapTable(tablecontent);
-
-
-            ///////////////////////////////MAPS REPORT////////////////////////
-
-            $scope.map = {
-                center: {
-                    latitude: markers['latitude'],
-                    longitude: markers['longitude']
-                },
-                zoom: 12
-            };
-
-            $scope.marker = {
-                coords: {
-                    latitude: markers['latitude'],
-                    longitude: markers['longitude']
-                }
-            }
-
-            $scope.markerList = markersArray;
-
-            ////Cambio el estado del loading para que no se muestre una vez cargado todo success
-            $scope.loading = false;
-
+    if(confirm("¿Esta seguro de borrar este registro?")){
+        /////Llamado al servicio de borrado////
+        defaultService.post(globales.static_url + '../service/form/delete/' + record_id + '/', '{"colector_id":"' + colector_id + '","record_id":"'+record_id+'"}', function(data) {
+           $scope.notificacion = "El registro ha sido borrado";
+           $location.path("reporte/id/"+ form_id+"" ).replace();
         }, function(error) {
             console.log(error)
         });
-
-
+    }else{
+        $location.path("reporte/id/"+ form_id+"" ).replace();
+    }
 }]);
+
+app.controller('ModalDemoCtrl', function ($scope, $uibModal, $log) {
+
+  $scope.items = ['item1', 'item2', 'item3'];
+
+  $scope.animationsEnabled = true;
+
+  $scope.open = function (size) {
+
+    var modalInstance = $uibModal.open({
+      animation: $scope.animationsEnabled,
+      templateUrl: 'myModalContent.html',
+      controller: 'ModalInstanceCtrl',
+      size: size,
+      resolve: {
+        items: function () {
+          return $scope.items;
+        }
+      }
+    });
+
+    modalInstance.result.then(function (selectedItem) {
+      $scope.selected = selectedItem;
+    }, function () {
+      $log.info('Modal dismissed at: ' + new Date());
+    });
+  };
+
+  $scope.toggleAnimation = function () {
+    $scope.animationsEnabled = !$scope.animationsEnabled;
+  };
+
+});
+
+// Please note that $uibModalInstance represents a modal window (instance) dependency.
+// It is not the same as the $uibModal service used above.
+
+app.controller('ModalInstanceCtrl', function ($scope, $uibModalInstance, items) {
+
+  $scope.items = items;
+  $scope.selected = {
+    item: $scope.items[0]
+  };
+
+  $scope.ok = function () {
+    $uibModalInstance.close($scope.selected.item);
+  };
+
+  $scope.cancel = function () {
+    $uibModalInstance.dismiss('cancel');
+  };
+});
 
 
 //////////////////////////////////////////////////////////////

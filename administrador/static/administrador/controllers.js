@@ -217,6 +217,20 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         column['title'] = "Fin";
         columns.push(column);
 
+        column = new Object();
+        column['field'] = "id";
+        column['sortable'] = true;
+        column['visible'] = false;
+        column['title'] = "id";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "sorter";
+        column['sortable'] = true;
+        column['visible'] = false;
+        column['title'] = "sorter";
+        columns.push(column);
+
         ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
@@ -303,6 +317,9 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                     var dfin = new Date(0);
                     dfin.setUTCSeconds(horafin);
                     datacolumns["Fin"] = dfin;
+
+                    datacolumns["id"] = filledforms[form].record_id;
+                    datacolumns["sorter"] = horafin;
 
                     datacolumns["Delete"] = '<a id="delete_row" href="#/reporte/id/'+$routeParams.form_id+'/record/delete/'+filledforms[form].record_id+'">Delete</a>';
 

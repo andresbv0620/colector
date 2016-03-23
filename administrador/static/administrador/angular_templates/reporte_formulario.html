@@ -1,4 +1,5 @@
 <div class="box-body">
+
 <!-- <p class="bg-success">[[notificacion]]</p> -->
 
 	<!-- <h2>[[formnameencabezado]]</h2> -->
@@ -7,7 +8,7 @@
 	<div class="text-center">
 		<!-- <h3>[[formname]]</h3> -->
 	</div>
-	<h4>Export</h4>
+	
         <div id="toolbar">
             <select class="form-control">
                 <option value="">Export Basic</option>
@@ -17,49 +18,61 @@
         </div>
 
     <style type="text/css">
-	    #thumbwrap {
+	#thumbwrap {
 		position:relative;
 		margin:75px auto;
 		width:252px; height:252px;
-		}
-		.thumb img { 
-			border:1px solid #000;
-			margin:3px;
-			float:left;
-		}
-		.thumb span { 
-			position:absolute;
-			visibility:hidden;
-		}
-		.thumb:hover, .thumb:hover span { 
-			visibility:visible;
-			top:0; left:250px; 
-			z-index:1;
-		}
+	}
+	.thumb img { 
+		border:1px solid #000;
+		margin:3px;
+		float:left;
+	}
+	.thumb span { 
+		position:fixed;
+		visibility:hidden;
+	}
+	.thumb:hover, .thumb:hover span { 
+		visibility:visible;
+		top:0; left:420px; 
+		z-index:1;
+	}
     </style>
 
 	<table id="table"
 	data-toggle="table"
-	data-show-export="true"
-	data-toolbar="#toolbar" 
-	data-sort-order="desc" 
-	data-show-columns="true"
-	data-search="true"
-    data-id-field="id"
-    data-escape="false"    
-    data-row-style="rowStyle"
-	data-show-toggle="true"></table>
 	
-<script>
-    var $table = $('#table');
-    $(function () {
-        $('#toolbar').find('select').change(function () {
-            $table.bootstrapTable('refreshOptions', {
-                exportDataType: $(this).val()
-            });
-        });
-    })
-</script>
+
+	data-toolbar="#toolbar"
+	data-search="true"
+	data-show-refresh="false"
+	data-show-toggle="true"
+	data-show-columns="true"
+	data-minimum-count-columns="2"
+	data-show-export="true"
+	data-show-pagination-switch="true"
+	data-pagination="true"
+	data-click-to-select="true"
+
+		
+	data-detail-view="true"
+	data-detail-formatter="¡Registro completo!"
+	
+	data-id-field="id"
+	data-page-list="[5, 10, 25, 50, 100, ALL]"
+
+	data-show-footer="false"
+	
+	data-height="500"
+ 	data-sort-order="desc" 
+ 	data-sort-name="Fin"
+
+    data-escape="false"    
+    data-striped="true"
+	
+	></table>
+	
+
 
 
 

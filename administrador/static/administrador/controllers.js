@@ -182,6 +182,7 @@ app.controller('reporteFormulario', ['$scope', 'defaultService', 'globales', fun
 app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
     
     $scope.loading = true;
+    $("#table").bootstrapTable("showLoading");
 
     ////////////////////////////////LLAMADO AL SERVICIO QUE DEVUELVE FORMULARIOS DILIGENCIADOS/////////////////////////////////////////////
     defaultService.get(globales.static_url + '../service/filled/forms/report/formid/' + $routeParams.form_id + '/', function(data) {
@@ -197,6 +198,13 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         markersArray = new Array();
 
         ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        column = new Object();
+        column['field'] = "state";
+        column['checkbox'] = true;
+        column['title'] = "state";
+        columns.push(column);
+
+
         column = new Object();
         column['field'] = "Inicio";
         column['sortable'] = true;
@@ -322,11 +330,30 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         columns.push(column);
         tablecontent['columns'] = columns;
         tablecontent['data'] = data;
+        tablecontent['formatLoadingMessage'] = function () {
+            return '<img src="http://www.arabianbusiness.com/skins/ab.main/gfx/loading_spinner.gif" />';
+        };
 
         $scope.tableheaders = tableheader;
         $('#table').bootstrapTable(tablecontent);
+        
+        $("#table").bootstrapTable('hideLoading');
+
+        ///Datos a exportar segun select, basico, seleccionados o todos.
+
+         var $table = $('#table');
+            $(function () {
+                $('#toolbar').find('select').change(function () {
+                    alert("Cambio");
+                    $table.bootstrapTable('refreshOptions', {
+                        exportDataType: $(this).val()
+                    });
+                });
+
+            });
 
 
+        
         ///////////////////////////////MAPS REPORT////////////////////////
         $scope.map = {
             center: {

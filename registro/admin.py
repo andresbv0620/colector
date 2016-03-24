@@ -45,7 +45,7 @@ class FichaAdmin(admin.ModelAdmin):
     inlines = (AsignacionEntradaInline,)
 
 class EntradaAdmin(admin.ModelAdmin):
-    list_display = ('id', 'nombre', 'descripcion',  'tipo' )    
+    list_display = ('nombre', 'descripcion',  'tipo', 'id', )    
     list_filter = ('tipo',)
     search_fields = ['nombre', 'descripcion' ]
     filter_horizontal = ('respuesta',  )
@@ -67,7 +67,7 @@ class ReglaVisibilidadAdmin(admin.ModelAdmin):
     search_fields = ['valor', ]
 
 class RespuestaAdmin(admin.ModelAdmin):
-    list_display = ('valor', )
+    list_display = ('valor', 'id', )
     search_fields = ['valor', ]
 
 class FormularioDiligenciadoAdmin(admin.ModelAdmin):

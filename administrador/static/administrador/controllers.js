@@ -440,6 +440,7 @@ app.controller('reporteMapa', ['$scope', '$routeParams', 'defaultService', 'glob
 app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'globales','$location', function($scope, $routeParams, defaultService, globales, $location) {
     colector_id = globales.user_id;
     record_id = $routeParams.record_id;
+    alert(record_id);
     form_id = $routeParams.form_id;
     $scope.notificacion = "Esta a punto de eliminar un registro";
     $scope.loading = true;

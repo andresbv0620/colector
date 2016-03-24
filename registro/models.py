@@ -123,6 +123,9 @@ class Entrada(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=True)
 	descripcion = models.TextField(max_length=100, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
+
+	class Meta:
+		ordering = ('id',)
 	
 	#precargado = models.CharField(max_length=2, choices=REQUIRED_CHOICES, default=NO)
 
@@ -193,6 +196,9 @@ class FormularioAsociado(models.Model):
 
 class Respuesta(models.Model):
 	valor  = models.CharField(max_length=500, blank = True , unique=True)
+
+	class Meta:
+		ordering = ('id',)
 
 	def __unicode__(self):
 		return self.valor

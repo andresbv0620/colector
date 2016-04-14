@@ -304,7 +304,6 @@ class GetForms(View):
 
         return HttpResponse('Single form')
 
-
 class SingleForm(View):
 
     @method_decorator(csrf_exempt)
@@ -614,6 +613,170 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
+#Guarda una foto a la vez
+class SaveImg(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SaveImg, self).dispatch(*args, **kwargs)
+
+    # validando la el formato del formulario enviado
+
+    def dataValidator(self, array_validation):
+
+        response = {}
+        response['error'] = False
+        response['validation_errors'] = []
+
+        # validacion del formulario
+
+        if not array_validation['colector_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('colector_id is blank')
+
+        if not array_validation['form_id'].strip():
+
+            response['error'] = True
+            response['validation_errors'].append('form_id is blank')
+
+        if len(array_validation['responses']) == 0:
+            response['error'] = True
+            response['validation_errors'].append('responses is blank')
+        else:
+
+            try:
+                for responseItem in array_validation['responses']:
+                    try:
+                        response_value=responseItem['value']
+                        input_id=responseItem['input_id']
+                    except Exception, e:
+                        response['error'] = True
+                        response['validation_errors'].append("any response don't contains value or input_id")
+                   
+            except Exception, e:
+                response['error'] = True
+                response['validation_errors'].append("any input don't contains responses")
+
+        return response
+
+    def post(self, request):
+        resp = {}
+        # validando data correcta enviada en body
+        try:
+            data = json.loads(request.body)
+            colector_id = data['colector_id']
+            form_id = data['form_id']
+            responses = data['responses']
+            
+            array_validation = {}
+            array_validation['colector_id'] = colector_id
+            array_validation['form_id'] = form_id
+            array_validation['responses'] = responses
+
+            data_validator = self.dataValidator(array_validation)
+
+            if data_validator['error'] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = \
+                    data_validator['validation_errors']
+                resp['response_description'] = \
+                    str('the body data contain validation errors')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ","responses":" " }')
+
+                return HttpResponse(json.dumps(resp,
+                                    default=json_util.default),
+                                    content_type='application/json')
+            else:
+                pass
+
+            # construyendo json para insertar en mongodb
+
+            try:
+
+                form = {}
+                form['fecha_creacion'] = datetime.utcnow()
+                form['record_id']=str(uuid.uuid4())
+                form['form_id'] = form_id
+                formulario = Formulario.objects.get(id = str(form['form_id']))
+                form['form_name'] = formulario.nombre
+                form['form_description'] = formulario.descripcion
+
+                #Aqui vienen las fotos y se recorre cada una para ser guardadas
+                for response in responses:
+                    input_id=response['input_id']
+                    entrada = Entrada.objects.get(id = str(input_id))
+                    response['label']=entrada.nombre
+                    response['tipo']=entrada.tipo
+                    if entrada.tipo == "4" or entrada.tipo == "5":
+                        response_id=response['value']
+                        respuesta = Respuesta.objects.get(id = str(response_id))
+                        response['value']=respuesta.valor
+
+                form['responses'] = responses
+
+                # return HttpResponse(json.dumps(data))
+
+                colector = \
+                    database.saved_imgs.find_one({'colector_id': str(colector_id)},
+                        {'_id': 0})                
+
+                # validando si existe un colector con esta id
+
+                if colector == None:
+                    data = {}
+                    data['colector_id'] = colector_id
+                    data['saved_imgs'] = []
+                    data['saved_imgs'].append(form)
+                    
+                    database.saved_imgs.insert(data)
+                    #database.saved_imgs.create_index("filled_forms.sections.inputs.responses")
+
+                else:
+
+                    database.saved_imgs.update({'colector_id': str(colector_id)},
+                            {'$push': {'saved_imgs': form}})
+
+                    # return HttpResponse("colector existe")
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('Img Saved')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+                return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
+            except Exception, e:
+
+                resp['response_code'] = '400'
+                resp['response_description'] = \
+                    str('Error inserting data image in mongodb' + str(e.args))
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+        except Exception, e:
+
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = \
+                str('{"colector_id":"", "form_id":" ", "responses":"[]" }')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+
+
+
 #ELIMINA UN REGISTRO
 class DeleteResponsesForm(View):
 
@@ -878,9 +1041,8 @@ class FillForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
-#Reporte SIN USO
-class FilledFormsReport(View):
-
+    #Reporte SIN USO
+ 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(FilledFormsReport, self).dispatch(*args, **kwargs)
@@ -991,6 +1153,10 @@ def FormIdReport(request, id):
         return HttpResponse(json.dumps(resp,
                             default=json_util.default),
                             content_type='application/json')
+
+#Reporte por form id paginacion
+def FormIdReportPag(request, id):
+    print "Llamo este metodo FormIdReportPag"
 
 #Reporte por fecha
 def DateReport(

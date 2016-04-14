@@ -27,6 +27,7 @@ url(r'^logout/$', 'django.contrib.auth.views.logout', {'template_name': 'adminis
 url(r'^dashboard/$', views.dashboard),
 url(r'^reporte/$', views.reporte),
 url(r'^index/$', views.index),
+url(r'^test/', 'administrador.views.testview'),
 
     
 ]

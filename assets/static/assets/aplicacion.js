@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute','uiGmapgoogle-maps','ui.bootstrap']);
+var app = angular.module('app', ['ngRoute','uiGmapgoogle-maps','ui.bootstrap','bsTable']);
 
 app.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');

@@ -11,13 +11,25 @@ from bson import json_util
 import hashlib
 import pymongo
 import uuid
+import collections
 from datetime import datetime
+import time
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 servidor = pymongo.MongoClient('localhost', 27017)
 database = servidor.colector
 
+#Convert cursor of mongo to a dict python
+def convert(data):
+    if isinstance(data, basestring):
+        return str(data)
+    elif isinstance(data, collections.Mapping):
+        return dict(map(convert, data.iteritems()))
+    elif isinstance(data, collections.Iterable):
+        return type(data)(map(convert, data))
+    else:
+        return data
 
 # Create your views here.
-
 class AllowedForms(View):   
 
     @method_decorator(csrf_exempt)
@@ -599,8 +611,7 @@ class FillResponsesForm(View):
                         )
                 resp['response_data'] = request.body
 
-            return HttpResponse(json.dumps(resp),
-                                content_type='application/json')
+            return HttpResponse(json.dumps(resp), content_type='application/json')
         except Exception, e:
 
             resp['response_code'] = '400'
@@ -774,8 +785,6 @@ class SaveImg(View):
 
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
-
-
 
 #ELIMINA UN REGISTRO
 class DeleteResponsesForm(View):
@@ -1154,9 +1163,156 @@ def FormIdReport(request, id):
                             default=json_util.default),
                             content_type='application/json')
 
+
 #Reporte por form id paginacion
 def FormIdReportPag(request, id):
-    print "Llamo este metodo FormIdReportPag"
+    #Setting Pagination
+    #sumo 1 porque en django la paginacion no empieza desde 0, empieza desde 1
+    page=int(request.GET.get('page', 1))+1
+    limit=int(request.GET.get('limit', 10))
+    #Consulta a mongodb
+    filled_forms = database.filled_forms.find({'filled_forms.form_id': str(id)}, {'_id': 0})
+    resp = {}
+    #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
+    if filled_forms.count() == 0:
+        resp['response_code'] = '404'
+        resp['response_description'] = 'form id not found'
+        return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
+    else:
+        #print "Count ",filled_forms.count()
+        forms = []
+        #Each colector has a document with its respective forms, the main nodes of a colector document are filled_forms and colector_id
+        #Below f is a document
+        for f in filled_forms:
+            #print "Colector Id who contains this formid: ",f["colector_id"]
+            #Converts mongo cursor into a python dict
+            colectorForms=convert(f["filled_forms"])
+            for colectorForm in colectorForms:
+                colectorFormId=colectorForm["form_id"]
+                #Filter the forms requested by id
+                if colectorFormId == id:
+                    #print colectorFormId
+                    forms.append(colectorForm)
+
+        #forms contiene todos los  registros del form con el id requerido. A continuacion se hace la paginacion
+        paginator = Paginator(forms, limit) # Show limit records per page
+        tableheader=[]
+
+        
+
+        try:
+            paginatedForms = paginator.page(page)
+            rows=[]
+            columns=[]
+            markersArray=[]
+
+            #Setting the paggination attributes  
+            resp['hasPrevious'] = paginatedForms.has_previous()
+            if paginatedForms.has_previous():
+                resp['hasPrevious'] = paginatedForms.has_previous()
+                resp['previousPageNumber'] = paginatedForms.previous_page_number()
+
+            resp['hasNext'] = paginatedForms.has_next()
+            if paginatedForms.has_next():   
+                resp['hasNext'] = paginatedForms.has_next()
+                resp['nextPageNumber'] = paginatedForms.next_page_number()
+
+            resp['currentPage'] = page
+            resp['numPages'] = paginatedForms.paginator.num_pages
+
+
+            for paginatedForm in paginatedForms:
+                #print paginatedForm["form_name"]
+                responses=paginatedForm["responses"]
+                datarows = {}#Objeto que va guardando las respuestas de cada registro
+                #markers objeto usado para el mapa
+                markers = {}
+                markers['longitude'] = paginatedForm["latitud"]
+                markers['latitude'] = paginatedForm["longitud"]
+                datarows["id"] = paginatedForm["record_id"]
+                datarows["form_id"] = paginatedForm["form_id"]
+
+                for response in responses:
+                    inputId = response["input_id"]
+                    #print "Input id: ", inputId
+                    inputValue = response["value"]
+                    inputLabel = response["label"]
+                    inputType = response["tipo"]
+
+                    #Se define la primer respuesta como el titulo del pin enel mapa
+                    if not markers.has_key('message'):
+                        markers['message'] = inputValue
+
+                    #Validamos para generar la fila de encabezados
+                    if not inputLabel in tableheader:
+                        column = {}
+                        column['field'] = inputLabel
+                        column['sortable'] = True
+                        column['title'] = inputLabel
+                        columns.append(column)
+                        tableheader.append(inputLabel)
+                    
+                    #Reporte numero, Se valida si es numero
+                    if (inputType == '8'):
+                        inputValue=float(inputValue)
+                        if datarows.has_key(inputLabel):
+                            datarows[inputLabel] = datarows[inputLabel] + ',' + inputValue
+                        else:
+                            datarows[inputLabel] = inputValue
+
+                    #Reporte para foto, Se valida si es foto, para convertirla de base64
+                    if ((inputType == '6')or(inputType=='14')):
+                        if datarows.has_key(inputLabel):
+                            datarows[inputLabel] = datarows[inputLabel] + '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>'
+                        else:
+                            datarows[inputLabel] = '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>'
+
+                    #Reporte para el resto de tipos de entrada
+                    if ((inputType=='1')or(inputType=='2')or(inputType=='3')or(inputType=='4')or(inputType=='5')or(inputType=='7')or(inputType=='9')or(inputType=='10')or(inputType=='11')or(inputType=='12')):
+                        if datarows.has_key(inputLabel):
+                            datarows[inputLabel] = datarows[inputLabel] + ',' + inputValue
+                        else:
+                            datarows[inputLabel] = inputValue
+
+                #Fin for para mostrar cada respuesta (columna) de una fila
+                #///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
+                horaini = float(paginatedForm["horaini"])
+                datarows["Inicio"] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(horaini))
+
+                horafin = float(paginatedForm["horafin"])
+                datarows["Fin"] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(horafin))
+
+                datarows["id"] = paginatedForm["record_id"]
+                datarows["sorter"] = horafin
+
+                datarows["Delete"] = '<a id="delete_row" href="#/reporte/id/'+datarows["form_id"]+'/record/delete/'+paginatedForm["record_id"]+'">Delete</a>'
+
+                #//Se guardan las respuestas de la fila en el objeto data
+                rows.append(datarows)
+                
+                markersArray.append(markers)
+                resp['response_code'] = '200'
+                resp['response_description'] = 'form id found'
+                resp['total'] = len(forms)
+                resp['rows'] = rows
+                resp['cols'] = columns
+                resp['markers'] = markersArray
+
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            paginatedForms = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            paginatedForms = paginator.page(paginator.num_pages)
+
+        
+
+        return HttpResponse(json.dumps(resp,
+                           default=json_util.default),
+                          content_type='application/json')
+
+
+
 
 #Reporte por fecha
 def DateReport(

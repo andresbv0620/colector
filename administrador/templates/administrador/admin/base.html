@@ -32,10 +32,6 @@
     <link rel="stylesheet" href="{% static 'administrador/admin/plugins/bootstrap-wysihtml5/bootstrap3-wysihtml5.min.css' %}">
     <!-- TABLE Latest compiled and minified CSS -->
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.8.1/bootstrap-table.min.css">
-
-
-
-
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -97,7 +93,6 @@
 
     <!-- TABLE Latest compiled and minified JavaScript -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/bootstrap-table.min.js"></script>
-
   <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.1/extensions/angular/bootstrap-table-angular.js"></script>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.10.0/extensions/export/bootstrap-table-export.js"></script>
@@ -243,7 +238,7 @@
                 
                     {% for formulario in formularios %}
                         <li>
-                          <a href="#/reporte/id/{{formulario.id}}/"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
+                          <a href="#/reporte/id/{{formulario.id}}/page/0/limit/10"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
                         </li>
                     {% endfor %}
    

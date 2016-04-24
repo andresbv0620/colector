@@ -257,7 +257,7 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
 
                     //Cada respuesta o columna en una fila
                     for (response in responses) {
-                        inputId = responses[response].inputs_id;
+                        inputId = responses[response].input_id;
                         //Se define la primer respuesta como el titulo del pin enel mapa
                         if (typeof markers['message'] == "undefined") {
                             markers['message'] = responses[response].value;
@@ -469,174 +469,192 @@ app.controller('alerta', ['$scope', '$routeParams', 'defaultService', 'globales'
 
 }]);
 
-app.controller('MainController', function ($scope, $http) {
-    $scope.workspaces = [];
-    $scope.workspaces.push({ name: 'Workspace 1' });
-    $scope.workspaces.push({ name: 'Workspace 2' });
-    $scope.workspaces.push({ name: 'Workspace 3' });
+//////////////Paginacion Controller//////////////////////7
+app.controller('FormIdReportPaginate', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
+    $scope.loading = true;
+    $("#table").bootstrapTable("showLoading");
 
-    function makeRandomRows (colData) {
-        var rows = [];
-        for (var i = 0; i < 500; i++) {
-            rows.push($.extend({
-                index: i,
-                id: 'row ' + i,
-                name: 'GOOG' + i,
-                flagImage: Math.random() < 0.4
-                    ? 'https://docs.angularjs.org/img/angularjs-for-header-only.svg'
-                    : Math.random() < 0.75
-                        ? 'https://docs.angularjs.org/img/angularjs-for-header-only.svg'
-                        : 'https://docs.angularjs.org/img/angularjs-for-header-only.svg'
-            }, colData));
-        }
-        return rows;
-    }
-    $scope.workspaces.forEach(function (wk,index) {
-        var colData = {workspace: wk.name};
-        wk.rows = makeRandomRows(colData);
+    ////////////////////////////////LLAMADO AL SERVICIO QUE DEVUELVE FORMULARIOS DILIGENCIADOS/////////////////////////////////////////////
+    defaultService.get(globales.static_url + '../service/filled/forms/report/formidpag/' + $routeParams.form_id + '/?page='+ $routeParams.page + '&limit='+ $routeParams.limit + '', function(data) {
+        console.log("datos recibidos del servidor: ");
+        console.log($routeParams.limit);
+        colectorfilledforms = data['data'];
+        formrows=data['rows'];
+        formcols=data['cols'];
+        markers=data['markers'];
+        console.log(markers)
+        // init paginacion
+        $scope.page = $routeParams.page;
+        $scope.limit = $routeParams.limit;
+        $scope.nextPageNumber = data['nextPageNumber']-1;
+        $scope.previousPageNumber = data['previousPageNumber']-1;
+        $scope.hasPrevious = data['hasPrevious'];
+        $scope.hasNext = data['hasNext'];
+        $scope.numPages = data['numPages'];
+        $scope.total = data['total'];
+        $scope.formId = $routeParams.form_id;
 
-        wk.bsTableControl = {
-            options: {
-                data: wk.rows,
-                rowStyle: function (row, index) {
-                    return { classes: 'none' };
-                },
-                cache: false,
-                height: 400,
-                striped: true,
-                pagination: true,
-                pageSize: 10,
-                pageList: [5, 10, 25, 50, 100, 200],
-                search: true,
-                showColumns: true,
-                showRefresh: false,
-                minimumCountColumns: 2,
-                clickToSelect: false,
-                showToggle: true,
-                maintainSelected: true,
-                columns: [{
-                    field: 'state',
-                    checkbox: true
-                }, {
-                    field: 'index',
-                    title: '#',
-                    align: 'right',
-                    valign: 'bottom',
-                    sortable: true
-                }, {
-                    field: 'id',
-                    title: 'Item ID',
-                    align: 'center',
-                    valign: 'bottom',
-                    sortable: true
-                }, {
-                    field: 'name',
-                    title: 'Item Name',
-                    align: 'center',
-                    valign: 'middle',
-                    sortable: true
-                }, {
-                    field: 'workspace',
-                    title: 'Workspace',
-                    align: 'left',
-                    valign: 'top',
-                    sortable: true
-                }, {
-                    field: 'flag',
-                    title: 'Flag',
-                    align: 'center',
-                    valign: 'middle',
-                    clickToSelect: false,
-                    formatter: flagFormatter,
-                    // events: flagEvents
-                }]
+        $scope.pageSizes = [5,10,25,50];
+        $scope.reverse = false;
+        $scope.filteredItems = formrows;
+        $scope.groupedItems = [];
+        $scope.itemsPerPage = 0;
+        $scope.pagedItems = formrows;
+        $scope.currentPage = 0;
+        $scope.items = formrows;
+
+        // show items per page
+        $scope.perPage = function () {
+            $scope.groupToPages();
+        };
+
+        // calculate page in place
+        $scope.groupToPages = function () {
+        $scope.pagedItems = [];
+
+        for (var i = 0; i < $scope.filteredItems.length; i++) {
+            if (i % $scope.itemsPerPage === 0) {
+                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
+            } else {
+                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
+            }
             }
         };
-        function flagFormatter(value, row, index) {
-            return '<img src="' + row.flagImage + '"/>'
+
+        $scope.range = function (start, end) {
+        var ret = [];
+        if (!end) {
+          end = start;
+          start = 0;
+        }
+        for (var i = start; i < end; i++) {
+          ret.push(i);
+        }
+        return ret;
+        };
+
+        $scope.prevPage = function () {
+        if ($scope.currentPage > 0) {
+          $scope.currentPage--;
+        }
+        };
+
+        $scope.nextPage = function () {
+        if ($scope.currentPage < $scope.pagedItems.length - 1) {
+          $scope.currentPage++;
+        }
+        };
+
+        $scope.setPage = function () {
+            $scope.currentPage = this.n;
+        };
+      ////////////////////////////////////////
+
+        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        column = new Object();
+        column['field'] = "state";
+        column['checkbox'] = true;
+        column['title'] = "state";
+        formcols.unshift(column);
+
+
+        column = new Object();
+        column['field'] = "Inicio";
+        column['sortable'] = true;
+        column['title'] = "Inicio";
+        formcols.push(column);
+
+        column = new Object();
+        column['field'] = "Fin";
+        column['sortable'] = true;
+        column['title'] = "Fin";
+        formcols.push(column);
+
+        column = new Object();
+        column['field'] = "id";
+        column['sortable'] = true;
+        column['visible'] = false;
+        column['title'] = "id";
+        formcols.push(column);
+
+        column = new Object();
+        column['field'] = "sorter";
+        column['sortable'] = true;
+        column['visible'] = false;
+        column['title'] = "sorter";
+        formcols.push(column);
+
+        /////ENCABEZADOS ADICIONALES////
+        column = new Object();
+        column['field'] = "Delete";
+        column['sortable'] = true;
+        column['title'] = "Delete";
+        formcols.push(column);
+        
+        //////////////MAPA EN CADA REGISTRO///////////////////
+        column = new Object();
+        column['field'] = "View Map";
+        column['sortable'] = true;
+        column['title'] = "View Map";
+        formcols.push(column);
+
+        tablecontent={}
+
+        tablecontent['columns'] = formcols;
+        tablecontent['data'] = formrows;
+        tablecontent['formatLoadingMessage'] = function () {
+            return '<img src="http://www.arabianbusiness.com/skins/ab.main/gfx/loading_spinner.gif" />';
+        };
+
+        //$scope.tableheaders = tableheader;
+
+        $('#table').bootstrapTable(tablecontent);
+
+        $('#table').on('click-row.bs.table', function (e, row, $element) {
+        console.log('Event: click-row.bs.table');
+        });
+        
+        $("#table").bootstrapTable('hideLoading');
+
+        ///Datos a exportar segun select, basico, seleccionados o todos.
+
+         var $table = $('#table');
+            $(function () {
+                $('#toolbar').find('select').change(function () {
+                    $table.bootstrapTable('refreshOptions', {
+                        exportDataType: $(this).val()
+                    });
+                });
+
+            });
+
+            ///////////////////////////////MAPS REPORT////////////////////////
+        $scope.map = {
+            center: {
+                latitude: markers[0]['latitude'],
+                longitude: markers[0]['longitude']
+            },
+            zoom: 12
+        };
+
+        $scope.marker = {
+            coords: {
+                latitude: markers[0]['latitude'],
+                longitude: markers[0]['longitude']
+            }
         }
 
+        $scope.markerList = markers;
+        ////Cambio el estado del loading para que no se muestre una vez cargado todo success
+        $scope.loading = false;
+
+    }, function(error) {
+        console.log(error)
     });
 
-        var colData = {workspace: "wk.name"};
-        tablerows = makeRandomRows(colData);
-        
+}]);
+///////////////////////////////////////////////////////
 
-        bsTableControl = {
-            options: {
-                data: tablerows,
-                rowStyle: function (row, index) {
-                    return { classes: 'none' };
-                },
-                cache: false,
-                height: 400,
-                striped: true,
-                pagination: true,
-                pageSize: 10,
-                pageList: [5, 10, 25, 50, 100, 200],
-                search: true,
-                showColumns: true,
-                showRefresh: false,
-                minimumCountColumns: 2,
-                clickToSelect: false,
-                showToggle: true,
-                maintainSelected: true,
-                columns: [{
-                    field: 'state',
-                    checkbox: true
-                }, {
-                    field: 'index',
-                    title: '#',
-                    align: 'right',
-                    valign: 'bottom',
-                    sortable: true
-                }, {
-                    field: 'id',
-                    title: 'Item ID',
-                    align: 'center',
-                    valign: 'bottom',
-                    sortable: true
-                }, {
-                    field: 'name',
-                    title: 'Item Name',
-                    align: 'center',
-                    valign: 'middle',
-                    sortable: true
-                }, {
-                    field: 'workspace',
-                    title: 'Workspace',
-                    align: 'left',
-                    valign: 'top',
-                    sortable: true
-                }, {
-                    field: 'flag',
-                    title: 'Flag',
-                    align: 'center',
-                    valign: 'middle',
-                    clickToSelect: false,
-                    formatter: flagFormatter,
-                    // events: flagEvents
-                }]
-            }
-        };
-
-        function flagFormatter(value, row, index) {
-            return '<img src="' + row.flagImage + '"/>'
-        }
-
-
-    $scope.changeCurrentWorkspace = function (wk) {
-        $scope.currentWorkspace = wk;
-    };
-
-
-    //Select the workspace in document ready event
-    /*$(document).ready(function () {
-        $scope.changeCurrentWorkspace($scope.workspaces[0]);
-        $scope.$apply();
-    });*/
-
-});
 
 app.controller('ModalDemoCtrl', function ($scope, $uibModal, $log) {
 

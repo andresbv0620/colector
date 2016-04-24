@@ -4,7 +4,7 @@ from auth_token_middleware.models import Token
 
 class AuthToken(object):  
     def process_request(self, request): 
-    	service_string = "/service/" 
+    	service_string = "/service_123456789/" 
     	request_path = str(request.path)
     	resp = {}
     	#validando url solicitada
@@ -13,6 +13,7 @@ class AuthToken(object):
     		#validando recepcion de HTTP_TOKEN
     		try:
     			http_token = request.META['HTTP_TOKEN']
+
     			
     			#validando que exista el token
     			try:

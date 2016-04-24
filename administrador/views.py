@@ -80,7 +80,7 @@ def testview(request):
     else:
         notificacion="No hay empresas registradas a este usuario"
 
-    return render(request, 'administrador/admin/reporte.html',{
+    return render(request, 'administrador/admin/index_test.html',{
         'user':request.user, 
         'empresas':empresas, 
         'token':token, 

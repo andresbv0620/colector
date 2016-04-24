@@ -24,10 +24,6 @@ app.config(['$httpProvider', function($httpProvider) {
 
 app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	$routeProvider
-	.when('/reporte/',{
-		controller:"reporteFormulario",
-		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
-	})
 	.when('/llenar/:form_id',{
 		controller:"llenarFormulario",
 		templateUrl:globales.static_url+"/administrador/angular_templates/llenar_formulario.html"
@@ -43,6 +39,11 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	.when('/reporte/id/:form_id/record/delete/:record_id',{
 		controller:"deleteRecord",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
+	})
+	.when('/reporte/id/:form_id/page/:page/limit/:limit',{
+		controller:"FormIdReportPaginate",
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario_paginate.html"
+		
 	})
 
 

@@ -4,6 +4,7 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
 from django.utils.decorators import method_decorator
+from django.utils.encoding import smart_str, smart_unicode
 from django.views.decorators.csrf import csrf_exempt
 from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad, FormularioAsociado, AsignacionEntrada
 import json
@@ -14,6 +15,7 @@ import uuid
 import collections
 from datetime import datetime
 import time
+import codecs
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 servidor = pymongo.MongoClient('localhost', 27017)
 database = servidor.colector
@@ -21,7 +23,7 @@ database = servidor.colector
 #Convert cursor of mongo to a dict python
 def convert(data):
     if isinstance(data, basestring):
-        return str(data)
+        return smart_str(data)
     elif isinstance(data, collections.Mapping):
         return dict(map(convert, data.iteritems()))
     elif isinstance(data, collections.Iterable):

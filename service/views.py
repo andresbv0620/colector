@@ -1189,7 +1189,7 @@ def FormIdReportPag(request, id):
             #print "Colector Id who contains this formid: ",f["colector_id"]
             #Converts mongo cursor into a python dict
             colectorForms=convert(f["filled_forms"])
-            for colectorForm in colectorForms:
+            for colectorForm in reversed(colectorForms):
                 colectorFormId=colectorForm["form_id"]
                 #Filter the forms requested by id
                 if colectorFormId == id:
@@ -1229,8 +1229,8 @@ def FormIdReportPag(request, id):
                 datarows = {}#Objeto que va guardando las respuestas de cada registro
                 #markers objeto usado para el mapa
                 markers = {}
-                markers['longitude'] = paginatedForm["longitud"]
-                markers['latitude'] = paginatedForm["latitud"]
+                markers['longitude'] = paginatedForm["latitud"]
+                markers['latitude'] = paginatedForm["longitud"]
                 datarows["id"] = paginatedForm["record_id"]
                 datarows["form_id"] = paginatedForm["form_id"]
 

@@ -1165,7 +1165,6 @@ def FormIdReport(request, id):
                             default=json_util.default),
                             content_type='application/json')
 
-
 #Reporte por form id paginacion
 def FormIdReportPag(request, id):
     #Setting Pagination
@@ -1183,8 +1182,8 @@ def FormIdReportPag(request, id):
     else:
         #print "Count ",filled_forms.count()
         forms = []
-        #Each colector has a document with its respective forms, the main nodes of a colector document are filled_forms and colector_id
-        #Below f is a document
+        #Each colector has a document with its respective forms, the main nodes of a colector document are filled_forms=[] and colector_id
+        #Below f is a document (a colector)
         for f in filled_forms:
             #print "Colector Id who contains this formid: ",f["colector_id"]
             #Converts mongo cursor into a python dict
@@ -1196,11 +1195,11 @@ def FormIdReportPag(request, id):
                     #print colectorFormId
                     forms.append(colectorForm)
 
+        forms.sort(key=lambda formu: formu["horafin"], reverse=True)
+
         #forms contiene todos los  registros del form con el id requerido. A continuacion se hace la paginacion
         paginator = Paginator(forms, limit) # Show limit records per page
         tableheader=[]
-
-        
 
         try:
             paginatedForms = paginator.page(page)

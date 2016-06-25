@@ -118,6 +118,8 @@ class GetForms(View):
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
                     formulario['precargado'] = p.formulario.precargado
+                    formulario['titulo_reporte'] = p.formulario.titulo_reporte
+
 
                     # validando que el formulario tenga fichas asociadas
                     if len(p.formulario.ficha.all()):
@@ -575,7 +577,6 @@ class FillResponsesForm(View):
                         {'_id': 0})                
 
                 # validando si existe un colector con esta id
-
                 if colector == None:
                     data = {}
                     data['colector_id'] = colector_id
@@ -586,15 +587,14 @@ class FillResponsesForm(View):
                     database.filled_forms.create_index("filled_forms.sections.inputs.responses")
 
                 else:
-
                     database.filled_forms.update({'colector_id': str(colector_id)},
                             {'$push': {'filled_forms': form}})
 
                     # return HttpResponse("colector existe")
-
                 resp['response_code'] = '200'
                 resp['response_description'] = str('form filled')
                 resp['body_received'] = str(request.body)
+                resp['record_id'] = form['record_id']
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
                         )
@@ -855,6 +855,75 @@ class DeleteResponsesForm(View):
 
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
+
+#EDITA UN REGISTRO
+class EditResponsesForm(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(DeleteResponsesForm, self).dispatch(*args, **kwargs)
+
+    # validando la el formato del formulario enviado
+    def post(self, request):
+        resp = {}
+        # validando data correcta enviada en body
+        try:
+            data = json.loads(request.body)
+            colector_id = data['colector_id']
+            record_id = data['record_id']
+            # construyendo json para insertar en mongodb
+
+            try:
+                colector = \
+                    database.filled_forms.find_one({'colector_id': str(colector_id)},
+                        {'_id': 0})                
+
+                # validando si existe un colector con esta id
+
+                if colector == None:
+                    pass
+
+                else:
+
+                    database.filled_forms.update({'colector_id': str(colector_id)},
+                            {'$pull': {'filled_forms':{'record_id':record_id} }})
+
+                    # return HttpResponse("colector existe")
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form filled')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+                return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
+            except Exception, e:
+                resp['response_code'] = '400'
+                resp['response_description'] = \
+                    str('Error inserting data in mongodb' + str(e.args))
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+        except Exception, e:
+
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = \
+                str('{"colector_id":"", "form_id":" ", "responses":"[]" }')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+
 
 #Guarda una estructura más compleja de los formularios, NO ESTA EN USO
 class FillForm(View):

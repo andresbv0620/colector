@@ -10,7 +10,7 @@ class EmpresaAdmin(admin.ModelAdmin):
     search_fields = ['nombre', 'nit']
     filter_horizontal = ('colector', 'formulario', 'tablets')
 
-class Colectordmin(admin.ModelAdmin):
+class ColectorAdmin(admin.ModelAdmin):
     list_display = ('get_nombre', 'get_email'  )
     search_fields = ['usuario__username']
 
@@ -86,7 +86,7 @@ class PermisoFormularioAdmin(admin.ModelAdmin):
     
 
 admin.site.register(Empresa, EmpresaAdmin)
-admin.site.register(Colector, Colectordmin)
+admin.site.register(Colector, ColectorAdmin)
 admin.site.register(Plan, PlanAdmin)
 admin.site.register(Formulario, FormularioAdmin)
 admin.site.register(Ficha, FichaAdmin)

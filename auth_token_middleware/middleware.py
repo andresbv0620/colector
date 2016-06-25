@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 import json
 from auth_token_middleware.models import Token
-
+#quitar los numeros de service_string para que funcione otra vez el middleware
 class AuthToken(object):  
     def process_request(self, request): 
     	service_string = "/service_123456789/" 

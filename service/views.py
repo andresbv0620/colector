@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from django.core.files import File
+from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.views.generic import View
@@ -626,7 +628,7 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
-#Guarda una foto a la vez
+#Guarda una foto a la vez (En base64)
 class SaveImg(View):
 
     @method_decorator(csrf_exempt)
@@ -636,67 +638,77 @@ class SaveImg(View):
     # validando la el formato del formulario enviado
 
     def dataValidator(self, array_validation):
-
         response = {}
         response['error'] = False
         response['validation_errors'] = []
 
         # validacion del formulario
 
+        if not array_validation['fileSend']:
+            response['error'] = True
+            response['validation_errors'].append('There is no document')
+
+        if not array_validation['extensionFile'].strip():
+            response['error'] = True
+            response['validation_errors'].append('extension in file is blank')
+
+        if not array_validation['question_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('question_id is blank')
+
+        if not array_validation['survey_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('survey_id is blank')
+
+        if not array_validation['nameFile'].strip():
+            response['error'] = True
+            response['validation_errors'].append('name in file is blank')
+
         if not array_validation['colector_id'].strip():
             response['error'] = True
-            response['validation_errors'].append('colector_id is blank')
-
-        if not array_validation['form_id'].strip():
-
-            response['error'] = True
-            response['validation_errors'].append('form_id is blank')
-
-        if len(array_validation['responses']) == 0:
-            response['error'] = True
-            response['validation_errors'].append('responses is blank')
-        else:
-
-            try:
-                for responseItem in array_validation['responses']:
-                    try:
-                        response_value=responseItem['value']
-                        input_id=responseItem['input_id']
-                    except Exception, e:
-                        response['error'] = True
-                        response['validation_errors'].append("any response don't contains value or input_id")
-                   
-            except Exception, e:
-                response['error'] = True
-                response['validation_errors'].append("any input don't contains responses")
+            response['validation_errors'].append('colector_id in file is blank')
 
         return response
 
+    def handle_uploaded_file(self, f, name, extension):
+        #file_path='/home/andres/media/'+name+'.'+extension
+        file_path=settings.FILES_ROOT+name+'.'+extension
+        print file_path
+        with open(file_path, 'wb+') as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
+        return file_path
+
     def post(self, request):
-        resp = {}
-        # validando data correcta enviada en body
+        resp={}
         try:
-            data = json.loads(request.body)
-            colector_id = data['colector_id']
-            form_id = data['form_id']
-            responses = data['responses']
-            
+            fileSend = request.FILES['document']
+            extensionFile = request.POST['extension']
+            question_id = request.POST['question_id']
+            survey_id = request.POST['survey_id']
+            nameFile = request.POST['name']
+            colector_id = request.POST['colector_id']
+
             array_validation = {}
+            array_validation['fileSend'] = fileSend
+            array_validation['extensionFile'] = extensionFile
+            array_validation['question_id'] = question_id
+            array_validation['survey_id'] = survey_id
+            array_validation['nameFile'] = nameFile
             array_validation['colector_id'] = colector_id
-            array_validation['form_id'] = form_id
-            array_validation['responses'] = responses
 
             data_validator = self.dataValidator(array_validation)
+            
 
             if data_validator['error'] == True:
                 resp['response_code'] = '400'
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
-                    str('the body data contain validation errors')
+                    str('the body data contains validation errors')
                 resp['body_received'] = str(request.body)
-                resp['body_expected'] = \
-                    str('{"colector_id":"", "form_id":" ","responses":" " }')
+                resp['form_data_expected'] = \
+                    str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
 
                 return HttpResponse(json.dumps(resp,
                                     default=json_util.default),
@@ -704,89 +716,28 @@ class SaveImg(View):
             else:
                 pass
 
-            # construyendo json para insertar en mongodb
+        
+            # Todo Validado entonces continuamos
+            uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''))
+            print uploaded_file
 
-            try:
-
-                form = {}
-                form['fecha_creacion'] = datetime.utcnow()
-                form['record_id']=str(uuid.uuid4())
-                form['form_id'] = form_id
-                formulario = Formulario.objects.get(id = str(form['form_id']))
-                form['form_name'] = formulario.nombre
-                form['form_description'] = formulario.descripcion
-
-                #Aqui vienen las fotos y se recorre cada una para ser guardadas
-                for response in responses:
-                    input_id=response['input_id']
-                    entrada = Entrada.objects.get(id = str(input_id))
-                    response['label']=entrada.nombre
-                    response['tipo']=entrada.tipo
-                    if entrada.tipo == "4" or entrada.tipo == "5":
-                        response_id=response['value']
-                        respuesta = Respuesta.objects.get(id = str(response_id))
-                        response['value']=respuesta.valor
-
-                form['responses'] = responses
-
-                # return HttpResponse(json.dumps(data))
-
-                colector = \
-                    database.saved_imgs.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
-
-                # validando si existe un colector con esta id
-
-                if colector == None:
-                    data = {}
-                    data['colector_id'] = colector_id
-                    data['saved_imgs'] = []
-                    data['saved_imgs'].append(form)
-                    
-                    database.saved_imgs.insert(data)
-                    #database.saved_imgs.create_index("filled_forms.sections.inputs.responses")
-
-                else:
-
-                    database.saved_imgs.update({'colector_id': str(colector_id)},
-                            {'$push': {'saved_imgs': form}})
-
-                    # return HttpResponse("colector existe")
-
-                resp['response_code'] = '200'
-                resp['response_description'] = str('Img Saved')
-                resp['body_received'] = str(request.body)
-                resp['body_expected'] = \
-                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
-                        )
-                resp['response_data'] = request.body
-
-                return HttpResponse(json.dumps(resp),
-                                    content_type='application/json')
-            except Exception, e:
-
-                resp['response_code'] = '400'
-                resp['response_description'] = \
-                    str('Error inserting data image in mongodb' + str(e.args))
-                resp['body_received'] = str(request.body)
-                resp['body_expected'] = \
-                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
-                        )
-                resp['response_data'] = request.body
+            resp['response_code'] = '200'
+            resp['response_description'] = str('Media Document Saved')
+            resp['media_url'] = str(uploaded_file)
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
 
             return HttpResponse(json.dumps(resp),
-                                content_type='application/json')
-        except Exception, e:
+                        content_type='application/json')
 
+        except Exception, e:
             resp['response_code'] = '400'
             resp['response_description'] = str('invalid body request '
                     + str(e.args))
-            resp['body_received'] = str(request.body)
-            resp['body_expected'] = \
-                str('{"colector_id":"", "form_id":" ", "responses":"[]" }')
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+            return HttpResponse(json.dumps(resp), content_type='application/json')
 
-            return HttpResponse(json.dumps(resp),
-                                content_type='application/json')
 
 #ELIMINA UN REGISTRO
 class DeleteResponsesForm(View):
@@ -923,7 +874,6 @@ class EditResponsesForm(View):
 
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
-
 
 #Guarda una estructura más compleja de los formularios, NO ESTA EN USO
 class FillForm(View):
@@ -1380,9 +1330,6 @@ def FormIdReportPag(request, id):
         return HttpResponse(json.dumps(resp,
                            default=json_util.default),
                           content_type='application/json')
-
-
-
 
 #Reporte por fecha
 def DateReport(

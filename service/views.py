@@ -556,18 +556,18 @@ class FillResponsesForm(View):
                 form['horaini'] = horaini
                 form['horafin'] = horafin
                 form['form_id'] = form_id
-                formulario = Formulario.objects.get(id = str(form['form_id']))
+                formulario = Formulario.objects.get(id = int(form['form_id']))
                 form['form_name'] = formulario.nombre
                 form['form_description'] = formulario.descripcion
 
                 for response in responses:
                     input_id=response['input_id']
-                    entrada = Entrada.objects.get(id = str(input_id))
+                    entrada = Entrada.objects.get(id = int(input_id))
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
                     if entrada.tipo == "4" or entrada.tipo == "5":
                         response_id=response['value']
-                        respuesta = Respuesta.objects.get(id = str(response_id))
+                        respuesta = Respuesta.objects.get(id = int(response_id))
                         response['value']=respuesta.valor
 
                 form['responses'] = responses

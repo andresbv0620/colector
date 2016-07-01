@@ -1,5 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
+from django.core.cache import cache
 from django.core.files import File
 from django.conf import settings
 from django.shortcuts import render
@@ -670,11 +673,12 @@ class SaveImg(View):
 
         return response
 
-    def handle_uploaded_file(self, f, name, extension):
+    def handle_uploaded_file(self, f, name, extension, question_id):
         #file_path='/home/andres/media/'+name+'.'+extension
-        file_path=settings.FILES_ROOT+name+'.'+extension
+        #file_path=settings.FILES_ROOT+name+'.'+extension
+        file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
         print file_path
-        with open(file_path, 'wb+') as destination:
+        with default_storage.open(file_path, 'wb') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
         return file_path
@@ -718,7 +722,7 @@ class SaveImg(View):
 
         
             # Todo Validado entonces continuamos
-            uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''))
+            uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''), question_id)
             print uploaded_file
 
             resp['response_code'] = '200'

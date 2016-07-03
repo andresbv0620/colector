@@ -123,7 +123,7 @@ class GetForms(View):
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
                     formulario['precargado'] = p.formulario.precargado
-                    formulario['titulo_reporte'] = p.formulario.titulo_reporte
+                    formulario['titulo_reporte'] = p.formulario.titulo_reporte.id
 
 
                     # validando que el formulario tenga fichas asociadas

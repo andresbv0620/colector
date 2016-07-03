@@ -1251,8 +1251,8 @@ def FormIdReportPag(request, id):
                 datarows = {}#Objeto que va guardando las respuestas de cada registro
                 #markers objeto usado para el mapa
                 markers = {}
-                markers['longitude'] = paginatedForm["latitud"]
-                markers['latitude'] = paginatedForm["longitud"]
+                markers['longitude'] = paginatedForm["longitud"]
+                markers['latitude'] = paginatedForm["latitud"]
                 datarows["id"] = paginatedForm["record_id"]
                 datarows["form_id"] = paginatedForm["form_id"]
 

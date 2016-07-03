@@ -247,8 +247,8 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                     datacolumns = new Object(); //Objeto que va guardando las respuestas de cada registro
                     //markers objeto usado para el mapa
                     markers = {};
-                    markers['longitude'] = filledforms[form].latitud;
-                    markers['latitude'] = filledforms[form].longitud;
+                    markers['longitude'] = filledforms[form].longitud;
+                    markers['latitude'] = filledforms[form].latitud;
                     
                     datacolumns["View Map"]="<a href='#/reporte/id/"+ $routeParams.form_id +"/"+markers['longitude']+"/"+markers['latitude']+"'>View Map</a>";
 

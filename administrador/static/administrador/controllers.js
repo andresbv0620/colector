@@ -446,7 +446,8 @@ app.controller('deleteRecord', ['$scope', '$routeParams', 'defaultService', 'glo
         /////Llamado al servicio de borrado////
         defaultService.post(globales.static_url + '../service/form/delete/' + record_id + '/', '{"colector_id":"' + colector_id + '","record_id":"'+record_id+'"}', function(data) {
            $scope.notificacion = "El registro ha sido borrado";
-           $location.path("reporte/id/"+ form_id+"/page/0/limit/10" ).replace();
+           //$location.path("reporte/id/"+ form_id+"/page/0/limit/10" ).replace();
+           $location.path("reporte/id/"+ form_id+"").replace();
         }, function(error) {
             console.log(error)
         });

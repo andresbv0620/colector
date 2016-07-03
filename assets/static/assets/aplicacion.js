@@ -34,7 +34,7 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	})
 	.when('/reporte/id/:form_id/:longitud/:latitud',{
 		controller:"reporteMapa",
-		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_mapa.html"
 	})
 	.when('/reporte/id/:form_id/record/delete/:record_id',{
 		controller:"deleteRecord",

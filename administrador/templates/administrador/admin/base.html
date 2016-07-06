@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 {% load staticfiles %}
+{% load static %}
 <html ng-app="app">
 <head>
     <meta charset="utf-8">
@@ -112,6 +113,7 @@
   angular.module('app').constant('globales', {
     auth_token:'{{token}}',
     static_url:{% static ''%},
+    media_url:'http://colector.co.s3.amazonaws.com/media/',
     user_id:'{{user.id}}'
   });
 </script>

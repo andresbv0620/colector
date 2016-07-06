@@ -183,6 +183,8 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
     
     $scope.loading = true;
     $("#table").bootstrapTable("showLoading");
+    media_url=globales.media_url;
+    static_url=globales.static_url;
 
     ////////////////////////////////LLAMADO AL SERVICIO QUE DEVUELVE FORMULARIOS DILIGENCIADOS/////////////////////////////////////////////
     defaultService.get(globales.static_url + '../service/filled/forms/report/formid/' + $routeParams.form_id + '/', function(data) {
@@ -290,9 +292,9 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                         //Reporte para foto, Se valida si es foto, para convertirla de base64
                         if ((inputType == 6)||(inputType==14)) {
                             if (typeof datacolumns[inputLabel] !== "undefined") {
-                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>';
+                                datacolumns[inputLabel] = datacolumns[inputLabel] + '<a class="thumb"><img width="50px" height="50px" src="' + media_url +inputId+'/'+inputValue+'" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><span><img width="450px" src="' + media_url +inputId+'/'+inputValue+'" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></span></a>';
                             } else {
-                                datacolumns[inputLabel] = '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>';
+                                datacolumns[inputLabel] = '<a class="thumb"><img width="50px" height="50px" src="' + media_url +inputId+'/'+inputValue+'" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><span><img width="450px" src="' + media_url +inputId+'/'+inputValue+'" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></span></a>';
                             }
                         } 
 

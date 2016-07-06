@@ -80,6 +80,9 @@ class Ficha(models.Model):
 	#entrada = SortedManyToManyField('Entrada')
 	#entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
 	entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
+
+	class Meta:
+		ordering = ('id',)
 	
 	def __unicode__(self):
 		return self.nombre

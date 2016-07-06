@@ -1,0 +1,104 @@
+<div class="box-body">
+	<!-- <p class="bg-success">[[notificacion]]</p> -->
+	<!-- <h2>[[formnameencabezado]]</h2> -->
+	<div ng-show="loading" class="loading"><img alt="Las buenas cosas toman tiempo: " src="http://content.iress.co.uk/hubfs/wemakeithappen/img/Preloader.gif">Las cosas buenas toman tiempo...</div>
+	<div class="text-center">
+		<!-- <h3>[[formname]]</h3> -->
+	</div>
+	<div id="toolbar">
+		
+		<!-- <div class="col-md-5">
+			<select class="form-control" ng-model="itemsPerPage" ng-change="perPage()" ng-options="('show '+size+' per page') for size in pageSizes">
+				<option value="">Records per page</option>
+			</select>
+			</div> -->
+		<div class="col-md-6">
+			<select class="form-control">
+				<option value="">Export Basic</option>
+				<option value="all">Export All</option>
+				<option value="selected">Export Selected</option>
+			</select>
+		</div>
+		<div class="col-md-6">
+			[[total]] Records
+		</div>
+	</div>
+	<style type="text/css">
+		#thumbwrap {
+		position:relative;
+		margin:75px auto;
+		width:252px; height:252px;
+		}
+		.thumb img { 
+		border:1px solid #000;
+		margin:3px;
+		float:left;
+		}
+		.thumb span { 
+		position:fixed;
+		visibility:hidden;
+		}
+		.thumb:hover, .thumb:hover span { 
+		visibility:visible;
+		bottom:0; left:420px; 
+		z-index:1;
+		}
+	</style>
+	<table ng-controller="alerta" id="table"
+		data-toggle="table"
+		data-toolbar="#toolbar"
+		data-search="true"
+		data-show-refresh="false"
+		data-show-toggle="true"
+		data-show-columns="true"
+		data-minimum-count-columns="2"
+		data-show-export="true"
+		data-click-to-select="true"
+		data-detail-view="true"
+		data-detail-formatter="¡Registro completo!"
+		data-id-field="id"
+		data-show-footer="false"
+		data-height="500"
+		data-sort-order="desc" 
+		data-sort-name="sorter"
+		data-escape="false"    
+		data-striped="true"
+		>
+		<tfoot>
+			<tr>
+				<td colspan="10">
+					[[sizes]]
+					<div class="text-center">
+						<ul class="pagination">
+							<li ng-class="{hidden: !hasPrevious}">
+								<a href="#/reporte/id/[[formId]]/page/[[previousPageNumber]]/limit/[[limit]]/" ng-click="prevPage()">« Prev</a>
+							</li>
+							<li ng-repeat="n in range(numPages)" ng-class="{active: n == page}" ng-click="setPage()">
+								<a href="#/reporte/id/[[formId]]/page/[[n]]/limit/[[limit]]/" ng-bind="n + 1">1</a>
+							</li>
+							<li ng-class="{hidden: !hasNext}">
+								<a href="#/reporte/id/[[formId]]/page/[[nextPageNumber]]/limit/[[limit]]/" ng-click="nextPage()">Next »</a>
+							</li>
+						</ul>
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+	</table>
+	<style type="text/css">
+		.angular-google-map-container { height: 400px; }
+	</style>
+	<ui-gmap-google-map center='map.center'
+		zoom='map.zoom'
+		dragging='true'
+		refresh='true'>
+		<ui-gmap-marker idKey='$index' ng-repeat='marker in markerList' coords='marker'>
+			<ui-gmap-window isIconVisibleOnClick='true'>
+				<p>
+					[[marker.message]]
+				</p>
+			</ui-gmap-window>
+		</ui-gmap-marker>
+	</ui-gmap-google-map>
+</div>
+<!-- /.box-body -->

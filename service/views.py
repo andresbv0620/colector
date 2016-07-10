@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 from django.core.files.storage import default_storage
+from django.contrib.auth.models import User, Group
 from django.core.files.base import ContentFile
 from django.core.cache import cache
 from django.core.files import File
@@ -758,35 +759,42 @@ class DeleteResponsesForm(View):
             data = json.loads(request.body)
             colector_id = data['colector_id']
             record_id = data['record_id']
-            # construyendo json para insertar en mongodb
 
             try:
-                colector = \
-                    database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                try:
+                    print "AQUI ESTOY"
+                    user_id = int(colector_id)
+                    user = User.objects.get(id=user_id)
+                except  User.DoesNotExist:
+                    resp['response_code'] = '400'
+                    resp['response_description'] = str('User Does Not Exist' + str(e.args))
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] = str('{"colector_id":"", "record_id":"d"}')
+                    resp['response_data'] = request.body
+                    return HttpResponse(json.dumps(resp), content_type='application/json')
 
-                # validando si existe un colector con esta id
+                if user.groups.filter(name='administrador'):
+                    empresa = user.empresa
+                    for colectorindjango in empresa.colector.all():
+                        colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 0})                
+                        # validando si existe un colector con esta id
+                        if colectorinmongo == None:
+                            pass
+                        else:
+                            database.filled_forms.update({'colector_id': str(colectorindjango.id)},{'$pull': {'filled_forms':{'record_id':record_id} }})
 
-                if colector == None:
-                    pass
+                        # return HttpResponse("colector existe")
 
-                else:
+                    resp['response_code'] = '200'
+                    resp['response_description'] = str('form filled')
+                    resp['body_received'] = str(request.body)
+                    resp['body_expected'] = \
+                        str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                            )
+                    resp['response_data'] = request.body
 
-                    database.filled_forms.update({'colector_id': str(colector_id)},
-                            {'$pull': {'filled_forms':{'record_id':record_id} }})
-
-                    # return HttpResponse("colector existe")
-
-                resp['response_code'] = '200'
-                resp['response_description'] = str('form filled')
-                resp['body_received'] = str(request.body)
-                resp['body_expected'] = \
-                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
-                        )
-                resp['response_data'] = request.body
-
-                return HttpResponse(json.dumps(resp),
-                                    content_type='application/json')
+                    return HttpResponse(json.dumps(resp),
+                                        content_type='application/json')
             except Exception, e:
                 resp['response_code'] = '400'
                 resp['response_description'] = \

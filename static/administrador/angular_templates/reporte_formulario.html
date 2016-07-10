@@ -73,3 +73,11 @@
 	</ui-gmap-google-map>
 </div>
 <!-- /.box-body -->
+<script type="text/javascript">
+	function openMedia(e){
+		e = e || window.event;
+		var target = e.target || e.srcElement;
+		console.log(target);
+		window.open(target.id, "Colector", "location=no, menubar=no, width=500, height=500, toolbar=no, titlebar=no, status=no, left=300, top=300");
+	}
+</script>

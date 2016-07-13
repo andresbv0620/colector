@@ -37,6 +37,7 @@ class FormularioAdmin(admin.ModelAdmin):
 class AsignacionEntradaInline(admin.TabularInline):
     model = AsignacionEntrada
     extra = 1
+    
 
 class FichaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', )    

@@ -762,7 +762,6 @@ class DeleteResponsesForm(View):
 
             try:
                 try:
-                    print "AQUI ESTOY"
                     user_id = int(colector_id)
                     user = User.objects.get(id=user_id)
                 except  User.DoesNotExist:
@@ -776,6 +775,7 @@ class DeleteResponsesForm(View):
                 if user.groups.filter(name='administrador'):
                     empresa = user.empresa
                     for colectorindjango in empresa.colector.all():
+                        print str(colectorindjango.id)
                         colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 0})                
                         # validando si existe un colector con esta id
                         if colectorinmongo == None:

@@ -57,7 +57,7 @@ IF_CHOICES = (
     )
 
 class Formulario(models.Model):
-	nombre  = models.CharField(max_length=50, blank = True , unique=True)
+	nombre  = models.CharField(max_length=50, blank = True , unique=False)
 	descripcion = models.TextField(max_length=100, blank = True )
 	ficha = models.ManyToManyField('Ficha',  blank = True)
 	precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
@@ -75,7 +75,7 @@ class PermisoFormulario(models.Model):
 
 
 class Ficha(models.Model):
-	nombre  = models.CharField(max_length=50, blank = True , unique=True)
+	nombre  = models.CharField(max_length=50, blank = True , unique=False)
 	descripcion = models.TextField(max_length=100, blank = True )
 	#entrada = SortedManyToManyField('Entrada')
 	#entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)

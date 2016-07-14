@@ -577,7 +577,6 @@ class FillResponsesForm(View):
                 form['responses'] = responses
 
                 # return HttpResponse(json.dumps(data))
-
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
                         {'_id': 0})                
@@ -1189,6 +1188,7 @@ def FormIdReport(request, id):
         forms = []
         for f in filled_forms:
             forms.append(f)
+
         resp['response_code'] = '200'
         resp['response_description'] = 'form id found'
         resp['data'] = forms

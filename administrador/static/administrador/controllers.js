@@ -191,6 +191,8 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         console.log("datos recibidos del servidor: ");
         //console.log(data);
         colectorfilledforms = data['data'];
+        console.log(colectorfilledforms);
+
         //$scope.colectorid=colectorfilledforms[0].colector_id;
         //console.log(filledforms);
         tableheader = [];
@@ -204,6 +206,13 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         column['field'] = "state";
         column['checkbox'] = true;
         column['title'] = "state";
+        columns.push(column);
+
+        column = new Object();
+        column['field'] = "ID Colector";
+        column['sortable'] = true;
+        column['visible'] = false;
+        column['title'] = "ID Colector";
         columns.push(column);
 
 
@@ -236,8 +245,10 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
+            colectoridrecord = colectorfilledforms[colectorDocument].colector_id;
+            //console.log(colectoridrecord);
             //$scope.filledforms=filledforms;
-            console.log(filledforms);
+            //console.log(filledforms);
 
             //Cada registro o fila en la tabla
             for (form in filledforms) {
@@ -312,6 +323,8 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
 
                     /////////////COLUMNAS ADICIONALES en la fila Calculo non monority//////
                     ///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
+                    datacolumns["ID Colector"] = colectoridrecord;
+
                     horaini = filledforms[form].horaini;
                     var dini = new Date(0);
                     dini.setUTCSeconds(horaini);

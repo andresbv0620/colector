@@ -37,7 +37,7 @@ class FormularioAdmin(admin.ModelAdmin):
 class AsignacionEntradaInline(admin.TabularInline):
     model = AsignacionEntrada
     extra = 1
-    
+
 
 class FichaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', )    
@@ -49,7 +49,8 @@ class EntradaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion',  'tipo', 'id', )    
     list_filter = ('tipo',)
     search_fields = ['nombre', 'descripcion' ]
-    filter_horizontal = ('respuesta',  )
+    #filter_horizontal = ('respuesta',  )
+    raw_id_fields = ('respuesta',)
 
 class FormularioAsociadoAdmin(admin.ModelAdmin):
     fieldsets = (

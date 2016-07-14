@@ -570,9 +570,14 @@ class FillResponsesForm(View):
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
                     if entrada.tipo == "4" or entrada.tipo == "5":
-                        response_id=response['value']
-                        respuesta = Respuesta.objects.get(id = int(response_id))
-                        response['value']=respuesta.valor
+                        try:
+                            response_id=response['value']
+                            respuesta = Respuesta.objects.get(id = int(response_id))
+                            response['value']=respuesta.valor
+                        except Exception, e:
+                            resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
+                            response['value']="Op_" + str(response['value'])
+
 
                 form['responses'] = responses
 

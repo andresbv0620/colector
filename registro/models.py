@@ -193,12 +193,20 @@ class FormularioAsociado(models.Model):
 	crear_nuevo = models.BooleanField(default=False)
 	actualizar_existente = models.BooleanField(default=False)
 	seleccionar_multiples = models.BooleanField(default=False)
-	entrada_fuente = models.ForeignKey(Entrada, related_name='entradafuente', on_delete=models.CASCADE, blank = True, null = True)
-	entrada_destino = models.ForeignKey(Entrada, related_name='entradadestino', on_delete=models.CASCADE, blank = True, null = True)
+	#entrada_fuente = models.ForeignKey(Entrada, related_name='entradafuente', on_delete=models.CASCADE, blank = True, null = True)
+	#entrada_destino = models.ForeignKey(Entrada, related_name='entradadestino', on_delete=models.CASCADE, blank = True, null = True)
+
 
 	def __unicode__(self):
 		return "%s "%self.form_asociado
     
+class ReglaAutollenado(models.Model):
+	asociacion = models.ForeignKey(FormularioAsociado, on_delete=models.CASCADE, blank = False, null = False)
+	entrada_fuente = models.ForeignKey(Entrada, related_name='entradafuente', on_delete=models.CASCADE, blank = True, null = True)
+	entrada_destino = models.ForeignKey(Entrada, related_name='entradadestino', on_delete=models.CASCADE, blank = True, null = True)
+
+	def __unicode__(self):
+		return "%s "%self.asociacion
 
 class Respuesta(models.Model):
 	valor  = models.CharField(max_length=500, blank = True , unique=True)

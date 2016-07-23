@@ -196,8 +196,21 @@ class GetForms(View):
                                         asociate_form['crear_nuevo'] = formasociado.crear_nuevo
                                         asociate_form['actualizar_existente'] = formasociado.actualizar_existente
                                         asociate_form['seleccionar_multiples'] = formasociado.seleccionar_multiples
-                                        asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
-                                        asociate_form['entrada_destino'] = formasociado.entrada_destino.id
+
+                                        asociate_form['autollenar'] = []
+                                        if len(asignacionentrada.formulario_asociado.reglaautollenado_set.all()):
+                                            
+                                            for rautollenar in asignacionentrada.formulario_asociado.reglaautollenado_set.all():
+                                                regllenado={}
+                                                regllenado['entrada_fuente']=rautollenar.entrada_fuente.id
+                                                regllenado['entrada_destino']=rautollenar.entrada_destino.id
+                                                asociate_form['autollenar'].append(regllenado)
+
+                                        else:
+                                            pass
+
+                                        #asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
+                                        #asociate_form['entrada_destino'] = formasociado.entrada_destino.id
 
 
                                         entrada['asociate_form'].append(asociate_form)

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from registro.models import Empresa, Colector, Plan, Formulario, PermisoFormulario 
 from registro.models import Ficha, Entrada, Respuesta, FormularioDiligenciado, Tablet
-from registro.models import AsignacionEntrada, ReglaVisibilidad, FormularioAsociado
+from registro.models import AsignacionEntrada, ReglaVisibilidad, FormularioAsociado, ReglaAutollenado
 # Register your models here.
 
 class EmpresaAdmin(admin.ModelAdmin):
@@ -52,15 +52,22 @@ class EntradaAdmin(admin.ModelAdmin):
     #filter_horizontal = ('respuesta',  )
     raw_id_fields = ('respuesta',)
 
+
+class ReglaAutollenadoInline(admin.TabularInline):
+    model = ReglaAutollenado
+    extra = 1
+
+
 class FormularioAsociadoAdmin(admin.ModelAdmin):
+    inlines = [ReglaAutollenadoInline,]
     fieldsets = (
         (None, {'fields': ('form_asociado',)}),
         (None, {'fields': (('seleccionar_existentes', 'crear_nuevo', 'actualizar_existente',  'seleccionar_multiples'),)} ),
-        ('Auto Llenar Campos', {
-            'classes': ('collapse', ),
-            'fields': ('entrada_fuente', 'entrada_destino',)
-            }),
-        )    
+        # ('Auto Llenar Campos', {
+        #     'classes': ('collapse', ),
+        #     'fields': ('entrada_fuente', 'entrada_destino',)
+        #     }),
+        )
     list_filter = ('form_asociado',)
     search_fields = ['form_asociado', ]
 

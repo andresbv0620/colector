@@ -98,17 +98,15 @@ class GetForms(View):
         resp = {}
 
         # validando data del body
-
         try:
             data = json.loads(request.body)
             #form_id = data['form_id']
             colector_id = data['colector_id']
 
-
             # obteniendo formularios con permisos del colector recibido
-
             permiso_formularios = \
-                PermisoFormulario.objects.filter(colectores__usuario__id=colector_id)
+                PermisoFormulario.objects.filter(colectores__usuario__id=int(colector_id))
+
             if len(permiso_formularios):
                 formularios_array = []
                 response_data = {}
@@ -124,7 +122,12 @@ class GetForms(View):
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
                     formulario['precargado'] = p.formulario.precargado
-                    formulario['titulo_reporte'] = p.formulario.titulo_reporte.id
+                    if not p.formulario.titulo_reporte:
+                        formulario['titulo_reporte'] = ""                   
+                    else:
+                        formulario['titulo_reporte'] = p.formulario.titulo_reporte.id
+                        
+                        
 
 
                     # validando que el formulario tenga fichas asociadas
@@ -193,8 +196,8 @@ class GetForms(View):
                                         asociate_form['crear_nuevo'] = formasociado.crear_nuevo
                                         asociate_form['actualizar_existente'] = formasociado.actualizar_existente
                                         asociate_form['seleccionar_multiples'] = formasociado.seleccionar_multiples
-                                        #asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
-                                        #asociate_form['entrada_destino'] = formasociado.entrada_destino.id
+                                        asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
+                                        asociate_form['entrada_destino'] = formasociado.entrada_destino.id
 
 
                                         entrada['asociate_form'].append(asociate_form)
@@ -316,7 +319,7 @@ class GetForms(View):
         except Exception, e:
             print e
             resp['response_code'] = '400'
-            resp['response_description'] = str('invalid body request '
+            resp['response_description'] = str('Invalid body request '
                     + str(e.args))
             resp['body_received'] = str(request.body)
             resp['body_expected'] = str('{"colector_id":" "}')

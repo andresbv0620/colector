@@ -831,9 +831,18 @@ class UploadData(View):
         for row in csvReader:
             #print('Row #' + str(csvReader.line_num) + ' ' + str(row))
             if csvReader.line_num==1:
-                inputIdList=row
-
-
+                inputsList=[]
+                for input_id in row:
+                    inputObject = {}
+                    try:
+                        entrada = Entrada.objects.get(id = int(input_id))
+                        inputObject['input_id']=input_id
+                        inputObject['label']=entrada.nombre
+                        inputObject['tipo']=entrada.tipo
+                        inputsList.append(inputObject)
+                    except Exception, e:
+                        return str('No se encuentra el id de la entrada definida en el encabezado del archivo'
+                                + str(e.args)) + str(input_id)  
 
             # construyendo json para insertar en mongodb
             try:
@@ -850,31 +859,18 @@ class UploadData(View):
                 responsesArray=[]
                 for rowvalue in row:
                     index = row.index(rowvalue)
-                    input_id=inputIdList[index]
+                    inputObject=inputsList[index]
+                    inputObject['value'] = rowvalue
 
-                    if input_id==element_longitud:
+                    if inputObject['input_id']==element_longitud:
                         form['longitud'] = rowvalue
 
-                    if input_id==element_latitud:
+                    if inputObject['input_id']==element_latitud:
                         form['latitud'] = rowvalue
 
-                    try:
-                        entrada = Entrada.objects.get(id = int(input_id))
-                        response = {}
-                        response['input_id']=str(entrada.id)
-                        response['label']=entrada.nombre
-                        response['tipo']=entrada.tipo
-                        response['value']=rowvalue
-                        responsesArray.append(response)
-                    except Exception, e:
-                        return str('No se encuentra el id de la entrada definida en el encabezado del archivo'
-                                + str(e.args)) + str(input_id)                      
+                form['responses'] = inputsList
 
-                form['responses'] = responsesArray
-
-                colector = \
-                    database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                colector = database.filled_forms.find_one({'colector_id': str(colector_id)},{'_id': 0})                
 
                 # validando si existe un colector con esta id
                 if colector == None:

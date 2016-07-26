@@ -803,10 +803,10 @@ class UploadData(View):
     def handle_uploaded_file(self, f, name, extension, question_id):
         resp={}
         try:
-            file_path='/home/andres/media/'+name+'.'+extension
+            #file_path='/home/andres/media/'+name+'.'+extension
             #file_path=settings.FILES_ROOT+name+'.'+extension
-            #file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
-            with open(file_path, 'wb') as destination:
+            file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
+            with default_storage.open(file_path, 'wb') as destination:
                 for chunk in f.chunks():
                     destination.write(chunk)
             resp['path']=file_path
@@ -819,7 +819,7 @@ class UploadData(View):
 
     def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
         try:
-            csvFile = open(file_path)
+            csvFile = default_storage.open(file_path)
             #csvFile = open('example.csv')
             csvReader = csv.reader(csvFile, delimiter=';')
             #csvData = list(csvReader)

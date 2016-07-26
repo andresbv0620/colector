@@ -825,8 +825,9 @@ class UploadData(View):
             #csvData = list(csvReader)
         except Exception, e:
             return str('No se encuentra el archivo en el servidor'
-                    + str(e.args)) + str(input_id)    
+                    + str(e.args)) + str(input_id)
 
+        records_counter=0
         for row in csvReader:
             #print('Row #' + str(csvReader.line_num) + ' ' + str(row))
             if csvReader.line_num==1:
@@ -884,15 +885,17 @@ class UploadData(View):
                     
                     database.filled_forms.insert(data)
                     #database.filled_forms.create_index("filled_forms.sections.inputs.responses")
+                    records_counter+=1
 
                 else:
                     database.filled_forms.update({'colector_id': str(colector_id)},
                             {'$push': {'filled_forms': form}})
+                    records_counter+=1
 
             except Exception, e:
                 return str('Error inserting data in mongodb' + str(e.args))
  
-        return str('Los registros del documento csv han sido guardados')
+        return str('Los registros del documento csv han sido guardados. Registros totales: ' + str(records_counter))
 
     def post(self, request):
         resp={}

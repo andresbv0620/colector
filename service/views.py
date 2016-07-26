@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+import csv
 from django.core.files.storage import default_storage
 from django.contrib.auth.models import User, Group
 from django.core.files.base import ContentFile
@@ -698,11 +699,193 @@ class SaveImg(View):
         #file_path='/home/andres/media/'+name+'.'+extension
         #file_path=settings.FILES_ROOT+name+'.'+extension
         file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
-        print file_path
         with default_storage.open(file_path, 'wb') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
         return file_path
+
+    def post(self, request):
+        resp={}
+        try:
+            fileSend = request.FILES['document']
+            extensionFile = request.POST['extension']
+            question_id = request.POST['question_id']
+            survey_id = request.POST['survey_id']
+            nameFile = request.POST['name']
+            colector_id = request.POST['colector_id']
+
+            array_validation = {}
+            array_validation['fileSend'] = fileSend
+            array_validation['extensionFile'] = extensionFile
+            array_validation['question_id'] = question_id
+            array_validation['survey_id'] = survey_id
+            array_validation['nameFile'] = nameFile
+            array_validation['colector_id'] = colector_id
+
+            data_validator = self.dataValidator(array_validation)
+
+            if data_validator['error'] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = \
+                    data_validator['validation_errors']
+                resp['response_description'] = \
+                    str('the body data contains validation errors')
+                resp['body_received'] = str(request.body)
+                resp['form_data_expected'] = \
+                    str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+
+                return HttpResponse(json.dumps(resp,
+                                    default=json_util.default),
+                                    content_type='application/json')
+            else:
+                pass
+
+        
+            # Todo Validado entonces continuamos
+            uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''), question_id)
+
+            resp['response_code'] = '200'
+            resp['response_description'] = str('Media Document Saved')
+            resp['media_url'] = str(uploaded_file)
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+
+            return HttpResponse(json.dumps(resp),
+                        content_type='application/json')
+
+        except Exception, e:
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+            return HttpResponse(json.dumps(resp), content_type='application/json')
+
+#Permite precargar registros en un formulario con datos desde un archivo plano
+class UploadData(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(UploadData, self).dispatch(*args, **kwargs)
+
+    def dataValidator(self, array_validation):
+        response = {}
+        response['error'] = False
+        response['validation_errors'] = []
+
+        # validacion del formulario
+
+        if not array_validation['fileSend']:
+            response['error'] = True
+            response['validation_errors'].append('There is no document')
+
+        if not array_validation['extensionFile'].strip():
+            response['error'] = True
+            response['validation_errors'].append('extension in file is blank')
+
+        if not array_validation['question_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('question_id is blank')
+
+        if not array_validation['survey_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('survey_id is blank')
+
+        if not array_validation['nameFile'].strip():
+            response['error'] = True
+            response['validation_errors'].append('name in file is blank')
+
+        if not array_validation['colector_id'].strip():
+            response['error'] = True
+            response['validation_errors'].append('colector_id in file is blank')
+
+        return response
+
+    def handle_uploaded_file(self, f, name, extension, question_id):
+        resp={}
+        try:
+            #file_path='/home/andres/media/'+name+'.'+extension
+            #file_path=settings.FILES_ROOT+name+'.'+extension
+            file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
+            with default_storage.open(file_path, 'wb') as destination:
+                for chunk in f.chunks():
+                    destination.write(chunk)
+            resp['path']=file_path
+            resp['error'] = False
+            return resp
+        except Exception, e:            
+            resp['error'] = True
+            resp['response_description'] = str('No fue posible subir el archivo al servidor ')+str(e)
+            return resp
+
+    def insert_file_records(self, file_path, form_id, colector_id, resp):
+        try:
+            csvFile = default_storage.open(file_path)
+            #csvFile = open('example.csv')
+            csvReader = csv.reader(csvFile, delimiter=';')
+            #csvData = list(csvReader)
+        except Exception, e:
+            return str('No se encuentra el archivo en el servidor'
+                    + str(e.args)) + str(input_id)    
+
+        for row in csvReader:
+            #print('Row #' + str(csvReader.line_num) + ' ' + str(row))
+            if csvReader.line_num==1:
+                inputIdList=row
+
+            # construyendo json para insertar en mongodb
+            try:
+                form = {}
+                form['fecha_creacion'] = datetime.utcnow()
+                form['record_id']=str(uuid.uuid4())
+                form['longitud'] = "0.0"
+                form['latitud'] = "0.0"
+                form['horaini'] = datetime.utcnow()
+                form['horafin'] = datetime.utcnow()
+                form['form_id'] = form_id
+                formulario = Formulario.objects.get(id = int(form['form_id']))
+                form['form_name'] = formulario.nombre
+                form['form_description'] = formulario.descripcion
+
+                responsesArray=[]
+                for rowvalue in row:
+                    index = row.index(rowvalue)
+                    input_id=inputIdList[index]
+                    try:
+                        entrada = Entrada.objects.get(id = int(input_id))
+                        response = {}
+                        response['input_id']=str(entrada.id)
+                        response['label']=entrada.nombre
+                        response['tipo']=entrada.tipo
+                        response['value']=rowvalue
+                        responsesArray.append(response)
+                    except Exception, e:
+                        return str('No se encuentra el id de la entrada definida en el encabezado del archivo'
+                                + str(e.args)) + str(input_id)                      
+
+                form['responses'] = responsesArray
+
+                colector = \
+                    database.filled_forms.find_one({'colector_id': str(colector_id)},
+                        {'_id': 0})                
+
+                # validando si existe un colector con esta id
+                if colector == None:
+                    data = {}
+                    data['colector_id'] = colector_id
+                    data['filled_forms'] = []
+                    data['filled_forms'].append(form)
+                    
+                    database.filled_forms.insert(data)
+                    #database.filled_forms.create_index("filled_forms.sections.inputs.responses")
+
+                else:
+                    database.filled_forms.update({'colector_id': str(colector_id)},
+                            {'$push': {'filled_forms': form}})
+
+            except Exception, e:
+                return str('Error inserting data in mongodb' + str(e.args))
+ 
+        return str('Los registros del documento csv han sido guardados')
 
     def post(self, request):
         resp={}
@@ -741,27 +924,45 @@ class SaveImg(View):
             else:
                 pass
 
-        
             # Todo Validado entonces continuamos
             uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''), question_id)
             print uploaded_file
+            if uploaded_file['error']:
+                resp['response_code'] = '403'
+                resp['response_description'] = uploaded_file['response_description']
+                resp['form_data_expected'] = \
+                    str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+                return HttpResponse(json.dumps(resp), content_type='application/json')
+
+            else:
+                path_file = uploaded_file['path']
+                print path_file
+
+
+            # Leemos y cargamos en mongo los registros del archivo, pasando el path del archivo guardado uploaded_file
+            registered_file = self.insert_file_records(path_file, survey_id, colector_id, resp)
+
+            print registered_file
+
 
             resp['response_code'] = '200'
-            resp['response_description'] = str('Media Document Saved')
+            resp['response_description'] = str(registered_file)
             resp['media_url'] = str(uploaded_file)
             resp['form_data_expected'] = \
-                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", "colector_id":""  }')
 
             return HttpResponse(json.dumps(resp),
                         content_type='application/json')
 
         except Exception, e:
-            resp['response_code'] = '400'
+            resp['response_code'] = '403'
             resp['response_description'] = str('invalid body request '
                     + str(e.args))
             resp['form_data_expected'] = \
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
+
+
 
 
 #ELIMINA UN REGISTRO

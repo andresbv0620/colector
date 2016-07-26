@@ -73,6 +73,7 @@ class FormularioAsociadoAdmin(admin.ModelAdmin):
 
 class ReglaVisibilidadAdmin(admin.ModelAdmin):
     list_filter = ['visibilizar__ficha__entrada']
+    list_display = ['elemento']
     search_fields = ['valor', ]
 
 class RespuestaAdmin(admin.ModelAdmin):

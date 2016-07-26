@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from service.views import AllowedForms, SingleForm, FillForm, ColectorIdReport, FormNameReport, GetForms
-from service.views import FormIdReport, FormIdReportPag, FillResponsesForm, DeleteResponsesForm, SaveImg
+from service.views import FormIdReport, FormIdReportPag, FillResponsesForm, DeleteResponsesForm, SaveImg, UploadData
 urlpatterns = [
 
     url(r'^colector/allowed/forms/', AllowedForms.as_view()),
@@ -24,6 +24,7 @@ urlpatterns = [
     url(r'^form/single/', SingleForm.as_view()),
     url(r'^fill/responses/$', FillResponsesForm.as_view()),
     url(r'^fill/img/$', SaveImg.as_view()),
+    url(r'^fill/csv/$', UploadData.as_view()),
     url(r'^form/delete/', DeleteResponsesForm.as_view()),
     url(r'^fill/form/$', FillForm.as_view()),
     url(r'^fill/form/(?P<id>.+)/$', FillForm.as_view()),

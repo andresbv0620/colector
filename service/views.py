@@ -803,10 +803,10 @@ class UploadData(View):
     def handle_uploaded_file(self, f, name, extension, question_id):
         resp={}
         try:
-            #file_path='/home/andres/media/'+name+'.'+extension
+            file_path='/home/andres/media/'+name+'.'+extension
             #file_path=settings.FILES_ROOT+name+'.'+extension
-            file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
-            with default_storage.open(file_path, 'wb') as destination:
+            #file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
+            with open(file_path, 'wb') as destination:
                 for chunk in f.chunks():
                     destination.write(chunk)
             resp['path']=file_path
@@ -817,9 +817,9 @@ class UploadData(View):
             resp['response_description'] = str('No fue posible subir el archivo al servidor ')+str(e)
             return resp
 
-    def insert_file_records(self, file_path, form_id, colector_id, resp):
+    def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
         try:
-            csvFile = default_storage.open(file_path)
+            csvFile = open(file_path)
             #csvFile = open('example.csv')
             csvReader = csv.reader(csvFile, delimiter=';')
             #csvData = list(csvReader)
@@ -832,13 +832,13 @@ class UploadData(View):
             if csvReader.line_num==1:
                 inputIdList=row
 
+
+
             # construyendo json para insertar en mongodb
             try:
                 form = {}
                 form['fecha_creacion'] = datetime.utcnow()
                 form['record_id']=str(uuid.uuid4())
-                form['longitud'] = "0.0"
-                form['latitud'] = "0.0"
                 form['horaini'] = datetime.utcnow()
                 form['horafin'] = datetime.utcnow()
                 form['form_id'] = form_id
@@ -850,6 +850,13 @@ class UploadData(View):
                 for rowvalue in row:
                     index = row.index(rowvalue)
                     input_id=inputIdList[index]
+
+                    if input_id==element_longitud:
+                        form['longitud'] = rowvalue
+
+                    if input_id==element_latitud:
+                        form['latitud'] = rowvalue
+
                     try:
                         entrada = Entrada.objects.get(id = int(input_id))
                         response = {}
@@ -896,6 +903,8 @@ class UploadData(View):
             survey_id = request.POST['survey_id']
             nameFile = request.POST['name']
             colector_id = request.POST['colector_id']
+            element_longitud = request.POST['element_longitud']
+            element_latitud = request.POST['element_latitud']
 
             array_validation = {}
             array_validation['fileSend'] = fileSend
@@ -940,7 +949,7 @@ class UploadData(View):
 
 
             # Leemos y cargamos en mongo los registros del archivo, pasando el path del archivo guardado uploaded_file
-            registered_file = self.insert_file_records(path_file, survey_id, colector_id, resp)
+            registered_file = self.insert_file_records(path_file, survey_id, colector_id, element_longitud, element_latitud)
 
             print registered_file
 

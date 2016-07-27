@@ -60,8 +60,9 @@ class Formulario(models.Model):
 	nombre  = models.CharField(max_length=50, blank = True , unique=False)
 	descripcion = models.TextField(max_length=100, blank = True )
 	ficha = models.ManyToManyField('Ficha',  blank = True)
-	precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
-	titulo_reporte = models.ForeignKey('Entrada', on_delete=models.CASCADE, blank = True, null = True, default=0)
+	#precargado = models.CharField(max_length=2, choices=IF_CHOICES, default=NO)
+	titulo_reporte = models.ForeignKey('Entrada', on_delete=models.CASCADE, blank = True, null = True)
+	titulo_reporte2 = models.ForeignKey('Entrada', related_name='tituloreporte2', on_delete=models.CASCADE, blank = True, null = True)
 	
 	def __unicode__(self):
 		return self.nombre

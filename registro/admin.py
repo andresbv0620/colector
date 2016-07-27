@@ -34,9 +34,32 @@ class FormularioAdmin(admin.ModelAdmin):
     search_fields = ['nombre', ]
     filter_horizontal = ('ficha',  )
 
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """enable ordering drop-down alphabetically"""
+        if (db_field.name == 'titulo_reporte') or (db_field.name == 'titulo_reporte2'):
+            empresa=Empresa.objects.filter(usuario=request.user)
+            if len(empresa):
+                formularios=Formulario.objects.filter(empresa=empresa)
+                fichas=Ficha.objects.filter(formulario__in=formularios).distinct()
+                entradas=Entrada.objects.filter(ficha__in=fichas).distinct()
+                kwargs['queryset'] = entradas
+        return super(FormularioAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
+
 class AsignacionEntradaInline(admin.TabularInline):
     model = AsignacionEntrada
     extra = 1
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """enable ordering drop-down alphabetically"""
+        if db_field.name == 'entrada':
+            empresa=Empresa.objects.filter(usuario=request.user)
+            if len(empresa):
+                formularios=Formulario.objects.filter(empresa=empresa)
+                fichas=Ficha.objects.filter(formulario__in=formularios).distinct()
+                entradas=Entrada.objects.filter(ficha__in=fichas).distinct()
+                kwargs['queryset'] = entradas
+        return super(AsignacionEntradaInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
+
 
 
 class FichaAdmin(admin.ModelAdmin):
@@ -56,6 +79,16 @@ class EntradaAdmin(admin.ModelAdmin):
 class ReglaAutollenadoInline(admin.TabularInline):
     model = ReglaAutollenado
     extra = 1
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """enable ordering drop-down alphabetically"""
+        if (db_field.name == 'entrada_fuente') or (db_field.name == 'entrada_destino'):
+            empresa=Empresa.objects.filter(usuario=request.user)
+            if len(empresa):
+                formularios=Formulario.objects.filter(empresa=empresa)
+                fichas=Ficha.objects.filter(formulario__in=formularios).distinct()
+                entradas=Entrada.objects.filter(ficha__in=fichas).distinct()
+                kwargs['queryset'] = entradas
+        return super(ReglaAutollenadoInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 class FormularioAsociadoAdmin(admin.ModelAdmin):
@@ -75,6 +108,16 @@ class ReglaVisibilidadAdmin(admin.ModelAdmin):
     list_filter = ['visibilizar__ficha__entrada']
     list_display = ['elemento']
     search_fields = ['valor', ]
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        """enable ordering drop-down alphabetically"""
+        if db_field.name == 'elemento':
+            empresa=Empresa.objects.filter(usuario=request.user)
+            if len(empresa):
+                formularios=Formulario.objects.filter(empresa=empresa)
+                fichas=Ficha.objects.filter(formulario__in=formularios).distinct()
+                entradas=Entrada.objects.filter(ficha__in=fichas).distinct()
+                kwargs['queryset'] = entradas
+        return super(ReglaVisibilidadAdmin, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 class RespuestaAdmin(admin.ModelAdmin):
     list_display = ('valor', 'id', )

@@ -123,12 +123,12 @@ class GetForms(View):
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
                     if not p.formulario.titulo_reporte:
-                        formulario['titulo_reporte'] = ""                   
+                        formulario['titulo_reporte'] = 0                   
                     else:
                         formulario['titulo_reporte'] = p.formulario.titulo_reporte.id
 
                     if not p.formulario.titulo_reporte2:
-                        formulario['titulo_reporte2'] = ""                   
+                        formulario['titulo_reporte2'] = 0                   
                     else:
                         formulario['titulo_reporte2'] = p.formulario.titulo_reporte2.id
                         

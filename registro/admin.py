@@ -33,6 +33,7 @@ class FormularioAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', )    
     search_fields = ['nombre', ]
     filter_horizontal = ('ficha',  )
+    list_filter = ('empresa',)
 
     def formfield_for_foreignkey(self, db_field, request, **kwargs):
         """enable ordering drop-down alphabetically"""
@@ -50,17 +51,16 @@ class AsignacionEntradaInline(admin.TabularInline):
     model = AsignacionEntrada
     extra = 1
 
-
-
 class FichaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion', )    
     search_fields = ['nombre', ]
     #filter_horizontal = ('entrada',  )
     inlines = (AsignacionEntradaInline,)
+    list_filter = ('formulario','formulario__empresa',)
 
 class EntradaAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'descripcion',  'tipo', 'id', )    
-    list_filter = ('tipo',)
+    list_filter = ('ficha','tipo','ficha__formulario__empresa')
     search_fields = ['nombre', 'descripcion' ]
     #filter_horizontal = ('respuesta',  )
     raw_id_fields = ('respuesta',)

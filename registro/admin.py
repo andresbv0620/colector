@@ -49,16 +49,6 @@ class FormularioAdmin(admin.ModelAdmin):
 class AsignacionEntradaInline(admin.TabularInline):
     model = AsignacionEntrada
     extra = 1
-    def formfield_for_foreignkey(self, db_field, request, **kwargs):
-        """enable ordering drop-down alphabetically"""
-        if db_field.name == 'entrada':
-            empresa=Empresa.objects.filter(usuario=request.user)
-            if len(empresa):
-                formularios=Formulario.objects.filter(empresa=empresa)
-                fichas=Ficha.objects.filter(formulario__in=formularios).distinct()
-                entradas=Entrada.objects.filter(ficha__in=fichas).distinct()
-                kwargs['queryset'] = entradas
-        return super(AsignacionEntradaInline, self).formfield_for_foreignkey(db_field, request, **kwargs)
 
 
 

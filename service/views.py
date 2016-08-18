@@ -585,7 +585,7 @@ class FillResponsesForm(View):
 
                 for response in responses:
                     #VALIDAMOS EL ESTADO DE LA ENCUESTA, SI ESTA LISTA PARA SINCRONIZAR SIGUE, SINO DEVUELVE UN 
-                    if()
+                    #if()
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
                     response['label']=entrada.nombre

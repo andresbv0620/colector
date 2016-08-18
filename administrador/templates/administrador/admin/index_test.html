@@ -1,5 +1,69 @@
 {% extends "administrador/admin/base_test.html" %}
 {% block content %}
-<h1>TEST ROUTED BY DJANGO</h1>
+<h1>TEST just ROUTED BY DJANGO</h1>
 <div ng-view></div>
+
+
+
+
+    <div class="container">
+        <h1>Server Side Pagination</h1>
+        <p>Use <code>sidePagination: 'server'</code> option to define the server side pagination of table.</p>
+        <div id="toolbar">
+		
+		<!-- <div class="col-md-5">
+			<select class="form-control" ng-model="itemsPerPage" ng-change="perPage()" ng-options="('show '+size+' per page') for size in pageSizes">
+				<option value="">Records per page</option>
+			</select>
+			</div> -->
+		<div class="col-md-6">
+			<select class="form-control">
+				<option value="">Export Basic</option>
+				<option value="all">Export All</option>
+				<option value="selected">Export Selected</option>
+			</select>
+		</div>
+		<div class="col-md-6">
+			[[total]] Records
+		</div>
+	</div>
+        <table id="table"
+
+
+		data-search="true"
+		data-show-refresh="false"
+		data-show-toggle="true"
+		data-show-columns="true"
+		data-minimum-count-columns="2"
+		data-show-export="true"
+		data-click-to-select="true"
+		data-detail-view="true"
+		data-detail-formatter="¡Registro completo!"
+		data-id-field="id"
+		data-show-footer="false"
+		data-height="500"
+		data-sort-order="desc" 
+		data-sort-name="sorter"
+		data-escape="false"    
+		data-striped="true"
+
+
+
+
+               data-toggle="table"
+               data-toolbar="#toolbar"
+               data-url="/service/filled/forms/report/paginate/formid/1/"
+               data-height="400"
+               data-side-pagination="server"
+               data-pagination="true"
+               data-page-list="[5, 10, 20, 50, 100, 200]"
+               data-search="true">
+
+        </table>
+    </div>
+<script>
+    var $table = $('#table');
+    $(function () {
+    });
+</script>
 {%endblock content%}

@@ -33,6 +33,31 @@
     }
 
  }]);*/
+ //////////////Reporte por formid////////////////////////7
+app.controller('testController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
+
+    $scope.loading = true;
+    $("#table").bootstrapTable("showLoading");
+    media_url=globales.media_url;
+    static_url=globales.static_url;
+
+    ////////////////////////////////CARGAR HEADER/////////////////////////////////////////////
+    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/', function(data) {
+        console.log("datos recibidos del servidor: ");
+        console.log(data['columns']);
+        columns = new Array();
+        tablecontent = new Object();
+
+        columns=data['columns']
+        tablecontent['columns'] = columns;
+
+        $('#table').bootstrapTable(tablecontent);
+    }, function(error) {
+        console.log(error)
+    });
+
+}]);
+///////////////////////////////////////////////////////
 
 //////////////Llenar formulario web///////////////////////
 app.controller('llenarFormulario', ['$scope', '$routeParams', 'defaultService', 'globales', function($scope, $routeParams, defaultService, globales) {
@@ -243,6 +268,7 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
         columns.push(column);
 
         ////For que recorre cada documento de colector (cada colector tiene un documento donde se guardan los registros filled_forms)
+        markers = {};
         for (colectorDocument in colectorfilledforms) {
             filledforms = colectorfilledforms[colectorDocument].filled_forms;
             colectoridrecord = colectorfilledforms[colectorDocument].colector_id;

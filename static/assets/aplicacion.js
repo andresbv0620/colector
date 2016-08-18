@@ -43,7 +43,9 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	.when('/reporte/id/:form_id/page/:page/limit/:limit',{
 		controller:"FormIdReportPaginate",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario_paginate.html"
-		
+	})
+	.when('/test/',{
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_testing.html"
 	})
 
 

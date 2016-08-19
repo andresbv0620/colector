@@ -587,8 +587,17 @@ class FillResponsesForm(View):
                     #VALIDAMOS EL ESTADO DE LA ENCUESTA, SI ESTA LISTA PARA SINCRONIZAR SIGUE, SINO DEVUELVE UN 
                     if response['value'] == '99270':
                         resp={}
+                        # return HttpResponse("colector existe")
+                        resp['response_code'] = '202'
+                        resp['response_description'] = str('Registro en edicion')
+                        resp['body_received'] = str(request.body)
+                        resp['body_expected'] = \
+                            str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                                )
+                        resp['response_data'] = request.body
+
                         return HttpResponse(json.dumps(resp),
-                                    content_type='application/json')
+                                            content_type='application/json')
 
 
 

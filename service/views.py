@@ -585,7 +585,13 @@ class FillResponsesForm(View):
 
                 for response in responses:
                     #VALIDAMOS EL ESTADO DE LA ENCUESTA, SI ESTA LISTA PARA SINCRONIZAR SIGUE, SINO DEVUELVE UN 
-                    #if()
+                    if response['value'] == '99270':
+                        resp={}
+                        return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
+
+
+
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
                     response['label']=entrada.nombre

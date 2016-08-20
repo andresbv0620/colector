@@ -615,8 +615,13 @@ class FillResponsesForm(View):
                             resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
                             response['value']="Op_" + str(response['value'])
 
-                    if entrada.tipo == "1" or entrada.tipo == "2":
+                    elif entrada.tipo == "1" or entrada.tipo == "2":
                         response['value']=response['value'].upper()
+                    else:
+                        response['value']=response['value']
+
+
+
 
 
                 form['responses'] = responses

@@ -597,8 +597,7 @@ class FillResponsesForm(View):
                                 )
                         resp['response_data'] = request.body
 
-                        return HttpResponse(json.dumps(resp),
-                                            content_type='application/json')
+                        return HttpResponse(status=202)
 
 
 

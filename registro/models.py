@@ -104,6 +104,7 @@ FORMULA='13'
 FIRMA='14'
 DECIMAL='15'
 DOCUMENTO='16'
+TIEMPO='17'
 ENTRADA_CHOICES = (
         (TEXTO, 'TEXTO'),
         (PARRAFO, 'PARRAFO'),
@@ -121,6 +122,7 @@ ENTRADA_CHOICES = (
         (FIRMA, 'FIRMA'),
         (DECIMAL, 'DECIMAL'),
         (DOCUMENTO, 'DOCUMENTO'),
+        (TIEMPO, 'TIEMPO'),
         
     )
 

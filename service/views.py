@@ -586,7 +586,7 @@ class FillResponsesForm(View):
                 for response in responses:
                     #VALIDAMOS EL ESTADO DE LA ENCUESTA, SI ESTA LISTA PARA SINCRONIZAR SIGUE, SINO DEVUELVE UN 
                     #if response['value'] == 'COLOCAR OPCION PARA ESTADO EDICION':
-                    if response['value'] == 99270:
+                    if response['value'] == "99270":
                         resp={}
                         # return HttpResponse("colector existe")
                         resp['response_code'] = '202'

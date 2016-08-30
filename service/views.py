@@ -19,6 +19,7 @@ import json
 from bson import json_util
 import hashlib
 import pymongo
+from bson.objectid import ObjectId
 import uuid
 import collections
 from datetime import datetime
@@ -681,7 +682,8 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
-#Guarda una estructura simple de las respuestas, colector_id, form_id, responses[id: , value: ] las respuestas estan referenciadas
+#Guarda una estructura simple de las respuestas, colector_id, form_id, rows{} las respuestas no estan referenciadas estan embebidas en rows y se hace referencia al colector id
+#OOOOOOOOOOJJJJJJJJJJJJJJJJJJJJJJOOOOOOOOOOOOOOO AGREGAR ESTADO EN EDICION A ESTE SERVICIO
 class FillResponsesFormTest(View):
 
     @method_decorator(csrf_exempt)
@@ -713,8 +715,6 @@ class FillResponsesFormTest(View):
         if not array_validation['horafin'].strip():
             response['error'] = True
             response['validation_errors'].append('horafin is blank')
-
-
 
         if not array_validation['colector_id'].strip():
             response['error'] = True
@@ -756,8 +756,7 @@ class FillResponsesFormTest(View):
             horafin = data['horafin']
             colector_id = data['colector_id']
             form_id = data['form_id']
-            responses = data['responses']
-            
+            responses = data['responses']            
 
             array_validation = {}
             array_validation['longitud'] = longitud
@@ -802,6 +801,7 @@ class FillResponsesFormTest(View):
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
 
+
                 for response in responses:
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
@@ -819,19 +819,28 @@ class FillResponsesFormTest(View):
                     if entrada.tipo == "1" or entrada.tipo == "2":
                         response['value']=response['value'].upper()
 
+                    if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
+                        #src='/home/andres/media/'+response['value']
+                        #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+                        src=settings.FILES_ROOT+str(entrada.id)+'/'+response['value']
+                        print src
+                        static_url=settings.STATIC_URL
+                        if response['label'] in rows:
+                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                        else:
+                            response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
                     rows[response['label']]=response['value']
-
 
                 form['responses'] = responses
 
                 # return HttpResponse(json.dumps(data))
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                        {'colector_id': 1})                
 
                 # validando si existe un colector con esta id
                 if colector == None:
-                    pass
+                    print 'EL COLECTOR NO EXISTE'
                 else:
                     print "El colector existe"
 
@@ -842,6 +851,7 @@ class FillResponsesFormTest(View):
                 data['filled_forms'] = []
                 data['filled_forms'] = form
                 
+                #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)
                 database.filled_forms.create_index("form_id")
                 database.filled_forms.create_index("colector_id")
@@ -1072,11 +1082,8 @@ class UploadData(View):
     def handle_uploaded_file(self, f, name, extension, question_id):
         resp={}
         try:
-            #activar la siguiente linea para probar local
+            #activar la siguiente linea para probar local y  a .open() quitar default storage
             #file_path='/home/andres/media/'+name+'.'+extension
-
-
-            #file_path=settings.FILES_ROOT+name+'.'+extension
 
             #Agregar default_storage.open para usar django-storages (aws s3) y activar la siguiente linea
             file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
@@ -1793,7 +1800,7 @@ def FormIdReportPag(request, id):
                         else:
                             datarows[inputLabel] = inputValue
 
-                    #Reporte para foto, Se valida si es foto, para convertirla de base64
+                    #Reporte para foto, Se valida si es foto, para convertirla de base64, no se incluye documento
                     if ((inputType == '6')or(inputType=='14')):
                         if datarows.has_key(inputLabel):
                             datarows[inputLabel] = datarows[inputLabel] + '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>'
@@ -1846,212 +1853,55 @@ def FormIdReportPag(request, id):
 
 #Reporte por form id paginacion
 def FormIdReportPagTest(request, id):
+    #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
+    getcolumns=request.GET.get('getcolumns')
+    if getcolumns=='true':
+        colrows = database.filled_forms.find_one({'form_id': str(id)}, {'rows': 1})
+        columns=[]
+        for col in colrows['rows']:
+            column={}
+            column['field']=col
+            column['title']=col
+            columns.append(column)
+
+        data={
+            'columns': columns,
+            }
+        return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
     #Setting Pagination
-
     offset=int(request.GET.get('offset', 10))
-    print offset
-    #sumo divido el offset entre 10 y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
-
-    page=(int(request.GET.get('offset', 0)))/10+1
-    print page
-    print "esta es la pagina"
     limit=int(request.GET.get('limit', 10))
-    #Consulta a mongodb. (Convertir form_id, en in indixe de primer nivel para optimizar la consulta)
+    #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
+    page=(int(request.GET.get('offset', 0)))/limit+1
+    
     #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
-    filled_forms = database.filled_forms.find({'form_id': str(id)}).limit(3)
-
+    if page == 1:
+        filled_forms = database.filled_forms.find({'form_id': str(id)}).limit(limit).sort("_id",-1)
+    else:
+        lastid = str(request.session[str(page-1)])
+        filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
     resp = {}
-
     #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
-    if filled_forms.count() == 0:
+    if filled_forms.count() != 0:
+        rows = []#rows array que contiene las filas de la tabla
+        #Below f is a document (a record)
+        for f in filled_forms:
+            #print f["filled_forms"]["responses"]
+            f["rows"]["MongoId"]=str(f["_id"])
+            rows.append(f["rows"])#list of records
+            mongoid= str(f["_id"])
+        request.session[str(page)] = mongoid
+    else:
         resp['response_code'] = '404'
         resp['response_description'] = 'form id not found'
         return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
-    else:
-        #print "Count ",filled_forms.count()
-        forms = []
-        #Each record has a document with its respective forms, the main nodes of a record document are filled_forms=[] and colector_id
-        #Below f is a document (a record)
-        for f in filled_forms:
-            print f["rows"]
 
-
-        #forms contiene todos los  registros del form con el id requerido. A continuacion se hace la paginacion
-        paginator = Paginator(forms, limit) # Show limit records per page
-        tableheader=[]
-
-        try:
-            paginatedForms = paginator.page(page)
-            rows=[]
-            columns=[]
-            markersArray=[]
-
-            #Setting the paggination attributes  
-            resp['hasPrevious'] = paginatedForms.has_previous()
-            if paginatedForms.has_previous():
-                resp['hasPrevious'] = paginatedForms.has_previous()
-                resp['previousPageNumber'] = paginatedForms.previous_page_number()
-
-            resp['hasNext'] = paginatedForms.has_next()
-            if paginatedForms.has_next():   
-                resp['hasNext'] = paginatedForms.has_next()
-                resp['nextPageNumber'] = paginatedForms.next_page_number()
-
-            resp['currentPage'] = page
-            resp['numPages'] = paginatedForms.paginator.num_pages
-
-
-            for paginatedForm in paginatedForms:
-                #print paginatedForm["form_name"]
-                responses=paginatedForm["responses"]
-                datarows = {}#Objeto que va guardando las respuestas de cada registro
-                #markers objeto usado para el mapa
-                markers = {}
-                markers['longitude'] = paginatedForm["longitud"]
-                markers['latitude'] = paginatedForm["latitud"]
-                datarows["id"] = paginatedForm["record_id"]
-                datarows["form_id"] = paginatedForm["form_id"]
-
-                for response in responses:
-                    inputId = response["input_id"]
-                    #print "Input id: ", inputId
-                    inputValue = response["value"]
-                    inputLabel = response["label"]
-                    inputType = response["tipo"]
-
-                    #Se define la primer respuesta como el titulo del pin enel mapa
-                    if not markers.has_key('message'):
-                        markers['message'] = inputValue
-
-                    #Validamos para generar la fila de encabezados
-                    if not inputLabel in tableheader:
-                        column = {}
-                        column['field'] = inputLabel
-                        column['sortable'] = True
-                        column['title'] = inputLabel
-                        columns.append(column)
-                        tableheader.append(inputLabel)
-                    
-                    #Reporte numero, Se valida si es numero
-                    if (inputType == '8'):
-                        inputValue=float(inputValue)
-                        if datarows.has_key(inputLabel):
-                            datarows[inputLabel] = datarows[inputLabel] + ',' + inputValue
-                        else:
-                            datarows[inputLabel] = inputValue
-
-                    #Reporte para foto, Se valida si es foto, para convertirla de base64
-                    if ((inputType == '6')or(inputType=='14')):
-                        if datarows.has_key(inputLabel):
-                            datarows[inputLabel] = datarows[inputLabel] + '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>'
-                        else:
-                            datarows[inputLabel] = '<a class="thumb"><img width="50px" height="50px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/><span><img width="450px" src="data:image/png;base64,' + inputValue + '" data-err-src="images/png/avatar.png"/></span></a>'
-
-                    #Reporte para el resto de tipos de entrada
-                    if ((inputType=='1')or(inputType=='2')or(inputType=='3')or(inputType=='4')or(inputType=='5')or(inputType=='7')or(inputType=='9')or(inputType=='10')or(inputType=='11')or(inputType=='12')):
-                        if datarows.has_key(inputLabel):
-                            datarows[inputLabel] = datarows[inputLabel] + ',' + inputValue
-                        else:
-                            datarows[inputLabel] = inputValue
-
-                #Fin for para mostrar cada respuesta (columna) de una fila
-                #///////////Se asigna la hora de inicio y fin del registro a las respuestas////////////////
-                horaini = float(paginatedForm["horaini"])
-                datarows["Inicio"] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(horaini))
-
-                horafin = float(paginatedForm["horafin"])
-                datarows["Fin"] = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(horafin))
-
-                datarows["id"] = paginatedForm["record_id"]
-                datarows["sorter"] = horafin
-
-                datarows["Delete"] = '<a id="delete_row" href="#/reporte/id/'+datarows["form_id"]+'/record/delete/'+paginatedForm["record_id"]+'">Delete</a>'
-
-                #//Se guardan las respuestas de la fila en el objeto data
-                rows.append(datarows)
-                
-                markersArray.append(markers)
-                resp['response_code'] = '200'
-                resp['response_description'] = 'form id found'
-                resp['total'] = len(forms)
-                resp['rows'] = rows
-                resp['cols'] = columns
-                resp['markers'] = markersArray
-
-        except PageNotAnInteger:
-            # If page is not an integer, deliver first page.
-            paginatedForms = paginator.page(1)
-        except EmptyPage:
-            # If page is out of range (e.g. 9999), deliver last page of results.
-            paginatedForms = paginator.page(paginator.num_pages)
-
-        
-
-        return HttpResponse(json.dumps(resp,
-                           default=json_util.default),
-                          content_type='application/json')
-
-
-
-    obj={
-          "total": 100,
-          "rows": 
-            [
-                {
-                  "id": 0,
-                  "name": "Item 0",
-                  "price": "$0"
-                },
-                {
-                  "id": 1,
-                  "name": "Item 1",
-                  "price": "$1"
-                },
-                {
-                  "id": 2,
-                  "name": "Item 2",
-                  "price": "$2"
-                },
-                {
-                  "id": 3,
-                  "name": "Item 3",
-                  "price": "$3"
-                },
-                {
-                  "id": 4,
-                  "name": "Item 4",
-                  "price": "$4"
-                },
-                {
-                  "id": 5,
-                  "name": "Item 5",
-                  "price": "$5"
-                },
-                {
-                  "id": 6,
-                  "name": "Item 6",
-                  "price": "$6"
-                },
-                {
-                  "id": 7,
-                  "name": "Item 7",
-                  "price": "$7"
-                },
-                {
-                  "id": 8,
-                  "name": "Item 8",
-                  "price": "$8"
-                },
-                {
-                  "id": 9,
-                  "name": "Item 9",
-                  "price": "$9"
-                }
-            ]
+    data={
+            "total": database.filled_forms.find({'form_id': str(id)}).count(),
+            "rows": rows,
         }
 
-
-    return HttpResponse(json.dumps(obj, default=json_util.default), content_type='application/json')
+    return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
 #Reporte por fecha
 def DateReport(

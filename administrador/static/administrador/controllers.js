@@ -33,16 +33,56 @@
     }
 
  }]);*/
- //////////////Reporte por formid////////////////////////7
-app.controller('testController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
+ //////////////Reporte por formid server side pagination////////////////////////
+app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
+    
+    //$scope.loading = true;
+    //$("#table").bootstrapTable("showLoading");
 
-    $scope.loading = true;
-    $("#table").bootstrapTable("showLoading");
     media_url=globales.media_url;
     static_url=globales.static_url;
 
+
+    var $table = $('#table'),
+    $pagination = $('#button');
+    //onPageChange
+    $scope.count = 0;
+    $scope.myFunction = function() {
+        $scope.count++;
+        //$scope.map = { center: { latitude: 45, longitude: -73 }, zoom: 8 };
+        //onPageChange
+        pagData = $table.bootstrapTable('getData');
+        markersArray = new Array();
+        for (var i = pagData.length - 1; i >= 0; i--) {
+            markers = {};
+            markers['longitude'] = pagData[i]["longitud"];
+            markers['latitude'] = pagData[i]["latitud"];
+            markers['message'] = pagData[i]["latitud"];
+            markersArray.push(markers);
+        }
+        ///////////////////////////////MAPS REPORT////////////////////////
+        console.log(markersArray);
+        $scope.map = {
+            center: {
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
+            },
+            zoom: 12
+        };
+
+        $scope.marker = {
+            coords: {
+                latitude: markers['latitude'],
+                longitude: markers['longitude']
+            }
+        }
+
+        $scope.markerList = markersArray;
+
+    }
     ////////////////////////////////CARGAR HEADER/////////////////////////////////////////////
-    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/', function(data) {
+    ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
+    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {
         console.log("datos recibidos del servidor: ");
         console.log(data['columns']);
         columns = new Array();
@@ -51,11 +91,23 @@ app.controller('testController', ['$scope', '$uibModal', '$log','$routeParams', 
         columns=data['columns']
         tablecontent['columns'] = columns;
 
+        column={};
+        column['field']="action";
+        column['title']="Accion";
+        column['formatter']="actionFormatter";
+        column['events']="actionEvents";
+        columns.push(column);
+        tablecontent['queryParams'] = parametros;
+
+        function parametros(params) {
+          params.lastid=data['lastid'];
+        return params;
+        }
+
         $('#table').bootstrapTable(tablecontent);
     }, function(error) {
         console.log(error)
-    });
-
+    });  
 }]);
 ///////////////////////////////////////////////////////
 
@@ -322,7 +374,6 @@ app.controller('reporteFormularioId', ['$scope', '$uibModal', '$log','$routePara
                                 datacolumns[inputLabel] = datacolumns[inputLabel] + ',' + inputValue;
                             } else {
                                 datacolumns[inputLabel] = inputValue;
-
                             }
                         }
 
@@ -671,6 +722,9 @@ app.controller('FormIdReportPaginate', ['$scope', '$uibModal', '$log','$routePar
                 });
 
             });
+
+
+
 
             ///////////////////////////////MAPS REPORT////////////////////////
         $scope.map = {

@@ -129,7 +129,7 @@ ENTRADA_CHOICES = (
 
 class Entrada(models.Model):
 	tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
-	nombre  = models.CharField(max_length=50, blank = True , unique=False)
+	nombre  = models.CharField(max_length=500, blank = True , unique=False)
 	descripcion = models.TextField(max_length=100, blank = True )
 	respuesta = models.ManyToManyField('Respuesta',  blank = True)
 

@@ -482,13 +482,13 @@ class FillResponsesForm(View):
         response['validation_errors'] = []
 
         # validacion del formulario
-        # if not array_validation['latitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('latitud is blank')
+        if not array_validation['latitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('latitud is blank')
 
-        # if not array_validation['longitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('longitud is blank')
+        if not array_validation['longitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('longitud is blank')
 
         if not array_validation['horaini'].strip():
             response['error'] = True
@@ -532,8 +532,8 @@ class FillResponsesForm(View):
         # validando data correcta enviada en body
         try:
             data = json.loads(request.body)
-            # longitud = data['longitud']
-            # latitud = data['latitud']
+            longitud = data['longitud']
+            latitud = data['latitud']
             horaini = data['horaini']
             horafin = data['horafin']
             colector_id = data['colector_id']
@@ -542,8 +542,8 @@ class FillResponsesForm(View):
             
 
             array_validation = {}
-            # array_validation['longitud'] = longitud
-            # array_validation['latitud'] = latitud
+            array_validation['longitud'] = longitud
+            array_validation['latitud'] = latitud
             array_validation['horaini'] = horaini
             array_validation['horafin'] = horafin
             array_validation['colector_id'] = colector_id
@@ -700,13 +700,13 @@ class FillResponsesFormTest(View):
 
         # validacion del formulario
 
-        # if not array_validation['latitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('latitud is blank')
+        if not array_validation['latitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('latitud is blank')
 
-        # if not array_validation['longitud'].strip():
-        #     response['error'] = True
-        #     response['validation_errors'].append('longitud is blank')
+        if not array_validation['longitud'].strip():
+            response['error'] = True
+            response['validation_errors'].append('longitud is blank')
 
         if not array_validation['horaini'].strip():
             response['error'] = True
@@ -750,8 +750,8 @@ class FillResponsesFormTest(View):
         # validando data correcta enviada en body
         try:
             data = json.loads(request.body)
-            # longitud = data['longitud']
-            # latitud = data['latitud']
+            longitud = data['longitud']
+            latitud = data['latitud']
             horaini = data['horaini']
             horafin = data['horafin']
             colector_id = data['colector_id']
@@ -759,8 +759,8 @@ class FillResponsesFormTest(View):
             responses = data['responses']            
 
             array_validation = {}
-            # array_validation['longitud'] = longitud
-            # array_validation['latitud'] = latitud
+            array_validation['longitud'] = longitud
+            array_validation['latitud'] = latitud
             array_validation['horaini'] = horaini
             array_validation['horafin'] = horafin
             array_validation['colector_id'] = colector_id

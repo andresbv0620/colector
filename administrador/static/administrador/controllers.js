@@ -38,6 +38,21 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
     
     //$scope.loading = true;
     //$("#table").bootstrapTable("showLoading");
+    window.actionEvents = {
+    'click .like': function (e, value, row, index) {
+        alert('You click like icon, row: ' + JSON.stringify(row));
+        console.log(value, row, index);
+    },
+    'click .edit': function (e, value, row, index) {
+        alert('You click edit icon, row: ' + JSON.stringify(row));
+        console.log(value, row, index);
+    },
+    'click .remove': function (e, value, row, index) {
+        alert('You click remove icon, row: ' + JSON.stringify(row));
+        console.log(value, row, index);
+        console.log(row['MongoId']);
+    }
+};
 
     media_url=globales.media_url;
     static_url=globales.static_url;
@@ -47,9 +62,6 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
     $scope.count = 0;
     
     $scope.myFunction = function() {
-        
-        $scope.count++;
-        console.log("lllama")
         pagData = $table.bootstrapTable('getData');
         markersArray = new Array();
         for (var i = pagData.length - 1; i >= 0; i--) {
@@ -58,9 +70,9 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
             markers['latitude'] = pagData[i]["latitud"];
             markers['message'] = pagData[i]["latitud"];
             markersArray.push(markers);
+            console.log(pagData[i]["MongoId"]);
         }
         ///////////////////////////////MAPS REPORT////////////////////////
-        console.log(markersArray);
         $scope.map = {
             center: {
                 latitude: markers['latitude'],
@@ -98,7 +110,15 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
         columns=data['columns']
         tablecontent['columns'] = columns;
 
-        column={};
+
+        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        column = new Object();
+        column['field'] = "state";
+        column['checkbox'] = true;
+        column['title'] = "state";
+        columns.unshift(column);
+
+        column = new Object();
         column['field']="action";
         column['title']="Accion";
         column['formatter']="actionFormatter";

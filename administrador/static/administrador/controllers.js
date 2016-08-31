@@ -42,15 +42,14 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
     media_url=globales.media_url;
     static_url=globales.static_url;
 
-
     var $table = $('#table'),
     $pagination = $('#button');
-    //onPageChange
     $scope.count = 0;
+    
     $scope.myFunction = function() {
+        
         $scope.count++;
-        //$scope.map = { center: { latitude: 45, longitude: -73 }, zoom: 8 };
-        //onPageChange
+        console.log("lllama")
         pagData = $table.bootstrapTable('getData');
         markersArray = new Array();
         for (var i = pagData.length - 1; i >= 0; i--) {
@@ -76,10 +75,18 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
                 longitude: markers['longitude']
             }
         }
-
         $scope.markerList = markersArray;
-
     }
+
+    ///AL HACER EL LLAMADO CON JAVASCRIPT NO ESTA FUNCIONANDO, CUANDO SE LLAMA CON ANGULAR FUNCIONA
+
+    $('#table').on('load-success.bs.table', function (e, number, size) {
+        $('#loadmapbutton').click();
+    });
+
+
+
+
     ////////////////////////////////CARGAR HEADER/////////////////////////////////////////////
     ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
     defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {

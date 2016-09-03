@@ -236,14 +236,15 @@
                 <span>Reports</span>
                 <i class="fa fa-angle-left pull-right"></i>
               </a>
-              <ul class="treeview-menu">
+              
+              <ul class="treeview-menu active">
                 
                     {% for formulario in formularios %}
                         <!-- Carga link de reporte con paginacion <li>
                           <a href="#/reporte/id/{{formulario.id}}/page/0/limit/10"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
                         </li> -->
                         <li>
-                          <a href="#/reporte/id/{{formulario.id}}"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
+                          <a href="#/reportepag/id/{{formulario.id}}"><i class="fa fa-circle-o"></i> {{ formulario}}<i class="fa fa-angle-left pull-right"></i></a>
                         </li>
                     {% endfor %}
    

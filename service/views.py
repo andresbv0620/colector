@@ -348,7 +348,7 @@ class GetForms(View):
                                 content_type='application/json')
 
         return HttpResponse('Single form')
-
+#DEPRECATED
 class SingleForm(View):
 
     @method_decorator(csrf_exempt)
@@ -466,8 +466,8 @@ class SingleForm(View):
 
         return HttpResponse('Single form')
 
-#Guarda una estructura simple de las respuestas, colector_id, form_id, responses[id: , value: ] las respuestas estan embebidas  en responses
-class FillResponsesForm(View):
+#DEPRECATED Guarda una estructura simple de las respuestas, colector_id, form_id, responses[id: , value: ] las respuestas estan embebidas  en responses
+class FillResponsesFormEmbeded(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -683,8 +683,8 @@ class FillResponsesForm(View):
                                 content_type='application/json')
 
 #Guarda una estructura simple de las respuestas, colector_id, form_id, rows{} las respuestas no estan referenciadas estan embebidas en rows y se hace referencia al colector id
-#OOOOOOOOOOJJJJJJJJJJJJJJJJJJJJJJOOOOOOOOOOOOOOO AGREGAR ESTADO EN EDICION A ESTE SERVICIO
-class FillResponsesFormTest(View):
+#SOLUCIONAR ERROR GPS, CUANDO NO VIENEN COORDENADAS NO VALIDAR ESTOS DATOS
+class FillResponsesForm(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -808,6 +808,16 @@ class FillResponsesFormTest(View):
                     response['tipo']=entrada.tipo
                     if entrada.tipo == "4" or entrada.tipo == "5":
                         try:
+                            if response['value'] == "99270":
+                                resp={}
+                                # return HttpResponse("colector existe")
+                                resp['response_code'] = '202'
+                                resp['response_description'] = str('Registro en edicion')
+                                resp['body_received'] = str(request.body)
+                                resp['body_expected'] = \
+                                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                                resp['response_data'] = request.body
+                                return HttpResponse(json.dumps(resp),content_type='application/json')
                             response_id=response['value']
                             respuesta = Respuesta.objects.get(id = int(response_id))
                             response['value']=respuesta.valor
@@ -1704,7 +1714,7 @@ def FormIdReport(request, id):
                             default=json_util.default),
                             content_type='application/json')
 
-#Reporte por form id paginacion
+#DEPRECATED Pagina sobre django usando el antiguo servicio donde los registros estaban embebidos
 def FormIdReportPag(request, id):
     #Setting Pagination
     #sumo 1 porque en django la paginacion no empieza desde 0, empieza desde 1
@@ -1851,8 +1861,8 @@ def FormIdReportPag(request, id):
                            default=json_util.default),
                           content_type='application/json')
 
-#Reporte por form id paginacion
-def FormIdReportPagTest(request, id):
+#Reporte pagina directamente sobre django usando el paginador de bootstrat table
+def FormIdReportPagServer(request, id):
     #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
     getcolumns=request.GET.get('getcolumns')
     if getcolumns=='true':
@@ -1861,6 +1871,7 @@ def FormIdReportPagTest(request, id):
         for col in colrows['rows']:
             column={}
             column['field']=col
+            column['sortable'] = 'true'
             column['title']=col
             columns.append(column)
 

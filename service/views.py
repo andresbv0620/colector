@@ -1686,7 +1686,7 @@ def FormNameReport(request, name):
                             default=json_util.default),
                             content_type='application/json')
 
-#Reporte por form id
+#DEPRECATED Reporte por form id, client side pagination
 def FormIdReport(request, id):
     filled_forms = \
         database.filled_forms.find({'filled_forms.form_id': str(id)},

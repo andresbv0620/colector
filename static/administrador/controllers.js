@@ -40,12 +40,18 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
     ///////////////////////////////CARGAR HEADER/////////////////////////////////////////////
     ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
     defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {
+        if (data['response_code']=='404') {
+            $scope.notificacion='NO HAY REGISTROS PARA ESTE FORMULARIO'
+            return;
+        }
         console.log("datos recibidos del servidor: ");
         console.log(data['columns']);
         columns = new Array();
         tablecontent = new Object();
 
         columns=data['columns']
+
+
         
         ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
         column = new Object();

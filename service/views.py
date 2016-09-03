@@ -801,7 +801,6 @@ class FillResponsesFormTest(View):
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
 
-
                 for response in responses:
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
@@ -1279,29 +1278,30 @@ class DeleteResponsesForm(View):
                     resp['response_data'] = request.body
                     return HttpResponse(json.dumps(resp), content_type='application/json')
 
-                if user.groups.filter(name='administrador'):
-                    empresa = user.empresa
-                    for colectorindjango in empresa.colector.all():
-                        print str(colectorindjango.id)
-                        colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 0})                
-                        # validando si existe un colector con esta id
-                        if colectorinmongo == None:
-                            pass
-                        else:
-                            database.filled_forms.update({'colector_id': str(colectorindjango.id)},{'$pull': {'filled_forms':{'record_id':record_id} }})
+                #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
+                #if user.groups.filter(name='administrador'):
+                empresa = user.empresa
+                for colectorindjango in empresa.colector.all():
+                    print str(colectorindjango.id)
+                    colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 0})                
+                    # validando si existe un colector con esta id
+                    if colectorinmongo == None:
+                        pass
+                    else:
+                        database.filled_forms.remove({'_id': ObjectId(str(record_id))})
 
-                        # return HttpResponse("colector existe")
+                    # return HttpResponse("colector existe")
 
-                    resp['response_code'] = '200'
-                    resp['response_description'] = str('form filled')
-                    resp['body_received'] = str(request.body)
-                    resp['body_expected'] = \
-                        str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
-                            )
-                    resp['response_data'] = request.body
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form filled')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = \
+                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'
+                        )
+                resp['response_data'] = request.body
 
-                    return HttpResponse(json.dumps(resp),
-                                        content_type='application/json')
+                return HttpResponse(json.dumps(resp),
+                                    content_type='application/json')
             except Exception, e:
                 resp['response_code'] = '400'
                 resp['response_description'] = \

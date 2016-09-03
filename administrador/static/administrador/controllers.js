@@ -35,34 +35,131 @@
  }]);*/
  //////////////Reporte por formid server side pagination////////////////////////
 app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
-    
-    //$scope.loading = true;
-    //$("#table").bootstrapTable("showLoading");
-    window.actionEvents = {
-    'click .like': function (e, value, row, index) {
-        alert('You click like icon, row: ' + JSON.stringify(row));
-        console.log(value, row, index);
-    },
-    'click .edit': function (e, value, row, index) {
-        alert('You click edit icon, row: ' + JSON.stringify(row));
-        console.log(value, row, index);
-    },
-    'click .remove': function (e, value, row, index) {
-        alert('You click remove icon, row: ' + JSON.stringify(row));
-        console.log(value, row, index);
-        console.log(row['MongoId']);
-    }
-};
-
     media_url=globales.media_url;
-    static_url=globales.static_url;
+    static_url=globales.static_url;    
+    ///////////////////////////////CARGAR HEADER/////////////////////////////////////////////
+    ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
+    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {
+        console.log("datos recibidos del servidor: ");
+        console.log(data['columns']);
+        columns = new Array();
+        tablecontent = new Object();
 
-    var $table = $('#table'),
-    $pagination = $('#button');
-    $scope.count = 0;
-    
-    $scope.myFunction = function() {
-        pagData = $table.bootstrapTable('getData');
+        columns=data['columns']
+        
+        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+        column = new Object();
+        column['field'] = "MongoId";
+        column['title'] = "MongoId";
+        columns.unshift(column);
+
+        column = new Object();
+        column['field'] = "state";
+        column['checkbox'] = true;
+        column['title'] = "state";
+        columns.unshift(column);
+
+        column = new Object();
+        column['field']="action";
+        column['title']="Accion";
+        column['formatter']="actionFormatter";
+        column['events']="actionEvents";
+        columns.push(column);
+
+        tablecontent['detailFormatter']=function(index, row, element) {
+
+         return [
+         '<ng-map center="[40.74, -74.18]"></ng-map>',
+        '<a class="edit ml10" href="javascript:void(0)" title="Edit">',
+        '<i class="glyphicon glyphicon-edit"></i>',
+        '</a>',
+        '<a class="remove ml10" href="javascript:void(0)" title="Remove">',
+        '<i class="glyphicon glyphicon-remove"></i>',
+        '</a>'
+    ].join('');
+            };
+
+
+        tablecontent['columns'] = columns; 
+        $('#table').bootstrapTable(tablecontent);   
+        
+        ///Ocultando columnas
+        $('#table').bootstrapTable('hideColumn', 'latitud');
+        $('#table').bootstrapTable('hideColumn', 'longitud');
+        $('#table').bootstrapTable('hideColumn', 'MongoId');
+        $('#table').bootstrapTable('hideColumn', 'record_id');
+        $('#table').bootstrapTable('hideColumn', 'form_name');
+        $('#table').bootstrapTable('hideColumn', 'form_description');
+        $('#table').bootstrapTable('hideColumn', 'form_id');
+        $('#table').bootstrapTable('hideColumn', 'fecha_creacion');
+        $('#table').bootstrapTable('hideColumn', 'horafin');
+        $('#table').bootstrapTable('hideColumn', 'horaini');
+    }, function(error) {
+        console.log(error)
+    }); 
+    ////ACCIONES SOBRE SELECCIONADOS
+    $('#deletebutton').click(function () {
+        if (!confirm('Los registros se borraran permanentemente')){
+            return;
+        }
+        var ids = $.map($('#table').bootstrapTable('getSelections'), function (row) {
+            colector_id = globales.user_id;
+            record_id = row.MongoId;
+            defaultService.post(globales.static_url + '../service/form/delete/' + record_id + '/', '{"colector_id":"' + colector_id + '","record_id":"'+record_id+'"}', function(data) {
+                $('#table').bootstrapTable('remove', {
+                    field: 'MongoId',
+                    values: ids
+                });
+            }, function(error) {
+                console.log(error)
+            });
+            return row.MongoId;
+        });
+        $('#table').bootstrapTable('remove', {
+            field: 'MongoId',
+            values: ids
+        });
+        alert('Registros Eliminados Permanentemente');
+    });
+    ////ACCIONES SOBRE EL REGISTRO
+    window.actionEvents = {
+        'click .mapa': function (e, value, row, index) {
+            console.log(value, row, index);
+            window.location.href="#/reporte/id/"+ $routeParams.form_id +"/"+row['longitud']+"/"+row['latitud'];
+
+            
+        },
+        'click .edit': function (e, value, row, index) {
+            alert('No cuenta con los privilegios para modificar este registro!');
+            console.log(value, row, index);
+        },
+        'click .remove': function (e, value, row, index) {
+            if (confirm('El registro se borrara permanentemente')){
+                console.log('Registro borrado '+row['MongoId']);
+                /////Llamado al servicio de borrado////
+                record_id = row['MongoId'];
+                colector_id = globales.user_id;
+                defaultService.post(globales.static_url + '../service/form/delete/' + record_id + '/', '{"colector_id":"' + colector_id + '","record_id":"'+record_id+'"}', function(data) {
+                    $scope.notificacion = "El registro ha sido borrado";
+
+                    var ids = $.map($('#table').bootstrapTable('getSelections'), function (row) {
+                        alert('Registro Eliminado Permanentemente');
+                        return row.MongoId;
+                    });
+                    $('#table').bootstrapTable('remove', {
+                        field: 'MongoId',
+                        values: ids
+                    }); 
+                }, function(error) {
+                    console.log(error)
+                });
+            }
+        }
+    };
+
+    //////FUNCION LLAMADA PARA CARGAR LOS DATOS DEL MAPA
+    $scope.loadMap = function() {
+        pagData = $('#table').bootstrapTable('getData');
         markersArray = new Array();
         for (var i = pagData.length - 1; i >= 0; i--) {
             markers = {};
@@ -70,9 +167,26 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
             markers['latitude'] = pagData[i]["latitud"];
             markers['message'] = pagData[i]["latitud"];
             markersArray.push(markers);
-            console.log(pagData[i]["MongoId"]);
         }
         ///////////////////////////////MAPS REPORT////////////////////////
+        $scope.polygons = [
+            {
+                id: 1,
+                path: markersArray,
+                stroke: {
+                    color: '#6060FB',
+                    weight: 3
+                },
+                editable: false,
+                draggable: false,
+                geodesic: false,
+                visible: true,
+                fill: {
+                    color: '#000000',
+                    opacity: 0.1
+                }
+            }
+        ];
         $scope.map = {
             center: {
                 latitude: markers['latitude'],
@@ -89,52 +203,13 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
         }
         $scope.markerList = markersArray;
     }
-
     ///AL HACER EL LLAMADO CON JAVASCRIPT NO ESTA FUNCIONANDO, CUANDO SE LLAMA CON ANGULAR FUNCIONA
-
     $('#table').on('load-success.bs.table', function (e, number, size) {
         $('#loadmapbutton').click();
     });
+    
 
 
-
-
-    ////////////////////////////////CARGAR HEADER/////////////////////////////////////////////
-    ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
-    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {
-        console.log("datos recibidos del servidor: ");
-        console.log(data['columns']);
-        columns = new Array();
-        tablecontent = new Object();
-
-        columns=data['columns']
-        tablecontent['columns'] = columns;
-
-
-        ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
-        column = new Object();
-        column['field'] = "state";
-        column['checkbox'] = true;
-        column['title'] = "state";
-        columns.unshift(column);
-
-        column = new Object();
-        column['field']="action";
-        column['title']="Accion";
-        column['formatter']="actionFormatter";
-        column['events']="actionEvents";
-        columns.push(column);
-        tablecontent['queryParams'] = parametros;
-
-        function parametros(params) {
-          params.lastid=data['lastid'];
-        return params;
-        }
-
-        $('#table').bootstrapTable(tablecontent);
-    }, function(error) {
-        console.log(error)
-    });  
 }]);
 ///////////////////////////////////////////////////////
 

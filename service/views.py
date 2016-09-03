@@ -831,7 +831,8 @@ class FillResponsesForm(View):
                     if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
                         #src='/home/andres/media/'+response['value']
                         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                        src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']
+                        fileext = response['value'].split("_.",1)[1] 
+                        src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
                         print src
                         static_url=settings.STATIC_URL
                         if response['label'] in rows:

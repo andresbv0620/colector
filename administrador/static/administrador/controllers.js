@@ -36,7 +36,7 @@
  //////////////Reporte por formid server side pagination////////////////////////
 app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
     media_url=globales.media_url;
-    static_url=globales.static_url;    
+    static_url=globales.static_url;
     ///////////////////////////////CARGAR HEADER/////////////////////////////////////////////
     ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
     defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {

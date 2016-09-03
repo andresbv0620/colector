@@ -1,0 +1,81 @@
+<div class="box-body">
+     <div id="toolbar">
+           <div class="col-md-6">
+               <button id="deletebutton" class="btn btn-default">Eliminar Seleccionados</button>
+          </div>
+          <div class="col-md-6">
+               <select class="form-control">
+                    <option value="">Export Basic</option>
+                    <option value="all">Export All</option>
+                    <option value="selected">Export Selected</option>
+               </select>
+               <button id='loadmapbutton' ng-click="loadMap()" style="display:none">VER MAPA</button>
+          </div>
+
+     </div>
+     <table id="table"
+          data-toggle="table"
+          data-toolbar="#toolbar"
+          data-url="/service/filled/forms/report/paginate/formid/1/"
+          data-height="500"
+          data-side-pagination="server"
+          data-pagination="true"
+          data-page-list="[5, 10, 20, 50, 100, 200]"
+          data-search="true"
+          data-show-refresh="true"
+          data-show-toggle="true"
+          data-show-columns="true"
+          data-minimum-count-columns="2"
+          data-show-export="true"
+          data-click-to-select="true"
+          data-detail-view="true"
+          data-id-field="MongoId"
+          data-show-footer="false"
+          data-sort-order="desc" 
+          data-sort-name="sorter"
+          data-escape="false"    
+          data-striped="true">
+     </table>
+     <style type="text/css">
+          .angular-google-map-container { height: 400px; }
+     </style>
+     <ui-gmap-google-map center='map.center'
+          zoom='map.zoom'
+          dragging='true'
+          refresh=true>
+          <ui-gmap-polygon static="true" ng-repeat="p in polygons track by p.id" path="p.path" stroke="p.stroke" visible="p.visible"
+                 geodesic="p.geodesic" fill="p.fill" fit="false" editable="p.editable" draggable="p.draggable"></ui-gmap-polygon>
+          <ui-gmap-marker idKey='$index' ng-repeat='marker in markerList' coords='marker'>
+               <ui-gmap-window isIconVisibleOnClick='true'>
+                    <p>
+                         [[marker.message]]
+                    </p>
+               </ui-gmap-window>
+          </ui-gmap-marker>
+     </ui-gmap-google-map>
+</div>
+
+<script type="text/javascript">
+     function openMedia(e){
+          e = e || window.event;
+          var target = e.target || e.srcElement;
+          console.log(target);
+          window.open(target.id, "Colector", "location=no, menubar=no, width=500, height=500, toolbar=no, titlebar=no, status=no, left=300, top=300");
+     }
+
+
+function actionFormatter(value, row, index) {
+    return [
+        '<a class="mapa ml10" href="javascript:void(0)" title="Mapa" ng-click="loadMapRecord()">',
+        '<i class="glyphicon glyphicon-map-marker"></i>',
+        '</a>',
+        '<a class="edit ml10" href="javascript:void(0)" title="Edit">',
+        '<i class="glyphicon glyphicon-edit"></i>',
+        '</a>',
+        '<a class="remove ml10" href="javascript:void(0)" title="Remove">',
+        '<i class="glyphicon glyphicon-remove"></i>',
+        '</a>'
+    ].join('');
+}
+</script>
+

@@ -72,6 +72,8 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
         column['events']="actionEvents";
         columns.push(column);
 
+        tablecontent['url'] = "/service/filled/forms/report/paginate/formid/" + $routeParams.form_id + "/";
+
         tablecontent['detailFormatter']=function(index, row, element) {
 
          return [
@@ -173,8 +175,9 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
             markers['latitude'] = pagData[i]["latitud"];
             markers['message'] = pagData[i]["latitud"];
             markersArray.push(markers);
+            console.log(markersArray);
         }
-        ///////////////////////////////MAPS REPORT////////////////////////
+        //////////////////////////MAPS REPORT////////////////////////
         $scope.polygons = [
             {
                 id: 1,

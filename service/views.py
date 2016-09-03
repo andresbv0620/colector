@@ -1891,7 +1891,6 @@ def FormIdReportPagServer(request, id):
     limit=int(request.GET.get('limit', 10))
     #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
     page=(int(request.GET.get('offset', 0)))/limit+1
-    
     #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
     if page == 1:
         filled_forms = database.filled_forms.find({'form_id': str(id)}).limit(limit).sort("_id",-1)

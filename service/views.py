@@ -471,7 +471,7 @@ class FillResponsesFormEmbeded(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(FillResponsesForm, self).dispatch(*args, **kwargs)
+        return super(FillResponsesFormEmbeded, self).dispatch(*args, **kwargs)
 
     # validando la el formato del formulario enviado
 
@@ -688,7 +688,7 @@ class FillResponsesForm(View):
 
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
-        return super(FillResponsesFormTest, self).dispatch(*args, **kwargs)
+        return super(FillResponsesForm, self).dispatch(*args, **kwargs)
 
     # validando la el formato del formulario enviado
 
@@ -1867,18 +1867,25 @@ def FormIdReportPagServer(request, id):
     getcolumns=request.GET.get('getcolumns')
     if getcolumns=='true':
         colrows = database.filled_forms.find_one({'form_id': str(id)}, {'rows': 1})
-        columns=[]
-        for col in colrows['rows']:
-            column={}
-            column['field']=col
-            column['sortable'] = 'true'
-            column['title']=col
-            columns.append(column)
+        if not colrows==None:
+            columns=[]
+            for col in colrows['rows']:
+                column={}
+                column['field']=col
+                column['sortable'] = 'true'
+                column['title']=col
+                columns.append(column)
 
-        data={
-            'columns': columns,
-            }
-        return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+            data={
+                'columns': columns,
+                }
+            return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+        else:
+            resp={}
+            resp['columns'] = []
+            resp['response_code'] = '404'
+            resp['response_description'] = 'No hay registros'
+            return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
     #Setting Pagination
     offset=int(request.GET.get('offset', 10))
     limit=int(request.GET.get('limit', 10))

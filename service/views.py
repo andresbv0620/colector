@@ -701,11 +701,11 @@ class FillResponsesForm(View):
         # validacion del formulario
 
         if not array_validation['latitud'].strip():
-            response['error'] = True
+            #response['error'] = True
             response['validation_errors'].append('latitud is blank')
 
         if not array_validation['longitud'].strip():
-            response['error'] = True
+            #response['error'] = True
             response['validation_errors'].append('longitud is blank')
 
         if not array_validation['horaini'].strip():
@@ -750,6 +750,10 @@ class FillResponsesForm(View):
         # validando data correcta enviada en body
         try:
             data = json.loads(request.body)
+            if 'longitud' not in data:
+                data['latitud']='0.0'
+                data['longitud']='0.0'
+            
             longitud = data['longitud']
             latitud = data['latitud']
             horaini = data['horaini']
@@ -831,7 +835,7 @@ class FillResponsesForm(View):
                     if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
                         #src='/home/andres/media/'+response['value']
                         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                        fileext = response['value'].split("_.",1)[1] 
+                        fileext = response['value'].split("_.",1)[1]
                         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
                         print src
                         static_url=settings.STATIC_URL
@@ -839,6 +843,7 @@ class FillResponsesForm(View):
                             response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
                         else:
                             response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                    print 'PASO TODO '
                     rows[response['label']]=response['value']
 
                 form['responses'] = responses

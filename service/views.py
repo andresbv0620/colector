@@ -1121,9 +1121,11 @@ def FormIdReportPagServer(request, id):
 
             ########################CONSULTANDO COLECTOR IDS##################3
             form_id = int(id)
-            empresa = Empresa.objects.get(id=form_id)
-            print empresa.nombre
+            empresas = Formulario.objects.get(id=form_id).empresa_set.all()
+            for empresa in empresas:
+                empresa = empresa
 
+            print empresa
             #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
             #if user.groups.filter(name='administrador'):
             colectors = []

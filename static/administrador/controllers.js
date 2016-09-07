@@ -34,26 +34,45 @@
 
  }]);*/
  //////////////Reporte por formid server side pagination////////////////////////
-app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $uibModal, $log,$routeParams, defaultService, globales) {
+app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uibModal', '$log','$routeParams', 'defaultService', 'globales', function($scope, $location, $http, $uibModal, $log,$routeParams, defaultService, globales) {
     media_url=globales.media_url;
-    static_url=globales.static_url;    
+    static_url=globales.static_url;
+    
+    
     ///////////////////////////////CARGAR HEADER/////////////////////////////////////////////
-    ///Basicamente se vuelve a llamar este servicio (Se llama dos veces, 1. para cargar los datos y 2. para generar el encabezado o columnas)
-    defaultService.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true', function(data) {
-        if (data['response_code']=='404') {
-            $scope.notificacion='NO HAY REGISTROS PARA ESTE FORMULARIO'
-            return;
-        }
-        console.log("datos recibidos del servidor: ");
-        console.log(data['columns']);
-        columns = new Array();
-        tablecontent = new Object();
 
-        columns=data['columns']
+    // define the function that does the ajax call
+    getheaders = function() {
+        return $http.get(globales.static_url + '../service/filled/forms/report/paginate/formid/' + $routeParams.form_id + '/?getcolumns=true')
+            .success(function(data) 
+            {
+                if (data['response_code']=='404') {
+                    $scope.notificacion='NO HAY REGISTROS PARA ESTE FORMULARIO'
+                    return;
+                }
+                $scope.mydata = data;
+            });
+    }
 
+    // Llamado inicial para carga sin filtros
+    getheaders().then(function(data) {
+        $scope.colectors=$scope.mydata['colectors']
+        console.log($scope.mydata);
+        // stuff is now in our scope, I can alert it
+        dataurl="/service/filled/forms/report/paginate/formid/" + $routeParams.form_id + "/";
+        setuptable($scope.mydata, dataurl);
+    });
 
-        
+    setuptable = function(data, dataurl) {
+        $('#table').bootstrapTable('destroy');
+        var tablecontent = new Object();
+        var columns = new Array();        
+
+        columns=$scope.mydata['columns']
+
         ////Inicializo los encabezados por defecto de la tabla reporte, Hora inicio, Hora final ////////////
+
+
         column = new Object();
         column['field'] = "MongoId";
         column['title'] = "MongoId";
@@ -71,27 +90,37 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
         column['formatter']="actionFormatter";
         column['events']="actionEvents";
         columns.push(column);
+        
+        tablecontent['url'] = dataurl;
 
-        tablecontent['url'] = "/service/filled/forms/report/paginate/formid/" + $routeParams.form_id + "/";
+        
 
         tablecontent['detailFormatter']=function(index, row, element) {
+            var html = [];
+                $.each(row, function (key, value) {
+                    if ((key=='horafin') || (key=='horaini')) {
+                        var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
+                        d.setUTCSeconds(value);
+                        html.unshift('<p><b>' + key + ':</b> ' + d + '</p>');
+                    }else{
+                        if ((key=='longitud') || (key=='latitud')) {
+                            html.unshift('<p><b>' + key + ':</b> ' + value + '</p>');
+                        }else{                    
+                            html.push('<p><b>' + key + ':</b> ' + value + '</p>');
+                        }                    
+                    }
 
-         return [
-         '<ng-map center="[40.74, -74.18]"></ng-map>',
-        '<a class="edit ml10" href="javascript:void(0)" title="Edit">',
-        '<i class="glyphicon glyphicon-edit"></i>',
-        '</a>',
-        '<a class="remove ml10" href="javascript:void(0)" title="Remove">',
-        '<i class="glyphicon glyphicon-remove"></i>',
-        '</a>'
-    ].join('');
-            };
+                });
+            return html.join('');
+        };
 
 
         tablecontent['columns'] = columns; 
+                
         $('#table').bootstrapTable(tablecontent);   
         
         ///Ocultando columnas
+        $('#table').bootstrapTable('hideColumn', 'colector_id');
         $('#table').bootstrapTable('hideColumn', 'latitud');
         $('#table').bootstrapTable('hideColumn', 'longitud');
         $('#table').bootstrapTable('hideColumn', 'MongoId');
@@ -99,12 +128,44 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
         $('#table').bootstrapTable('hideColumn', 'form_name');
         $('#table').bootstrapTable('hideColumn', 'form_description');
         $('#table').bootstrapTable('hideColumn', 'form_id');
-        $('#table').bootstrapTable('hideColumn', 'fecha_creacion');
+        $('#table').bootstrapTable('hideColumn', 'sincronizado_utc');
         $('#table').bootstrapTable('hideColumn', 'horafin');
         $('#table').bootstrapTable('hideColumn', 'horaini');
-    }, function(error) {
-        console.log(error)
-    }); 
+
+    }
+
+    
+    /////Filters/////
+    $scope.filterResults = function() {
+
+        getheaders().then(function(data) {
+            
+            colector_id = $scope.selectedColector.colector_id;
+            dataurl = "/service/filled/forms/report/paginate/formid/" + $routeParams.form_id + "/?colector_id="+colector_id;
+            setuptable($scope.mydata, dataurl);
+
+            $('#table').bootstrapTable('refresh', {});
+
+        });
+        $scope.filtered = true;        
+    }
+
+    $scope.resetFilter = function() {
+
+
+        getheaders().then(function(data) {
+            colector_id = $scope.selectedColector.colector_id;
+            dataurl="/service/filled/forms/report/paginate/formid/" + $routeParams.form_id + "/";
+            setuptable($scope.mydata, dataurl);
+            $('#table').bootstrapTable('refresh', {});
+        });
+
+        $scope.selectedColector = {};
+        $scope.filtered = false;
+        
+    }
+
+
     ////ACCIONES SOBRE SELECCIONADOS
     $('#deletebutton').click(function () {
         if (!confirm('Los registros se borraran permanentemente')){
@@ -175,7 +236,7 @@ app.controller('serverSidePagController', ['$scope', '$uibModal', '$log','$route
             markers['latitude'] = pagData[i]["latitud"];
             markers['message'] = pagData[i]["latitud"];
             markersArray.push(markers);
-            console.log(markersArray);
+            //console.log(markersArray);
         }
         //////////////////////////MAPS REPORT////////////////////////
         $scope.polygons = [

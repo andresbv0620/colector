@@ -1,10 +1,17 @@
 <div class="box-body">
 
      <div id="toolbar">
-           <div class="col-md-6">
+           <div class="col-md-5">
                <button id="deletebutton" class="btn btn-default">Eliminar Seleccionados</button>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-4">
+             <select class="form-control" ng-change="filterResults()" ng-model="selectedColector" ng-options="colector.colector_name for colector in colectors"><option value="" style="display: none;">-- Colector --</option>
+             </select>
+             <a class="ml10" ng-show="filtered" href="javascript:void(0)" title="Mapa" ng-click="resetFilter()"><i class="glyphicon glyphicon glyphicon-remove"></i> Quitar Filtro</a>
+          </div>
+
+
+          <div class="col-md-3">
                <select class="form-control">
                     <option value="">Export Basic</option>
                     <option value="all">Export All</option>
@@ -21,8 +28,8 @@
           data-height="500"
           data-side-pagination="server"
           data-pagination="true"
-          data-page-list="[5, 10, 20, 50, 100, 200]"
-          data-search="true"
+          data-page-list="[5, 10, 20, 50, 100, 200, 500, 1000]"
+          data-search="false"
           data-show-refresh="true"
           data-show-toggle="true"
           data-show-columns="true"
@@ -35,7 +42,8 @@
           data-sort-order="desc" 
           data-sort-name="sorter"
           data-escape="false"    
-          data-striped="true">
+          data-striped="true"
+          data-filter-control="true">
      </table>
      <style type="text/css">
           .angular-google-map-container { height: 400px; }

@@ -93,8 +93,6 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         
         tablecontent['url'] = dataurl;
 
-        
-
         tablecontent['detailFormatter']=function(index, row, element) {
             var html = [];
                 $.each(row, function (key, value) {

@@ -1137,7 +1137,6 @@ def FormIdReportPagServer(request, id):
                     usuario = User.objects.get(id=colectorindjango.id)
                     colectorObj['colector_name'] = usuario.username
                     colectors.append(colectorObj)
-           
 
             #colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]
 

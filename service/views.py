@@ -460,7 +460,10 @@ class FillResponsesForm(View):
 
                 form = {}
                 rows = {}
-                rows['fecha_creacion'] = datetime.utcnow()
+                rows['colector_id'] = colector_id
+                rows['sincronizado_utc'] = datetime.utcnow()
+                #rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d")
                 rows['record_id']=str(uuid.uuid4())
                 rows['longitud'] = longitud
                 rows['latitud'] = latitud
@@ -503,16 +506,14 @@ class FillResponsesForm(View):
                         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
                         fileext = response['value'].split("_.",1)[1]
                         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
-                        print src
                         static_url=settings.STATIC_URL
                         if response['label'] in rows:
-                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><form method="get" action="'+src+'"><button type="submit">Descargar</button></form></a>';
                         else:
-                            response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
-                    print 'PASO TODO '
+                            response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><form method="get" action="'+src+'"><button type="submit">Descargar</button></form></a>';
                     rows[response['label']]=response['value']
 
-                form['responses'] = responses
+                #form['responses'] = responses
 
                 # return HttpResponse(json.dumps(data))
                 colector = \
@@ -521,16 +522,15 @@ class FillResponsesForm(View):
 
                 # validando si existe un colector con esta id
                 if colector == None:
-                    print 'EL COLECTOR NO EXISTE'
+                    print 'EL COLECTOR NO EXISTE en mongo'
                 else:
-                    print "El colector existe"
+                    print "El colector existe en mongo"
 
                 data = {}
                 data['colector_id'] = colector_id
                 data['form_id'] = form_id
                 data['rows'] = rows
-                data['filled_forms'] = []
-                data['filled_forms'] = form
+                data['responses'] = responses
                 
                 #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)
@@ -1077,22 +1077,73 @@ class EditResponsesForm(View):
                                 content_type='application/json')
 
 #Reporte pagina directamente sobre django usando el paginador de bootstrat table
+def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, **kwargs):
+    if colector_id==None and page==1:
+        return database.filled_forms.find({'form_id': str(id)}).limit(limit).sort("_id",-1)
+    elif colector_id!=None and page==1:
+        return database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}]}).limit(limit).sort("_id",-1)
+
+    if colector_id==None and page!=1:
+        return database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+    else:
+        return database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+
+
 def FormIdReportPagServer(request, id):
     #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
     getcolumns=request.GET.get('getcolumns')
+
     if getcolumns=='true':
-        colrows = database.filled_forms.find_one({'form_id': str(id)}, {'rows': 1})
+        colrows = database.filled_forms.find_one({'form_id': str(id)})
         if not colrows==None:
             columns=[]
-            for col in colrows['rows']:
+            for cell in colrows["responses"]:
                 column={}
-                column['field']=col
+                column['field']=cell['label']
                 column['sortable'] = 'true'
-                column['title']=col
+                column['title']=cell['label']
+                column['filterControl'] = "input"
                 columns.append(column)
+
+            for row in colrows["rows"]:
+                column={}
+                column['field']=row
+                column['sortable'] = 'true'
+                column['title']=row
+                column['filterControl'] = "input"
+                
+                if column not in columns:
+                    if cell['label'] == 'sincronizado':
+                        column['filterControl'] = "select"
+                    else:
+                        column['filterControl'] = "select"
+                    columns.append(column)
+
+            ########################CONSULTANDO COLECTOR IDS##################3
+            form_id = int(id)
+            empresa = Empresa.objects.get(id=form_id)
+            print empresa.nombre
+
+            #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
+            #if user.groups.filter(name='administrador'):
+            colectors = []
+            for colectorindjango in empresa.colector.all():
+                print str(colectorindjango.id)
+                colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 1})                
+                # validando si existe un colector con esta id
+                if colectorinmongo != None:
+                    colectorObj={}
+                    colectorObj['colector_id'] = colectorindjango.id
+                    usuario = User.objects.get(id=colectorindjango.id)
+                    colectorObj['colector_name'] = usuario.username
+                    colectors.append(colectorObj)
+           
+
+            #colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]
 
             data={
                 'columns': columns,
+                'colectors':colectors
                 }
             return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
         else:
@@ -1107,29 +1158,89 @@ def FormIdReportPagServer(request, id):
     #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
     page=(int(request.GET.get('offset', 0)))/limit+1
     #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
+    colector_id=request.GET.get('colector_id')
+
+    lastid=0
+
     if page == 1:
-        filled_forms = database.filled_forms.find({'form_id': str(id)}).limit(limit).sort("_id",-1)
+        filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
+        request.session['colector_'+str(colector_id)] = filled_forms.count()
     else:
         lastid = str(request.session[str(page-1)])
-        filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
-    resp = {}
+        filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
+        #filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+        #filled_forms = database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+
+    data = {}
     #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
     if filled_forms.count() != 0:
         rows = []#rows array que contiene las filas de la tabla
         #Below f is a document (a record)
         for f in filled_forms:
-            #print f["filled_forms"]["responses"]
+            row = {}
             f["rows"]["MongoId"]=str(f["_id"])
-            rows.append(f["rows"])#list of records
+            #rows.append(f["rows"])#list of records
             mongoid= str(f["_id"])
-        request.session[str(page)] = mongoid
+            request.session[str(page)] = mongoid
+
+            ############ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
+            # ##LA OTRA FORMA DE HACERLO, ES CONSULTAR DIRECTAMENTE EL NODO ROWS
+            # for response in f["responses"]:
+            #     input_id=response['input_id']
+            #     entrada = Entrada.objects.get(id = int(input_id))
+            #     response['label']=entrada.nombre
+            #     response['tipo']=entrada.tipo
+            #     if entrada.tipo == "4" or entrada.tipo == "5":
+            #         try:
+            #             if response['value'] == "99270":
+            #                 resp={}
+            #                 # return HttpResponse("colector existe")
+            #                 resp['response_code'] = '202'
+            #                 resp['response_description'] = str('Registro en edicion')
+            #                 resp['body_received'] = str(request.body)
+            #                 resp['body_expected'] = \
+            #                     str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+            #                 resp['response_data'] = request.body
+            #                 return HttpResponse(json.dumps(resp),content_type='application/json')
+            #             response_id=response['value']
+            #             respuesta = Respuesta.objects.get(id = int(response_id))
+            #             response['value']=respuesta.valor
+            #         except Exception, e:
+            #             resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
+            #             response['value']="Op_" + str(response['value'])
+
+            #     if entrada.tipo == "1" or entrada.tipo == "2":
+            #         response['value']=response['value'].upper()
+
+            #     if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
+            #         #src='/home/andres/media/'+response['value']
+            #         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+            #         fileext = response['value'].split("_.",1)[1]
+            #         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
+            #         static_url=settings.STATIC_URL
+            #         if response['label'] in rows:
+            #             response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+            #         else:
+            #             response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                
+
+            #     row[response['label']] = response['value']
+            #     #rows[response['label']]=response['value']
+            # #########################################USANDO ESTO DE ARRIBA SE PUEDE ALIVIANAR LA CARGA AL GUARDAR EN MONGO
+
+            #rows.append(row)#list of records
+            rows.append(f["rows"])#list of records
+
     else:
-        resp['response_code'] = '404'
-        resp['response_description'] = 'form id not found'
-        return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
+        print 'NO HAY REGISTROS'
+        data['response_code'] = '404'
+        data['response_description'] = 'No hay registros'
+        data['rows'] = []
+        data['total'] = 0
+        return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
     data={
-            "total": database.filled_forms.find({'form_id': str(id)}).count(),
+            "total": request.session['colector_'+str(colector_id)],
             "rows": rows,
         }
 

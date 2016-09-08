@@ -498,9 +498,9 @@ class FillResponsesForm(View):
                         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
                         static_url=settings.STATIC_URL
                         if response['label'] in rows:
-                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><form method="get" action="'+src+'"><button type="submit">Descargar</button></form></a>';
+                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
                         else:
-                            response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><form method="get" action="'+src+'"><button type="submit">Descargar</button></form></a>';
+                            response['value'] =                     '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
                     rows[response['label']]=response['value']
 
                 #form['responses'] = responses

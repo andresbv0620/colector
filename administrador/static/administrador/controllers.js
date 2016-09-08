@@ -93,10 +93,12 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         
         tablecontent['url'] = dataurl;
 
+        
+
         tablecontent['detailFormatter']=function(index, row, element) {
             var html = [];
                 $.each(row, function (key, value) {
-                    if ((key=='horafin') || (key=='horaini')) {
+                    if ((key=='Hora Fin') || (key=='Hora Inicio')) {
                         var d = new Date(0); // The 0 there is the key, which sets the date to the epoch
                         d.setUTCSeconds(value);
                         html.unshift('<p><b>' + key + ':</b> ' + d + '</p>');
@@ -127,8 +129,8 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         $('#table').bootstrapTable('hideColumn', 'form_description');
         $('#table').bootstrapTable('hideColumn', 'form_id');
         $('#table').bootstrapTable('hideColumn', 'sincronizado_utc');
-        $('#table').bootstrapTable('hideColumn', 'horafin');
-        $('#table').bootstrapTable('hideColumn', 'horaini');
+        $('#table').bootstrapTable('hideColumn', 'Hora Fin');
+        $('#table').bootstrapTable('hideColumn', 'Hora Inicio');
 
     }
 

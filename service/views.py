@@ -453,62 +453,35 @@ class FillResponsesForm(View):
                 rows['colector_id'] = colector_id
                 rows['sincronizado_utc'] = datetime.utcnow()
                 #rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d")
+                rows['Sincronizado'] = datetime.now().strftime("%Y-%m-%d")
+                rows['Hora Sincronizado'] = datetime.now().strftime("%H:%M:%S")
                 rows['record_id']=str(uuid.uuid4())
                 rows['longitud'] = longitud
                 rows['latitud'] = latitud
-                rows['horaini'] = horaini
-                rows['horafin'] = horafin
+                rows['Hora Inicio'] = horaini
+                rows['Hora Fin'] = horafin
                 rows['form_id'] = form_id
                 formulario = Formulario.objects.get(id = int(form_id))
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
+
                 for response in responses:
+                    if response['value'] == "99270":
+                        resp={}
+                        # return HttpResponse("colector existe")
+                        resp['response_code'] = '202'
+                        resp['response_description'] = str('Registro en edicion')
+                        resp['body_received'] = str(request.body)
+                        resp['body_expected'] = \
+                            str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                        resp['response_data'] = request.body
+                        return HttpResponse(json.dumps(resp),content_type='application/json')
+
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
-                    if entrada.tipo == "1" or entrada.tipo == "2":
-                        rows[response['label']]=response['value'].upper()
 
-                    if entrada.tipo == "3" or entrada.tipo == "4" or entrada.tipo == "5":
-                        try:
-                            if response['value'] == "99270":
-                                resp={}
-                                # return HttpResponse("colector existe")
-                                resp['response_code'] = '202'
-                                resp['response_description'] = str('Registro en edicion')
-                                resp['body_received'] = str(request.body)
-                                resp['body_expected'] = \
-                                    str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
-                                resp['response_data'] = request.body
-                                return HttpResponse(json.dumps(resp),content_type='application/json')
-                            response_id=response['value']
-                            respuesta = Respuesta.objects.get(id = int(response_id))
-                            rows[response['label']]=respuesta.valor
-                        except Exception, e:
-                            resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
-                            rows[response['label']]="Op_" + str(response['value'])
-
-                    if entrada.tipo == "7" or entrada.tipo == "8" or entrada.tipo == "9" or entrada.tipo == "10" or entrada.tipo == "11" or entrada.tipo == "12" or entrada.tipo == "13" or entrada.tipo == "15" or entrada.tipo == "17":
-                        rows[response['label']]=response['value']
-
-                    if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
-                        #src='/home/andres/media/'+response['value']
-                        #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                        #fileext = response['value'].split("_.",1)[1]
-                        fid, tagfoto, tipo, fechafoto, algo, fileext = response['value'].split('_')
-                        src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+fileext
-                        static_url=settings.STATIC_URL
-                        if response['label'] in rows:
-                            rows[response['label']]=rows[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
-                        else:
-                            rows[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
-                    
-
-                #form['responses'] = responses
-
-                # return HttpResponse(json.dumps(data))
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
                         {'colector_id': 1})                
@@ -1081,14 +1054,13 @@ def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, *
     else:
         return database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
 
-
 def FormIdReportPagServer(request, id):
     #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
     getcolumns=request.GET.get('getcolumns')
 
     if getcolumns=='true':
         colrows = database.filled_forms.find_one({'form_id': str(id)})
-        if not colrows==None:
+        if colrows!=None:
             columns=[]
             for cell in colrows["responses"]:
                 column={}
@@ -1107,7 +1079,7 @@ def FormIdReportPagServer(request, id):
                 column['filterControl'] = "input"
                 
                 if column not in columns:
-                    if cell['label'] == 'sincronizado':
+                    if cell['label'] == 'Sincronizado':
                         column['filterControl'] = "select"
                     else:
                         column['filterControl'] = "select"
@@ -1172,7 +1144,6 @@ def FormIdReportPagServer(request, id):
         rows = []#rows array que contiene las filas de la tabla
         #Below f is a document (a record)
         for f in filled_forms:
-            row = {}
             f["rows"]["MongoId"]=str(f["_id"])
             #rows.append(f["rows"])#list of records
             mongoid= str(f["_id"])
@@ -1180,51 +1151,57 @@ def FormIdReportPagServer(request, id):
 
             ############ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
             # ##LA OTRA FORMA DE HACERLO, ES CONSULTAR DIRECTAMENTE EL NODO ROWS
-            # for response in f["responses"]:
-            #     input_id=response['input_id']
-            #     entrada = Entrada.objects.get(id = int(input_id))
-            #     response['label']=entrada.nombre
-            #     response['tipo']=entrada.tipo
-            #     if entrada.tipo == "4" or entrada.tipo == "5":
-            #         try:
-            #             if response['value'] == "99270":
-            #                 resp={}
-            #                 # return HttpResponse("colector existe")
-            #                 resp['response_code'] = '202'
-            #                 resp['response_description'] = str('Registro en edicion')
-            #                 resp['body_received'] = str(request.body)
-            #                 resp['body_expected'] = \
-            #                     str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
-            #                 resp['response_data'] = request.body
-            #                 return HttpResponse(json.dumps(resp),content_type='application/json')
-            #             response_id=response['value']
-            #             respuesta = Respuesta.objects.get(id = int(response_id))
-            #             response['value']=respuesta.valor
-            #         except Exception, e:
-            #             resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
-            #             response['value']="Op_" + str(response['value'])
+            row = f["rows"]
+            formulario = Formulario.objects.get(id = int(id))
+            row['form_name'] = formulario.nombre
+            row['form_description'] = formulario.descripcion
+            for response in f["responses"]:
+                input_id=response['input_id']
+                entrada = Entrada.objects.get(id = int(input_id))
+                response['label']=entrada.nombre
+                response['tipo']=entrada.tipo
+                if entrada.tipo == "1" or entrada.tipo == "2":
+                    row[response['label']]=response['value'].upper()
 
-            #     if entrada.tipo == "1" or entrada.tipo == "2":
-            #         response['value']=response['value'].upper()
+                if entrada.tipo == "3" or entrada.tipo == "4" or entrada.tipo == "5":
+                    try:
+                        if response['value'] == "99270":
+                            resp={}
+                            # return HttpResponse("colector existe")
+                            resp['response_code'] = '202'
+                            resp['response_description'] = str('Registro en edicion')
+                            resp['body_received'] = str(request.body)
+                            resp['body_expected'] = \
+                                str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                            resp['response_data'] = request.body
+                            return HttpResponse(json.dumps(resp),content_type='application/json')
+                        response_id=response['value']
+                        respuesta = Respuesta.objects.get(id = int(response_id))
+                        row[response['label']]=respuesta.valor
+                    except Exception, e:
+                        resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
+                        row[response['label']]="Op_" + str(response['value'])
 
-            #     if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
-            #         #src='/home/andres/media/'+response['value']
-            #         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-            #         fileext = response['value'].split("_.",1)[1]
-            #         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
-            #         static_url=settings.STATIC_URL
-            #         if response['label'] in rows:
-            #             response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
-            #         else:
-            #             response['value'] = '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                if entrada.tipo == "7" or entrada.tipo == "8" or entrada.tipo == "9" or entrada.tipo == "10" or entrada.tipo == "11" or entrada.tipo == "12" or entrada.tipo == "13" or entrada.tipo == "15" or entrada.tipo == "17":
+                    row[response['label']]=response['value']
+
+                if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
+                    #src='/home/andres/media/'+response['value']
+                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+                    #fileext = response['value'].split("_.",1)[1]
+                    fid, tagfoto, tipo, fechafoto, algo, fileext = response['value'].split('_')
+                    src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+fileext
+                    static_url=settings.STATIC_URL
+                    if response['label'] in row:
+                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+                    else:
+                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
                 
-
-            #     row[response['label']] = response['value']
-            #     #rows[response['label']]=response['value']
+            rows.append(row)#list of records
             # #########################################USANDO ESTO DE ARRIBA SE PUEDE ALIVIANAR LA CARGA AL GUARDAR EN MONGO
 
-            #rows.append(row)#list of records
-            rows.append(f["rows"])#list of records
+            
+            #rows.append(f["rows"])#list of records
 
     else:
         print 'NO HAY REGISTROS'

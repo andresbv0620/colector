@@ -223,27 +223,13 @@ class GetForms(View):
                                         entrada['asociate_form'].append(asociate_form)
                                         entrada['options'] = []
                                         entrada['atributos'] = []
-                                        document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(formasociado.form_asociado.id)},
-                                            {"filled_forms.form_description":0,
-                                            "filled_forms.form_name":0,
-                                            "filled_forms.form_description":0,
-                                            "filled_forms.fecha_creacion":0,
-                                            "filled_forms.sections.description":0,
-                                            "filled_forms.sections.name":0,
-                                            "filled_forms.sections.section_id":0,
-                                            "filled_forms.sections.inputs.input_id":0,
-                                            "filled_forms.sections.inputs.description":0,
-                                            "colector_id":0,
-                                            "_id":0
-
-                                            });
+                                        document_filled_forms = database.filled_forms.find({"form_id":str(formasociado.form_asociado.id)});
                                         arrayChecker=[]
-                                        for filled in document_filled_forms:
-                                            for record in filled["filled_forms"]:
+                                        for record in document_filled_forms:
                                                 if record['form_id']!=str(formasociado.form_asociado.id):
                                                     pass
                                                 else:
-                                                    record["record_id"]=str(record["record_id"])
+                                                    record["rows"]["record_id"]=str(record["rows"]["record_id"])
 
                                                     #La siguiente linea crea el nodo formula para hacer el calculo del valor de cada producto SOLO EN ORDEN VENTA
                                                     #Se debe ajustar para que sea dinamico y sea extensible a otras funcionalidades
@@ -261,14 +247,18 @@ class GetForms(View):
 
                                                         if option_response["label"]=="_IVA":
                                                             ivaProducto=option_response["value"]
-                                                                                                                    
-
-                                                    record["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
-
-                                                    
 
                                                     #Crea el nodo opciones en base a el registro en mongodb
-                                                    entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
+                                                    optionsObject={}                                                                                                                   
+                                                    optionsObject["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
+
+                                                    optionsObject['responses'] = record['responses']
+                                                    optionsObject['horafin'] = record['rows']['horafin']
+                                                    optionsObject['horaini'] = record['rows']['horaini']
+                                                    optionsObject['record_id'] = record['rows']['record_id']
+                                                    optionsObject['form_id'] = record['form_id']
+
+                                                    entrada['options'].append(optionsObject) #(json.dumps(f,default=json_util.default))
 
 
                                                     #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro

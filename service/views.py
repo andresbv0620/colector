@@ -463,13 +463,15 @@ class FillResponsesForm(View):
                 formulario = Formulario.objects.get(id = int(form_id))
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
-
                 for response in responses:
                     input_id=response['input_id']
                     entrada = Entrada.objects.get(id = int(input_id))
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
-                    if entrada.tipo == "4" or entrada.tipo == "5":
+                    if entrada.tipo == "1" or entrada.tipo == "2":
+                        rows[response['label']]=response['value'].upper()
+
+                    if entrada.tipo == "3" or entrada.tipo == "4" or entrada.tipo == "5":
                         try:
                             if response['value'] == "99270":
                                 resp={}
@@ -483,25 +485,26 @@ class FillResponsesForm(View):
                                 return HttpResponse(json.dumps(resp),content_type='application/json')
                             response_id=response['value']
                             respuesta = Respuesta.objects.get(id = int(response_id))
-                            response['value']=respuesta.valor
+                            rows[response['label']]=respuesta.valor
                         except Exception, e:
                             resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
-                            response['value']="Op_" + str(response['value'])
+                            rows[response['label']]="Op_" + str(response['value'])
 
-                    if entrada.tipo == "1" or entrada.tipo == "2":
-                        response['value']=response['value'].upper()
+                    if entrada.tipo == "7" or entrada.tipo == "8" or entrada.tipo == "9" or entrada.tipo == "10" or entrada.tipo == "11" or entrada.tipo == "12" or entrada.tipo == "13" or entrada.tipo == "15" or entrada.tipo == "17":
+                        rows[response['label']]=response['value']
 
                     if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
                         #src='/home/andres/media/'+response['value']
                         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                        fileext = response['value'].split("_.",1)[1]
+                        #fileext = response['value'].split("_.",1)[1]
+                        fid, tagfoto, tipo, fechafoto, algo, fileext = response['value'].split('_')
                         src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
                         static_url=settings.STATIC_URL
                         if response['label'] in rows:
-                            response['value'] = response['value'] + '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
+                            rows[response['label']]=rows[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
                         else:
-                            response['value'] =                     '<a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a>';
-                    rows[response['label']]=response['value']
+                            rows[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+                    
 
                 #form['responses'] = responses
 
@@ -1093,7 +1096,8 @@ def FormIdReportPagServer(request, id):
                 column['sortable'] = 'true'
                 column['title']=cell['label']
                 column['filterControl'] = "input"
-                columns.append(column)
+                if column not in columns:
+                    columns.append(column)
 
             for row in colrows["rows"]:
                 column={}

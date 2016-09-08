@@ -498,7 +498,7 @@ class FillResponsesForm(View):
                         #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
                         #fileext = response['value'].split("_.",1)[1]
                         fid, tagfoto, tipo, fechafoto, algo, fileext = response['value'].split('_')
-                        src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+'.'+fileext
+                        src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+fileext
                         static_url=settings.STATIC_URL
                         if response['label'] in rows:
                             rows[response['label']]=rows[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'

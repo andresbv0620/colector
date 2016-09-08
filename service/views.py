@@ -441,7 +441,7 @@ class FillResponsesForm(View):
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
-                    str('the body data contain validation errors')
+                    str('the body data contain validation errors')+str(resp['validation_errors'][0])
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ","responses":" " }')

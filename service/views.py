@@ -133,6 +133,9 @@ class GetForms(View):
                         formulario['titulo_reporte2'] = 0                   
                     else:
                         formulario['titulo_reporte2'] = p.formulario.titulo_reporte2.id
+                        
+                        
+
 
                     # validando que el formulario tenga fichas asociadas
                     if len(p.formulario.ficha.all()):
@@ -220,7 +223,7 @@ class GetForms(View):
                                         entrada['asociate_form'].append(asociate_form)
                                         entrada['options'] = []
                                         entrada['atributos'] = []
-                                        document_filled_forms = database.filled_forms.find({"rows.form_id":str(formasociado.form_asociado.id)},
+                                        document_filled_forms = database.filled_forms.find({"filled_forms.form_id":str(formasociado.form_asociado.id)},
                                             {"filled_forms.form_description":0,
                                             "filled_forms.form_name":0,
                                             "filled_forms.form_description":0,
@@ -235,63 +238,63 @@ class GetForms(View):
 
                                             });
                                         arrayChecker=[]
-                                        for record in document_filled_forms:
-                                            if record['form_id']!=str(formasociado.form_asociado.id):
-                                                pass
-                                            else:
-                                                record['rows']["record_id"]=str(record['rows']["record_id"])
+                                        for filled in document_filled_forms:
+                                            for record in filled["filled_forms"]:
+                                                if record['form_id']!=str(formasociado.form_asociado.id):
+                                                    pass
+                                                else:
+                                                    record["record_id"]=str(record["record_id"])
 
-                                                #La siguiente linea crea el nodo formula para hacer el calculo del valor de cada producto SOLO EN ORDEN VENTA
-                                                #Se debe ajustar para que sea dinamico y sea extensible a otras funcionalidades
-                                                #Deja estatico el valor del iva en 0,16
-                                                
-                                                #print record["responses"]
-                                                #Se itera sobre la opcion para sacar las variables de cada formula
-                                                precioProducto=0
-                                                ivaProducto=0
-                                                for option_response in record["responses"]:
+                                                    #La siguiente linea crea el nodo formula para hacer el calculo del valor de cada producto SOLO EN ORDEN VENTA
+                                                    #Se debe ajustar para que sea dinamico y sea extensible a otras funcionalidades
+                                                    #Deja estatico el valor del iva en 0,16
                                                     
-                                                    if option_response["label"]=="_PRECIO":
-                                                        precioProducto=option_response["value"]
-                                                                                                               
-
-                                                    if option_response["label"]=="_IVA":
-                                                        ivaProducto=option_response["value"]
-                                                                                                                
-
-                                                record["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
-
-                                                
-
-                                                #Crea el nodo opciones en base a el registro en mongodb
-                                                entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
-
-
-                                                #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
-                                                #for recordinput in filled['responses']
-                                                for recordinput in record["responses"]:
-
-                                                    
-                                                    if recordinput["input_id"] in arrayChecker:
-                                                        pass
-                                                    else:
-                                                        objeto_atributos={}
-                                                        arrayChecker.append(recordinput["input_id"])
-                                                        objeto_atributos["label"]=recordinput["label"]
-                                                        objeto_atributos["input_id"]=recordinput["input_id"]
-                                                        record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
-                                                        objeto_atributos["type"]=record_entrada.tipo
+                                                    #print record["responses"]
+                                                    #Se itera sobre la opcion para sacar las variables de cada formula
+                                                    precioProducto=0
+                                                    ivaProducto=0
+                                                    for option_response in record["responses"]:
                                                         
-                                                        entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
-                                                        if len(entrada_anidada.respuesta.all()):
-                                                            objeto_atributos["responses"]=[]
-                                                            for r in entrada_anidada.respuesta.all():
-                                                                respuestaAnidada={}
-                                                                respuestaAnidada['response_id'] = r.id
-                                                                respuestaAnidada['value'] = r.valor
-                                                                objeto_atributos["responses"].append(respuestaAnidada)
+                                                        if option_response["label"]=="_PRECIO":
+                                                            precioProducto=option_response["value"]
+                                                                                                                   
 
-                                                        entrada['atributos'].append(objeto_atributos)
+                                                        if option_response["label"]=="_IVA":
+                                                            ivaProducto=option_response["value"]
+                                                                                                                    
+
+                                                    record["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
+
+                                                    
+
+                                                    #Crea el nodo opciones en base a el registro en mongodb
+                                                    entrada['options'].append(record) #(json.dumps(f,default=json_util.default))
+
+
+                                                    #Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en caso de un nuevo registro
+
+                                                    for recordinput in record["responses"]:
+                                                        
+                                                        if recordinput["input_id"] in arrayChecker:
+                                                            pass
+                                                        else:
+                                                            objeto_atributos={}
+                                                            arrayChecker.append(recordinput["input_id"])
+                                                            objeto_atributos["label"]=recordinput["label"]
+                                                            objeto_atributos["input_id"]=recordinput["input_id"]
+                                                            record_entrada = Entrada.objects.get(id = str(recordinput["input_id"]))
+                                                            objeto_atributos["type"]=record_entrada.tipo
+                                                            
+                                                            entrada_anidada = Entrada.objects.get(id=int(objeto_atributos["input_id"]))
+                                                            if len(entrada_anidada.respuesta.all()):
+                                                                objeto_atributos["responses"]=[]
+                                                                for r in entrada_anidada.respuesta.all():
+                                                                    respuestaAnidada={}
+                                                                    respuestaAnidada['response_id'] = r.id
+                                                                    respuestaAnidada['value'] = r.valor
+                                                                    objeto_atributos["responses"].append(respuestaAnidada)
+
+                                                            entrada['atributos'].append(objeto_atributos)
 
 
                                             form_aux = {}
@@ -392,20 +395,19 @@ class FillResponsesForm(View):
             response['error'] = True
             response['validation_errors'].append('responses is blank')
         else:
-            pass
 
-            # try:
-            #     for responseItem in array_validation['responses']:
-            #         try:
-            #             response_value=responseItem['value']
-            #             input_id=responseItem['input_id']
-            #         except Exception, e:
-            #             response['error'] = True
-            #             response['validation_errors'].append("any response don't contains value or input_id")
+            try:
+                for responseItem in array_validation['responses']:
+                    try:
+                        response_value=responseItem['value']
+                        input_id=responseItem['input_id']
+                    except Exception, e:
+                        response['error'] = True
+                        response['validation_errors'].append("any response don't contains value or input_id")
                    
-            # except Exception, e:
-            #     response['error'] = True
-            #     response['validation_errors'].append("any input don't contains responses")
+            except Exception, e:
+                response['error'] = True
+                response['validation_errors'].append("any input don't contains responses")
 
         return response
 
@@ -442,7 +444,7 @@ class FillResponsesForm(View):
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
-                    str('the body data contain validation errors: ')+str(resp['validation_errors'][0])
+                    str('the body data contain validation errors')
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ","responses":" " }')

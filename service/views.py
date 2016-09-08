@@ -392,19 +392,20 @@ class FillResponsesForm(View):
             response['error'] = True
             response['validation_errors'].append('responses is blank')
         else:
+            pass
 
-            try:
-                for responseItem in array_validation['responses']:
-                    try:
-                        response_value=responseItem['value']
-                        input_id=responseItem['input_id']
-                    except Exception, e:
-                        response['error'] = True
-                        response['validation_errors'].append("any response don't contains value or input_id")
+            # try:
+            #     for responseItem in array_validation['responses']:
+            #         try:
+            #             response_value=responseItem['value']
+            #             input_id=responseItem['input_id']
+            #         except Exception, e:
+            #             response['error'] = True
+            #             response['validation_errors'].append("any response don't contains value or input_id")
                    
-            except Exception, e:
-                response['error'] = True
-                response['validation_errors'].append("any input don't contains responses")
+            # except Exception, e:
+            #     response['error'] = True
+            #     response['validation_errors'].append("any input don't contains responses")
 
         return response
 
@@ -441,7 +442,7 @@ class FillResponsesForm(View):
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
-                    str('the body data contain validation errors')+str(resp['validation_errors'][0])
+                    str('the body data contain validation errors: ')+str(resp['validation_errors'][0])
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ","responses":" " }')

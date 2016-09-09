@@ -403,7 +403,7 @@ class FillResponsesForm(View):
 
     ####EXCLUSIVO PARA TECNOQUIMICAS####
     def tecnoquimica_cols(self, tqformid2, colector_id):
-        tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+        tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
         tqarray = []
         for tqobj in tqobjs:
             for respuesta in tqobj['responses']:

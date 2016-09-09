@@ -500,7 +500,7 @@ class FillResponsesForm(View):
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
                     rep = User.objects.get(id=int(colector_id))
-                    aditionalcols[0]['value'] = rep.first_name
+                    aditionalcols[0]['value'] = str(rep.first_name) + str(rep.first_name)
                     #aditionalcols.extend(responses)
                     responses.insert(0, aditionalcols[0])
                     responses.insert(0, aditionalcols[1])

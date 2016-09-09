@@ -404,8 +404,8 @@ class FillResponsesForm(View):
     ####EXCLUSIVO PARA TECNOQUIMICAS####
     def tecnoquimica_cols(self, tqformid, colector_id, responses):
         tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid}, {'colector_id': str(colector_id)}]})
-        for response in tqobj['responses']:
-            responses.append(response)
+        for response in tqobj:
+            responses.append(response['responses'])
         return responses
     ####EXCLUSIVO PARA TECNOQUIMICAS####
 

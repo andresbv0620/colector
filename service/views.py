@@ -496,7 +496,14 @@ class FillResponsesForm(View):
                 tqformid2 = '30'
                 if form_id == tqformid:
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
-                    responses = aditionalcols.extend(responses)
+                    lst1 = aditionalcols
+                    lst2 = responses
+                    result = []
+                    lst1.extend(lst2)
+                    for myDict in lst1:
+                        if myDict not in result:
+                            result.append(myDict)
+                    print result
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -515,7 +522,8 @@ class FillResponsesForm(View):
                 data['colector_id'] = colector_id
                 data['form_id'] = form_id
                 data['rows'] = rows
-                data['responses'] = responses
+                #data['responses'] = responses
+                data['responses'] = result
                 
                 #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)

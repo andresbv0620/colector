@@ -402,7 +402,7 @@ class FillResponsesForm(View):
         return response
 
     ####EXCLUSIVO PARA TECNOQUIMICAS####
-    def tecnoquimica_cols(tqformid, colector_id, responses):
+    def tecnoquimica_cols(self, tqformid, colector_id, responses):
         tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid}, {'colector_id': str(colector_id)}]})
         for response in tqobj['responses']:
             responses.append(response)

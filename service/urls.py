@@ -17,7 +17,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from service.views import AllowedForms, GetForms
 from service.views import FillResponsesForm,  DeleteResponsesForm, SaveImg, UploadData
-from service.views import FormIdReportPagServer
+from service.views import FormIdReportPagServer, RegisterUsersCsv
 
 urlpatterns = [
 
@@ -28,5 +28,6 @@ urlpatterns = [
     url(r'^fill/csv/$', UploadData.as_view()),
     url(r'^form/delete/', DeleteResponsesForm.as_view()),
     url(r'^filled/forms/report/paginate/formid/(?P<id>.+)/', 'service.views.FormIdReportPagServer'),
+    url(r'^registerusers/csv/$', RegisterUsersCsv.as_view()),
     
 ]

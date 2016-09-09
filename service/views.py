@@ -401,6 +401,14 @@ class FillResponsesForm(View):
 
         return response
 
+    ####EXCLUSIVO PARA TECNOQUIMICAS####
+    def tecnoquimica_cols(tqformid, colector_id, responses):
+        tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid}, {'colector_id': str(colector_id)}]})
+        for response in tqobj['responses']:
+            responses.append(response)
+        return responses
+    ####EXCLUSIVO PARA TECNOQUIMICAS####
+
     def post(self, request):
         resp = {}
         # validando data correcta enviada en body
@@ -482,6 +490,13 @@ class FillResponsesForm(View):
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
 
+                ####EXCLUSIVO PARA TECNOQUIMICAS####
+                tqformid = '29'
+                if form_id == tqformid:
+                    responses = self.tecnoquimica_cols(tqformid, colector_id, responses)
+                ####EXCLUSIVO PARA TECNOQUIMICAS####
+
+                
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
                         {'colector_id': 1})                
@@ -730,11 +745,11 @@ class UploadData(View):
         resp={}
         try:
             #activar la siguiente linea para probar local y  a .open() quitar default storage
-            #file_path='/home/andres/media/'+name+'.'+extension
+            file_path='/home/andres/media/'+name+'.'+extension
 
             #Agregar default_storage.open para usar django-storages (aws s3) y activar la siguiente linea
-            file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
-            with default_storage.open(file_path, 'wb') as destination:
+            #file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
+            with open(file_path, 'wb') as destination:
                 for chunk in f.chunks():
                     destination.write(chunk)
             resp['path']=file_path
@@ -747,7 +762,8 @@ class UploadData(View):
 
     def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
         try:
-            csvFile = default_storage.open(file_path)
+            #Quitar default_storage para probar local
+            csvFile = open(file_path)
             #csvFile = open('example.csv')
             csvReader = csv.reader(csvFile, delimiter=';')
             #csvData = list(csvReader)
@@ -757,7 +773,7 @@ class UploadData(View):
 
         records_counter=0
         for row in csvReader:
-            #print('Row #' + str(csvReader.line_num) + ' ' + str(row))
+            print('Row #' + str(csvReader.line_num) + ' ' + str(row))
             if csvReader.line_num==1:
                 inputsList=[]
                 for input_id in row:
@@ -774,15 +790,18 @@ class UploadData(View):
 
             # construyendo json para insertar en mongodb
             try:
-                form = {}
-                form['fecha_creacion'] = datetime.utcnow()
-                form['record_id']=str(uuid.uuid4())
-                form['horaini'] = datetime.utcnow()
-                form['horafin'] = datetime.utcnow()
-                form['form_id'] = form_id
-                formulario = Formulario.objects.get(id = int(form['form_id']))
-                form['form_name'] = formulario.nombre
-                form['form_description'] = formulario.descripcion
+                rows = {}
+                rows['colector_id'] = colector_id
+                rows['Sincronizado'] = datetime.now().strftime("%Y-%m-%d")
+                rows['Hora Sincronizado'] = datetime.now().strftime("%H:%M:%S")
+                rows['sincronizado_utc'] = datetime.utcnow()
+                rows['record_id']=str(uuid.uuid4())
+                rows['Hora Inicio'] = datetime.utcnow()
+                rows['Hora Fin'] = datetime.utcnow()
+                rows['form_id'] = form_id
+                formulario = Formulario.objects.get(id = int(form_id))
+                rows['form_name'] = formulario.nombre
+                rows['form_description'] = formulario.descripcion
 
                 responsesArray=[]
                 for rowvalue in row:
@@ -790,31 +809,42 @@ class UploadData(View):
                     inputObject=inputsList[index]
                     inputObject['value'] = rowvalue
 
-                    if inputObject['input_id']==element_longitud:
-                        form['longitud'] = rowvalue
+                    if element_longitud != None and inputObject['input_id']==element_longitud:
+                        rows['longitud'] = rowvalue
+                    else:
+                        rows['longitud'] = "0.0"
 
-                    if inputObject['input_id']==element_latitud:
-                        form['latitud'] = rowvalue
+                    if element_latitud != None and inputObject['input_id']==element_latitud:
+                        rows['latitud'] = rowvalue
+                    else:
+                        rows['latitud'] = "0.0"
 
-                form['responses'] = inputsList
 
                 colector = database.filled_forms.find_one({'colector_id': str(colector_id)},{'_id': 0})                
 
                 # validando si existe un colector con esta id
                 if colector == None:
-                    data = {}
-                    data['colector_id'] = colector_id
-                    data['filled_forms'] = []
-                    data['filled_forms'].append(form)
-                    
-                    database.filled_forms.insert(data)
-                    #database.filled_forms.create_index("filled_forms.sections.inputs.responses")
-                    records_counter+=1
-
+                    print 'EL COLECTOR NO EXISTE en mongo'
                 else:
-                    database.filled_forms.update({'colector_id': str(colector_id)},
-                            {'$push': {'filled_forms': form}})
-                    records_counter+=1
+                    print "El colector existe en mongo"
+                
+                records_counter+=1
+                data = {}
+                #####CONDICIONAL PARA TQ######
+                if form_id=='30':
+                    data['colector_id'] = row[0]
+                else:
+                    data['colector_id'] = colector_id
+                data['form_id'] = form_id
+                data['rows'] = rows
+                data['responses'] = inputsList
+                
+                #Se crean los indices para agilizar la consulta
+                database.filled_forms.insert(data)
+                database.filled_forms.create_index("form_id")
+                database.filled_forms.create_index("colector_id")
+                database.filled_forms.create_index("rows.record_id")
+
 
             except Exception, e:
                 return str('Error inserting data in mongodb' + str(e.args))
@@ -1042,6 +1072,112 @@ class EditResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
+class RegisterUsersCsv(UploadData, View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(RegisterUsersCsv, self).dispatch(*args, **kwargs)
+
+    def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
+        try:
+            #Quitar default_storage para probar local
+            csvFile = open(file_path)
+            #csvFile = open('example.csv')
+            csvReader = csv.reader(csvFile, delimiter=';')
+            #csvData = list(csvReader)
+        except Exception, e:
+            return str('No se encuentra el archivo en el servidor'
+                    + str(e.args)) + str(input_id)
+
+        records_counter=0
+        for row in csvReader:
+            print('Row #' + str(csvReader.line_num) + ' ' + str(row))
+            userObject = {}
+            userObject['username']=row[0]
+            userObject['email']=row[1]
+            userObject['password']=row[2]
+
+            user = User.objects.create_user(userObject['username'], userObject['email'], userObject['password'])
+            records_counter+=1
+            # construyendo json para insertar en mongodb
+             
+        return str('Los registros del documento csv han sido guardados. Registros totales: ' + str(records_counter))
+
+    def post(self, request):
+        resp={}
+        try:
+            fileSend = request.FILES['document']
+            extensionFile = request.POST['extension']
+            question_id = request.POST['question_id']
+            survey_id = request.POST['survey_id']
+            nameFile = request.POST['name']
+            colector_id = request.POST['colector_id']
+            element_longitud = request.POST['element_longitud']
+            element_latitud = request.POST['element_latitud']
+
+            array_validation = {}
+            array_validation['fileSend'] = fileSend
+            array_validation['extensionFile'] = extensionFile
+            array_validation['question_id'] = question_id
+            array_validation['survey_id'] = survey_id
+            array_validation['nameFile'] = nameFile
+            array_validation['colector_id'] = colector_id
+
+            data_validator = self.dataValidator(array_validation)
+            
+
+            if data_validator['error'] == True:
+                resp['response_code'] = '400'
+                resp['validation_errors'] = \
+                    data_validator['validation_errors']
+                resp['response_description'] = \
+                    str('the body data contains validation errors')
+                resp['body_received'] = str(request.body)
+                resp['form_data_expected'] = \
+                    str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+
+                return HttpResponse(json.dumps(resp,
+                                    default=json_util.default),
+                                    content_type='application/json')
+            else:
+                pass
+
+            # Todo Validado entonces continuamos
+            uploaded_file = self.handle_uploaded_file(fileSend, nameFile.replace('"',''), extensionFile.replace('"',''), question_id)
+            print uploaded_file
+            if uploaded_file['error']:
+                resp['response_code'] = '403'
+                resp['response_description'] = uploaded_file['response_description']
+                resp['form_data_expected'] = \
+                    str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+                return HttpResponse(json.dumps(resp), content_type='application/json')
+
+            else:
+                path_file = uploaded_file['path']
+                print path_file
+
+            # Leemos y cargamos en mongo los registros del archivo, pasando el path del archivo guardado uploaded_file
+            registered_file = self.insert_file_records(path_file, survey_id, colector_id, element_longitud, element_latitud)
+
+            print registered_file
+
+
+            resp['response_code'] = '200'
+            resp['response_description'] = str(registered_file)
+            resp['media_url'] = str(uploaded_file)
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", "colector_id":""  }')
+
+            return HttpResponse(json.dumps(resp),
+                        content_type='application/json')
+
+        except Exception, e:
+            resp['response_code'] = '403'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['form_data_expected'] = \
+                str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
+            return HttpResponse(json.dumps(resp), content_type='application/json')
+
 #Reporte pagina directamente sobre django usando el paginador de bootstrat table
 def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, **kwargs):
     if colector_id==None and page==1:
@@ -1165,16 +1301,6 @@ def FormIdReportPagServer(request, id):
 
                 if entrada.tipo == "3" or entrada.tipo == "4" or entrada.tipo == "5":
                     try:
-                        if response['value'] == "99270":
-                            resp={}
-                            # return HttpResponse("colector existe")
-                            resp['response_code'] = '202'
-                            resp['response_description'] = str('Registro en edicion')
-                            resp['body_received'] = str(request.body)
-                            resp['body_expected'] = \
-                                str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
-                            resp['response_data'] = request.body
-                            return HttpResponse(json.dumps(resp),content_type='application/json')
                         response_id=response['value']
                         respuesta = Respuesta.objects.get(id = int(response_id))
                         row[response['label']]=respuesta.valor

@@ -11,7 +11,7 @@ class EmpresaAdmin(admin.ModelAdmin):
     filter_horizontal = ('colector', 'formulario', 'tablets')
 
 class ColectorAdmin(admin.ModelAdmin):
-    list_display = ('get_nombre', 'get_email'  )
+    list_display = ('get_nombre', 'get_email', 'id',)
     search_fields = ['usuario__username']
 
     def get_nombre(self, obj):

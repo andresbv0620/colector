@@ -240,6 +240,13 @@ class GetForms(View):
                                                 precioProducto=0
                                                 ivaProducto=0
                                                 for option_response in record["responses"]:
+                                                    if option_response['tipo'] == "3" or option_response['tipo'] == "4" or option_response['tipo'] == "5":
+                                                        try:
+                                                            response_id=option_response['value']
+                                                            respuesta = Respuesta.objects.get(id = int(response_id))
+                                                            option_response['value']=respuesta.valor
+                                                        except Exception, e:
+                                                            option_response['value']="Op_" + option_response['value']
                                                     
                                                     if option_response["label"]=="_PRECIO":
                                                         precioProducto=option_response["value"]

@@ -403,16 +403,10 @@ class FillResponsesForm(View):
 
     ####EXCLUSIVO PARA TECNOQUIMICAS####
     def tecnoquimica_cols(self, tqformid2, colector_id):
-        print 'form id, colector id'
-        print tqformid2
-        print colector_id
         tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
         tqarray = []
-        print 'Antes de entrar al for'
         for respuesta in tqobj:
             tqarray.append(respuesta['responses'])
-            print 'tq array'
-            print tqarray
         return tqarray
     ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -502,7 +496,9 @@ class FillResponsesForm(View):
                 tqformid2 = '30'
                 if form_id == tqformid:
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
-                    responses = aditionalcols + responses
+                    responses.insert(0, aditionalcols[1])
+                    responses.insert(0, aditionalcols[2])
+                    
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
                 

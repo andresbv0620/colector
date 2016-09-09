@@ -253,8 +253,8 @@ class GetForms(View):
                                                 optionsObject["formula"]='('+str(precioProducto)+'*<cantidad>)+('+str(precioProducto)+'*<cantidad>*'+str(ivaProducto)+')'
 
                                                 optionsObject['responses'] = record['responses']
-                                                optionsObject['horafin'] = record['rows']['horafin']
-                                                optionsObject['horaini'] = record['rows']['horaini']
+                                                optionsObject['Hora Fin'] = record['rows']['Hora Fin']
+                                                optionsObject['Hora Inicio'] = record['rows']['Hora Inicio']
                                                 optionsObject['record_id'] = record['rows']['record_id']
                                                 optionsObject['form_id'] = record['form_id']
 

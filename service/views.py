@@ -496,8 +496,8 @@ class FillResponsesForm(View):
                 tqformid2 = '30'
                 if form_id == tqformid:
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
-                    responses.insert(0, aditionalcols[1])
-                    responses.insert(0, aditionalcols[2])
+                    for tqcol in aditionalcols:
+                        responses.append(tqcol)
                     
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 

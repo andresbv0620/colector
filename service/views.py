@@ -500,7 +500,9 @@ class FillResponsesForm(View):
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
 
-                    aditionalcols.extend(responses)
+                    #aditionalcols.extend(responses)
+                    responses.insert(0, aditionalcols[1])
+                    responses.insert(0, aditionalcols[2])
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -519,7 +521,7 @@ class FillResponsesForm(View):
                 data['colector_id'] = colector_id
                 data['form_id'] = form_id
                 data['rows'] = rows
-                data['responses'] = aditionalcols
+                data['responses'] = responses
                 
                 #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)

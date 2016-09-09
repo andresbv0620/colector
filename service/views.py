@@ -842,7 +842,7 @@ class UploadData(View):
                 
                 records_counter+=1
                 data = {}
-                #####CONDICIONAL PARA TQ######
+                #####CONDICIONAL PARA TQ PARA REESTABLECER DEJAR SOLO EL ELSE######
                 if form_id=='30':
                     data['colector_id'] = row[0]
                 else:
@@ -1239,12 +1239,10 @@ def FormIdReportPagServer(request, id):
             for empresa in empresas:
                 empresa = empresa
 
-            print empresa
             #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
             #if user.groups.filter(name='administrador'):
             colectors = []
             for colectorindjango in empresa.colector.all():
-                print str(colectorindjango.id)
                 colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 1})                
                 # validando si existe un colector con esta id
                 if colectorinmongo != None:
@@ -1304,36 +1302,50 @@ def FormIdReportPagServer(request, id):
             row['form_name'] = formulario.nombre
             row['form_description'] = formulario.descripcion
             for response in f["responses"]:
-                input_id=response['input_id']
-                entrada = Entrada.objects.get(id = int(input_id))
-                response['label']=entrada.nombre
-                response['tipo']=entrada.tipo
-                if entrada.tipo == "1" or entrada.tipo == "2":
+                #input_id=response['input_id']
+                #entrada = Entrada.objects.get(id = int(input_id))
+                #response['label']=entrada.nombre
+                #response['tipo']=entrada.tipo
+                if response['tipo'] == "1" or response['tipo'] == "2":
                     row[response['label']]=response['value'].upper()
 
-                if entrada.tipo == "3" or entrada.tipo == "4" or entrada.tipo == "5":
+                if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
                     try:
                         response_id=response['value']
                         respuesta = Respuesta.objects.get(id = int(response_id))
                         row[response['label']]=respuesta.valor
                     except Exception, e:
-                        resp['Warning'] = 'Algunas opciones de respuesta no se almacenaron correctamente: ' + str(response['value'])
                         row[response['label']]="Op_" + str(response['value'])
 
-                if entrada.tipo == "7" or entrada.tipo == "8" or entrada.tipo == "9" or entrada.tipo == "10" or entrada.tipo == "11" or entrada.tipo == "12" or entrada.tipo == "13" or entrada.tipo == "15" or entrada.tipo == "17":
+                if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
+                    print 'RESTO'
                     row[response['label']]=response['value']
-
-                if entrada.tipo == '6' or entrada.tipo=='14' or entrada.tipo=='16':
+                #FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
+                if response['tipo'] == "6":
                     #src='/home/andres/media/'+response['value']
-                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
                     #fileext = response['value'].split("_.",1)[1]
-                    fid, tagfoto, tipo, fechafoto, algo, fileext = response['value'].split('_')
-                    src=settings.MEDIA_URL+str(entrada.id)+'/'+response['value']+fileext
+                    fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+
+                    src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
                     static_url=settings.STATIC_URL
                     if response['label'] in row:
                         row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
                     else:
                         row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+
+                if response['tipo']=="14" or response['tipo']=="16":
+                    #src='/home/andres/media/'+response['value']
+                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+                    #fileext = response['value'].split("_.",1)[1]
+                    fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+
+                    src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
+                    static_url=settings.STATIC_URL
+                    if response['label'] in row:
+                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+                    else:
+                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
                 
             rows.append(row)#list of records
             # #########################################USANDO ESTO DE ARRIBA SE PUEDE ALIVIANAR LA CARGA AL GUARDAR EN MONGO
@@ -1348,6 +1360,7 @@ def FormIdReportPagServer(request, id):
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+    print 'ANTES DEL RESPONSE'
 
     data={
             "total": request.session['colector_'+str(colector_id)],

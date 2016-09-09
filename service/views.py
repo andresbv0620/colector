@@ -474,6 +474,7 @@ class FillResponsesForm(View):
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
 
+                newresponses = []
                 for response in responses:
                     if response['value'] == "99270":
                         resp={}
@@ -491,14 +492,16 @@ class FillResponsesForm(View):
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
 
+                    newresponses.append(response)
+
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
                 tqformid = '29'
                 tqformid2 = '30'
                 if form_id == tqformid:
+                    aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
 
-                    for tqcol in aditionalcols:
-                        responses.append(tqcol.copy())
+                    finalresponses = aditionalcols.extend(newresponses)
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -517,7 +520,7 @@ class FillResponsesForm(View):
                 data['colector_id'] = colector_id
                 data['form_id'] = form_id
                 data['rows'] = rows
-                data['responses'] = responses
+                data['responses'] = finalresponses
                 
                 #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)

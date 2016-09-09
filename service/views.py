@@ -969,17 +969,11 @@ class DeleteResponsesForm(View):
                     return HttpResponse(json.dumps(resp), content_type='application/json')
 
                 #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
-                #if user.groups.filter(name='administrador'):
-                empresa = user.empresa
-                for colectorindjango in empresa.colector.all():
-                    print str(colectorindjango.id)
-                    colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 0})                
-                    # validando si existe un colector con esta id
-                    if colectorinmongo == None:
-                        pass
-                    else:
-                        database.filled_forms.remove({'_id': ObjectId(str(record_id))})
-
+                print user
+                if user.groups.filter(name='administrador'):
+                    database.filled_forms.remove({'_id': ObjectId(str(record_id))})
+                    print 'removed'
+                
                     # return HttpResponse("colector existe")
 
                 resp['response_code'] = '200'

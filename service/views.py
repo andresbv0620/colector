@@ -745,11 +745,11 @@ class UploadData(View):
         resp={}
         try:
             #activar la siguiente linea para probar local y  a .open() quitar default storage
-            file_path='/home/andres/media/'+name+'.'+extension
+            #file_path='/home/andres/media/'+name+'.'+extension
 
             #Agregar default_storage.open para usar django-storages (aws s3) y activar la siguiente linea
-            #file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
-            with open(file_path, 'wb') as destination:
+            file_path=settings.FILES_ROOT+question_id+'/'+name+'.'+extension
+            with default_storage.open(file_path, 'wb') as destination:
                 for chunk in f.chunks():
                     destination.write(chunk)
             resp['path']=file_path
@@ -763,7 +763,7 @@ class UploadData(View):
     def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
         try:
             #Quitar default_storage para probar local
-            csvFile = open(file_path)
+            csvFile = default_storage.open(file_path)
             #csvFile = open('example.csv')
             csvReader = csv.reader(csvFile, delimiter=';')
             #csvData = list(csvReader)
@@ -1080,7 +1080,7 @@ class RegisterUsersCsv(UploadData, View):
     def insert_file_records(self, file_path, form_id, colector_id, element_longitud, element_latitud):
         try:
             #Quitar default_storage para probar local
-            csvFile = open(file_path)
+            csvFile = default_storage.open(file_path)
             #csvFile = open('example.csv')
             csvReader = csv.reader(csvFile, delimiter=';')
             #csvData = list(csvReader)

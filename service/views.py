@@ -1315,10 +1315,9 @@ def FormIdReportPagServer(request, id):
                         respuesta = Respuesta.objects.get(id = int(response_id))
                         row[response['label']]=respuesta.valor
                     except Exception, e:
-                        row[response['label']]="Op_" + str(response['value'])
+                        row[response['label']]="Op_" + response['value']
 
                 if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
-                    print 'RESTO'
                     row[response['label']]=response['value']
                 #FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
                 if response['tipo'] == "6":
@@ -1360,7 +1359,6 @@ def FormIdReportPagServer(request, id):
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
-    print 'ANTES DEL RESPONSE'
 
     data={
             "total": request.session['colector_'+str(colector_id)],

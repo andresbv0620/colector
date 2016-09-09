@@ -405,8 +405,9 @@ class FillResponsesForm(View):
     def tecnoquimica_cols(self, tqformid2, colector_id):
         tqobj = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
         tqarray = []
-        for respuesta in tqobj:
-            tqarray.append(respuesta['responses'])
+        for tqobj in tqobjs:
+            for respuesta in tqobj['responses']:
+                tqarray.append(respuesta)
         return tqarray
     ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -492,8 +493,6 @@ class FillResponsesForm(View):
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
 
-                    newresponses.append(response)
-
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
                 tqformid = '29'
                 tqformid2 = '30'
@@ -501,7 +500,7 @@ class FillResponsesForm(View):
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
 
-                    finalresponses = aditionalcols.extend(newresponses)
+                    aditionalcols.extend(responses)
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -520,7 +519,7 @@ class FillResponsesForm(View):
                 data['colector_id'] = colector_id
                 data['form_id'] = form_id
                 data['rows'] = rows
-                data['responses'] = finalresponses
+                data['responses'] = aditionalcols
                 
                 #Se crean los indices para agilizar la consulta
                 database.filled_forms.insert(data)

@@ -35,6 +35,7 @@ class Tablet(models.Model):
 
 class Colector(models.Model):
 	usuario  = models.OneToOneField(User, blank = True)
+	respuesta = models.ManyToManyField('Respuesta',  blank = True)
 
 	def __unicode__(self):
 		return self.usuario.username

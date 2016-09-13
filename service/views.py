@@ -97,6 +97,21 @@ class GetForms(View):
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
 
+    def filterColector(self, colector_id):
+        colector = Colector.objects.get(usuario = colector_id)
+        print 'COLECTOR FILTRADO RESPUESTAS'
+        if len(colector.respuesta.all()):
+            respuestascolector = []
+            for r in colector.respuesta.all():
+                respuesta = {}
+                respuesta['response_id'] = r.id
+                respuesta['value'] = r.valor
+                respuestascolector.append(respuesta)
+            return respuestascolector
+
+
+
+
     def post(self, request):
         resp = {}
 
@@ -134,9 +149,6 @@ class GetForms(View):
                     else:
                         formulario['titulo_reporte2'] = p.formulario.titulo_reporte2.id
                         
-                        
-
-
                     # validando que el formulario tenga fichas asociadas
                     if len(p.formulario.ficha.all()):
                         formulario['sections'] = []
@@ -293,7 +305,6 @@ class GetForms(View):
 
                                                         entrada['atributos'].append(objeto_atributos)
 
-
                                             form_aux = {}
                                             
                                     ficha['inputs'].append(entrada)
@@ -305,6 +316,13 @@ class GetForms(View):
                                             respuesta['response_id'] = r.id
                                             respuesta['value'] = r.valor
                                             entrada['responses'].append(respuesta)
+
+                                    ###########CONDICIONAL PARA TQ##################
+                                    if e.id == 543:
+                                        entrada['responses'] = []
+                                        entrada['responses'] = self.filterColector(colector_id)
+                                        print entrada['responses']
+
                                     else:
 
                                         entrada['responses'] = []

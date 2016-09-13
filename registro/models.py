@@ -212,7 +212,7 @@ class ReglaAutollenado(models.Model):
 		return "%s "%self.asociacion
 
 class Respuesta(models.Model):
-	valor  = models.CharField(max_length=500, blank = True , unique=True)
+	valor  = models.CharField(max_length=500, blank = True , unique=False)
 
 	class Meta:
 		ordering = ('id',)

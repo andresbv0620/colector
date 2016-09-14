@@ -316,6 +316,8 @@ class GetForms(View):
                                             respuesta['response_id'] = r.id
                                             respuesta['value'] = r.valor
                                             entrada['responses'].append(respuesta)
+                                    else:
+                                        entrada['responses'] = []
 
                                     ###########CONDICIONAL PARA TQ##################
                                     if e.id == 543:
@@ -323,10 +325,6 @@ class GetForms(View):
                                         entrada['responses'] = self.filterColector(colector_id)
                                         colector = Colector.objects.get(usuario = colector_id)
                                         formulario['form_description'] = str(colector)
-
-                                    else:
-
-                                        entrada['responses'] = []
                             else:
                                 ficha['inputs'] = []
                             formulario['sections'].append(ficha)

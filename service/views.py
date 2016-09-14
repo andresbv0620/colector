@@ -322,8 +322,7 @@ class GetForms(View):
                                         entrada['responses'] = []
                                         entrada['responses'] = self.filterColector(colector_id)
                                         colector = Colector.objects.get(usuario = colector_id)
-                                        ficha['description'] = colector
-                                        print entrada['responses']
+                                        formulario['form_description'] = str(colector)
 
                                     else:
 

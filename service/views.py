@@ -321,6 +321,8 @@ class GetForms(View):
                                     if e.id == 543:
                                         entrada['responses'] = []
                                         entrada['responses'] = self.filterColector(colector_id)
+                                        colector = Colector.objects.get(usuario = colector_id)
+                                        ficha['description'] = colector
                                         print entrada['responses']
 
                                     else:
@@ -1366,10 +1368,6 @@ def FormIdReportPagServer(request, id):
                         row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
                 
             rows.append(row)#list of records
-            # #########################################USANDO ESTO DE ARRIBA SE PUEDE ALIVIANAR LA CARGA AL GUARDAR EN MONGO
-
-            
-            #rows.append(f["rows"])#list of records
 
     else:
         print 'NO HAY REGISTROS'

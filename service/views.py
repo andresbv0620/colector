@@ -1458,7 +1458,7 @@ def FormExcelReport(request, id):
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
     # Create a workbook and add a worksheet.
-    exceltimestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    exceltimestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     excelfilename = str(id)+'_'+str(exceltimestamp)+'.xlsx'
 
     workbook = xlsxwriter.Workbook(excelfilename)

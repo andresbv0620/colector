@@ -2,7 +2,8 @@
 
      <div id="toolbar">
            <div class="col-md-5">
-               <button id="deletebutton" class="btn btn-default">Eliminar Seleccionados</button>
+               <button id="deletebutton" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i> Eliminar</button>
+               <button id='loadexcelbutton' ng-click="loadExcel()"><i class="glyphicon glyphicon-export"></i> Exportar Todos los Registros</button>
           </div>
           <div class="col-md-4">
              <select class="form-control" ng-change="filterResults()" ng-model="selectedColector" ng-options="colector.colector_name for colector in colectors"><option value="" style="display: none;">-- Colector --</option>

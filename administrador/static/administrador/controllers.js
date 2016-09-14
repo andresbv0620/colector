@@ -273,6 +273,19 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         }
         $scope.markerList = markersArray;
     }
+
+    //////FUNCION LLAMADA PARA DESCARGAR EXCEL
+    $scope.loadExcel = function() {
+        colector_id = globales.user_id;
+        defaultService.post(globales.static_url + '../service/filled/forms/report/excel/formid/' + $routeParams.form_id + '/', '{"colector_id":"' + colector_id + '}', function(data) {
+            console.log(data);
+        }, function(error) {
+            console.log(error)
+        });
+    }
+
+
+
     ///AL HACER EL LLAMADO CON JAVASCRIPT NO ESTA FUNCIONANDO, CUANDO SE LLAMA CON ANGULAR FUNCIONA
     $('#table').on('load-success.bs.table', function (e, number, size) {
         $('#loadmapbutton').click();

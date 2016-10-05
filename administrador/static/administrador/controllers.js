@@ -278,11 +278,24 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
     $scope.loadExcel = function() {
         colector_id = globales.user_id;
         defaultService.post(globales.static_url + '../service/filled/forms/report/excel/formid/' + $routeParams.form_id + '/', '{"colector_id":"' + colector_id + '}', function(data) {
-            console.log(data);
+            console.log(encodeURIComponent(data['file_url']));
+
+            window.open(static_url+'administrador/admin/dist/img/'+data['file_name']);
+
+
+            var anchor = angular.element('<a/>');
+             anchor.attr({
+                 href: 'data:attachment/csv;charset=utf-8,'+estatic_url+''+data['file_name']+'',
+                 download: 'file.xlsx',
+                 target: '_blank'
+             })[0].click();
         }, function(error) {
             console.log(error)
         });
     }
+
+
+
 
 
 

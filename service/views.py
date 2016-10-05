@@ -27,6 +27,8 @@ import time
 import codecs
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlsxwriter
+import StringIO
+
 servidor = pymongo.MongoClient('localhost', 27017)
 database = servidor.colector
 
@@ -1382,7 +1384,6 @@ def FormIdReportPagServer(request, id):
 
     return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
-#Permite precargar registros en un formulario con datos desde un archivo plano
 def FormExcelReport(request, id):
 
     filled_forms=database.filled_forms.find({'form_id': str(id)}).sort("_id",-1)
@@ -1458,10 +1459,18 @@ def FormExcelReport(request, id):
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
     # Create a workbook and add a worksheet.
+
     exceltimestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     excelfilename = str(id)+'_'+str(exceltimestamp)+'.xlsx'
 
-    workbook = xlsxwriter.Workbook(excelfilename)
+    #file_path=settings.FILES_ROOT+str(id)+'/reports/'+excelfilename
+    #file_path='/home/andres/python2.7env/bin/colector/media/'+excelfilename
+    static_url=settings.STATIC_ROOT
+    file_url=settings.STATIC_ROOT+'administrador/admin/dist/img/'+excelfilename
+    file_path=static_url+'administrador/admin/dist/img/'+excelfilename
+
+
+    workbook = xlsxwriter.Workbook(file_path)
     worksheet = workbook.add_worksheet()
 
     # Add a bold format to use to highlight cells.
@@ -1500,8 +1509,16 @@ def FormExcelReport(request, id):
 
     workbook.close()
 
-    response = HttpResponse(content_type='application/vnd.ms-excel')
-    response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
-    response.write(excelfilename)
-    return response
-        
+    # response = HttpResponse(content_type='application/vnd.ms-excel')
+    # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
+    # response.write(excelfilename)
+    # return response
+
+    data = {}
+    data['response_code'] = '200'
+    data['response_description'] = 'Reporte Creado'
+    data['file_path'] = file_path
+    data['file_url'] = file_url
+    data['file_name'] = excelfilename
+
+    return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')

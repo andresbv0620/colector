@@ -3,7 +3,19 @@
      <div id="toolbar">
            <div class="col-md-5">
                <button id="deletebutton" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i> Eliminar</button>
-               <button id='loadexcelbutton' ng-click="loadExcel()"><i class="glyphicon glyphicon-export"></i> Exportar Todos los Registros</button>
+               <style type="text/css">
+                 .button {
+                      display: block;
+                      background: #4E9CAF;
+                      padding: 10px;
+                      text-align: center;
+                      border-radius: 5px;
+                      color: white;
+                      font-weight: bold;
+                  }
+               </style>
+               <a class='button' href="http://web.colector.co/static/administrador/admin/dist/img/reporttq.xlsx"><i class="glyphicon glyphicon glyphicon-export"></i> Descargar Reporte</a>
+
           </div>
           <div class="col-md-4">
              <select class="form-control" ng-change="filterResults()" ng-model="selectedColector" ng-options="colector.colector_name for colector in colectors"><option value="" style="display: none;">-- Colector --</option>
@@ -64,6 +76,7 @@
           </ui-gmap-marker>
      </ui-gmap-google-map>
 </div>
+<button id='loadexcelbutton' ng-click="loadExcel()"><i class="glyphicon glyphicon-export"></i> Exportar Todos los Registros</button>
 
 <script type="text/javascript">
      function openMedia(e){

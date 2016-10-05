@@ -1461,7 +1461,7 @@ def FormExcelReport(request, id):
     exceltimestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
     excelfilename = str(id)+'_'+str(exceltimestamp)+'.xlsx'
 
-    workbook = xlsxwriter.Workbook('static/administrador/admin/dist/img/reporttq.xlsx')
+    workbook = xlsxwriter.Workbook('reporttq.xlsx')
     worksheet = workbook.add_worksheet()
 
     # Add a bold format to use to highlight cells.

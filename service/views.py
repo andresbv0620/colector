@@ -1467,7 +1467,8 @@ def FormExcelReport(request, id):
     #file_path='/home/andres/python2.7env/bin/colector/media/'+excelfilename
     static_url=settings.STATIC_ROOT
     file_url=settings.STATIC_ROOT+'administrador/admin/dist/img/'+excelfilename
-    file_path=static_url+'administrador/admin/dist/img/'+excelfilename
+    #file_path=static_url+'administrador/admin/dist/img/'+excelfilename
+    file_path='static/administrador/admin/dist/img/'+excelfilename
 
 
     workbook = xlsxwriter.Workbook(file_path)

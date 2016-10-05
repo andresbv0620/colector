@@ -280,7 +280,7 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         defaultService.post(globales.static_url + '../service/filled/forms/report/excel/formid/' + $routeParams.form_id + '/', '{"colector_id":"' + colector_id + '}', function(data) {
             console.log(encodeURIComponent(data['file_url']));
 
-            window.open(static_url+'administrador/admin/dist/img/'+data['file_name']);
+            //window.open(static_url+'administrador/admin/dist/img/'+data['file_name']);
 
 
             /*var anchor = angular.element('<a/>');

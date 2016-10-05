@@ -280,13 +280,13 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
         defaultService.post(globales.static_url + '../service/filled/forms/report/excel/formid/' + $routeParams.form_id + '/', '{"colector_id":"' + colector_id + '}', function(data) {
             console.log(encodeURIComponent(data['file_url']));
 
-            //window.open(static_url+'administrador/admin/dist/img/'+data['file_name']);
+            window.open('http://web.colector.co/static/administrador/admin/dist/img/reporttq.xlsx');
 
 
             /*var anchor = angular.element('<a/>');
              anchor.attr({
-                 href: 'data:attachment/csv;charset=utf-8,'+estatic_url+''+data['file_name']+'',
-                 download: 'file.xlsx',
+                 href: 'http://web.colector.co/static/administrador/admin/dist/img/reporttq.xlsx',
+                 download: 'reporttq.xlsx',
                  target: '_blank'
              })[0].click();*/
         }, function(error) {

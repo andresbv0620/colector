@@ -1469,7 +1469,7 @@ def FormExcelReport(request, id):
     file_url=settings.STATIC_ROOT+'administrador/admin/dist/img/'+excelfilename
     #file_path=static_url+'administrador/admin/dist/img/'+excelfilename
     #file_path='static/administrador/admin/dist/img/'+excelfilename
-    file_path=excelfilename
+    file_path='http://web.colector.co/static/administrador/admin/dist/img/reporttq.xlsx'
 
 
     workbook = xlsxwriter.Workbook(file_path)

@@ -283,12 +283,12 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
             window.open(static_url+'administrador/admin/dist/img/'+data['file_name']);
 
 
-            var anchor = angular.element('<a/>');
+            /*var anchor = angular.element('<a/>');
              anchor.attr({
                  href: 'data:attachment/csv;charset=utf-8,'+estatic_url+''+data['file_name']+'',
                  download: 'file.xlsx',
                  target: '_blank'
-             })[0].click();
+             })[0].click();*/
         }, function(error) {
             console.log(error)
         });

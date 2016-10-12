@@ -7,29 +7,26 @@ import xlsxwriter
 from datetime import datetime
 from celery import shared_task
 
+from boto.s3.connection import S3Connection
+from boto.s3.key import Key
+
 from django.core.files.storage import default_storage
 from django.conf import settings
 from django.core.mail import send_mail, EmailMessage
 
 from registro import models as registro_models
-
-@shared_task
-def add(x, y):
-    return x + y
-
-
-@shared_task
-def mul(x, y):
-    return x * y
-
-
-@shared_task
-def xsum(numbers):
-    return sum(numbers)
-
+from colector import settings as colector_settings
 
 @shared_task
 def generate_xls_report(id, email):
+    """
+    Run Worker: celery worker -A colector  -l info
+    Run workers on Background : celery multi start worker1 -A colector --pidfile="$ctp/colector/celery/%n%I.pid" --logfile="$ctp/colector/celery/%n%I.log"
+    Kill Workers: ps auxww | grep 'celery worker' | awk '{print $2}' | xargs kill -9
+    :param id: Form id
+    :param email: Mail to send report
+    :return: None
+    """
     servidor = pymongo.MongoClient('localhost', 27017)
     database = servidor.colector
     filled_forms = database.filled_forms.find({'form_id': str(id)}).sort("_id", -1)
@@ -153,36 +150,59 @@ def generate_xls_report(id, email):
 
     workbook.close()
 
-    print default_storage.connection
-    print default_storage.__class__
+    # Connect to s3
+    s3_file_name = "reporte.xlsx"
+
+    conn = S3Connection(colector_settings.AWS_ACCESS_KEY_ID, colector_settings.AWS_SECRET_ACCESS_KEY)
+    bucket = conn.get_bucket(colector_settings.AWS_STORAGE_BUCKET_NAME)
+    k = Key(bucket)
+    k.key = s3_file_name
+    k.set_contents_from_filename('reporttq.xlsx')
+    k.set_acl('public-read')
 
     files3 = default_storage.open('reporte.xlsx', 'w')
-    files3.write(workbook)
+    # file_to_attach = open('reporttq.xlsx', 'r')
 
-    url_s3_archivo = ""
 
     # TODO Estoy muy convencido que esto no debe ir aquí, pero por lo pronto lo voy a dejar aquí
-    flag_send_mail = False
+    flag_send_mail = True
+    flag_send_as_link = True
     if flag_send_mail:
-        email = EmailMessage(
-            "Reporte Colector",
-            "Adjunto le enviamos el archivo con su reporte",
-            "andres@colector.co",
-            [email],
-        )
-        file_to_attach = open('reporttq.xlsx', 'r')
-        data = file_to_attach.read()
+        if flag_send_as_link:
+            send_mail(
+                "Reporte Colector",
+                "Por favor descargue su reporte desde esta url: http://%s.s3.amazonaws.com/%s" % (
+                    colector_settings.AWS_STORAGE_BUCKET_NAME,
+                    s3_file_name
+                ),
+                "prodati@itechsas.com",
+                [email],
+                html_message="Por favor descargue su reporte desde <a href='http://%s.s3.amazonaws.com/%s'>esta url</a> " % (
+                    colector_settings.AWS_STORAGE_BUCKET_NAME,
+                    s3_file_name
+                ),
+            )
+        else:
+            email = EmailMessage(
+                "Reporte Colector",
+                "Adjunto le enviamos el archivo con su reporte",
+                "andres@colector.co",
+                [email],
+            )
+            file_to_attach = open('reporttq.xlsx', 'r')
+            data = file_to_attach.read()
 
-        email.attach('reporte.xlsx', data, 'application/vnd.ms-excel')
-        email.send()
-        # send_mail(
-        #     "Reporte Colector",
-        #     "Por favor descargue su reporte desde esta url: %s" % (url_s3_archivo,),
-        #     "prodati@itechsas.com",
-        #     [email],
-        #     html_message="Por favor descargue su reporte desde esta url: %s" % (url_s3_archivo,)
-        # )
+            email.attach('reporte.xlsx', data, 'application/vnd.ms-excel')
+            email.send()
+
 
     # response = HttpResponse(content_type='application/vnd.ms-excel')
     # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
     # response.write(excelfilename)
+
+# from boto.s3.connection import S3Connection
+#
+# conn = S3Connection('AKIAICWTALYFX6UGE5UA','cKV/+7a8Ja/+C3fXvEpgvZ0Od+GlnkqrMFrxu6I3')
+# bucket = conn.get_bucket('colector')
+# for key in bucket.list():
+#     print key.name.encode('utf-8')

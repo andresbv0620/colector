@@ -1,11 +1,15 @@
+#! -*- coding: UTF-8 -*-
 from __future__ import absolute_import
 
+import base64
 import pymongo
 import xlsxwriter
 from datetime import datetime
 from celery import shared_task
 
+from django.core.files.storage import default_storage
 from django.conf import settings
+from django.core.mail import send_mail, EmailMessage
 
 from registro import models as registro_models
 
@@ -25,7 +29,7 @@ def xsum(numbers):
 
 
 @shared_task
-def generate_xls_report(id):
+def generate_xls_report(id, email):
     servidor = pymongo.MongoClient('localhost', 27017)
     database = servidor.colector
     filled_forms = database.filled_forms.find({'form_id': str(id)}).sort("_id", -1)
@@ -148,6 +152,36 @@ def generate_xls_report(id):
     # worksheet.write(row, 1, '=SUM(B1:B4)')
 
     workbook.close()
+
+    print default_storage.connection
+    print default_storage.__class__
+
+    files3 = default_storage.open('reporte.xlsx', 'w')
+    files3.write(workbook)
+
+    url_s3_archivo = ""
+
+    # TODO Estoy muy convencido que esto no debe ir aquí, pero por lo pronto lo voy a dejar aquí
+    flag_send_mail = False
+    if flag_send_mail:
+        email = EmailMessage(
+            "Reporte Colector",
+            "Adjunto le enviamos el archivo con su reporte",
+            "andres@colector.co",
+            [email],
+        )
+        file_to_attach = open('reporttq.xlsx', 'r')
+        data = file_to_attach.read()
+
+        email.attach('reporte.xlsx', data, 'application/vnd.ms-excel')
+        email.send()
+        # send_mail(
+        #     "Reporte Colector",
+        #     "Por favor descargue su reporte desde esta url: %s" % (url_s3_archivo,),
+        #     "prodati@itechsas.com",
+        #     [email],
+        #     html_message="Por favor descargue su reporte desde esta url: %s" % (url_s3_archivo,)
+        # )
 
     # response = HttpResponse(content_type='application/vnd.ms-excel')
     # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'

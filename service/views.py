@@ -1451,7 +1451,8 @@ def FormExcelReport(request, id):
         #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
         #
         #     rows.append(row) # list of records
-        celery_tasks.generate_xls_report.apply_async((id,))
+        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email))
+
         print 'NO HAY REGISTROS'
         data = {}
         data['response_code'] = '200'

@@ -154,7 +154,7 @@ def generate_xls_report(id, email):
     s3_file_name = "reporte.xlsx"
 
     conn = S3Connection(colector_settings.AWS_ACCESS_KEY_ID, colector_settings.AWS_SECRET_ACCESS_KEY)
-    bucket = conn.get_bucket(colector_settings.AWS_STORAGE_BUCKET_NAME)
+    bucket = conn.get_bucket(colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS)
     k = Key(bucket)
     k.key = s3_file_name
     k.set_contents_from_filename('reporttq.xlsx')
@@ -178,7 +178,7 @@ def generate_xls_report(id, email):
                 "prodati@itechsas.com",
                 [email],
                 html_message="Por favor descargue su reporte desde <a href='http://%s.s3.amazonaws.com/%s'>esta url</a> " % (
-                    colector_settings.AWS_STORAGE_BUCKET_NAME,
+                    colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
                     s3_file_name
                 ),
             )

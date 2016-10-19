@@ -172,7 +172,7 @@ def generate_xls_report(id, email):
             send_mail(
                 "Reporte Colector",
                 "Por favor descargue su reporte desde esta url: http://%s.s3.amazonaws.com/%s" % (
-                    colector_settings.AWS_STORAGE_BUCKET_NAME,
+                    colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
                     s3_file_name
                 ),
                 "prodati@itechsas.com",

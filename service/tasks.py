@@ -175,7 +175,7 @@ def generate_xls_report(id, email):
                     colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
                     s3_file_name
                 ),
-                "andres@colector.co",
+                "Andres de Colector <andres@colector.co>",
                 [email],
                 html_message="Por favor descargue su reporte desde <a href='http://%s.s3.amazonaws.com/%s'>esta url</a> " % (
                     colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
@@ -186,7 +186,7 @@ def generate_xls_report(id, email):
             email = EmailMessage(
                 "Reporte Colector",
                 "Adjunto le enviamos el archivo con su reporte",
-                "andres@colector.co",
+                "Andres de Colector <andres@colector.co>",
                 [email],
             )
             file_to_attach = open('reporttq.xlsx', 'r')

@@ -2,7 +2,7 @@
 
      <div id="toolbar">
            <div class="col-md-5">
-               <button id="deletebutton" class="btn btn-default"><i class="glyphicon glyphicon-trash"></i> Eliminar</button>
+               <button id="deletebutton" class="btn btn-danger"><i class="glyphicon glyphicon-trash"></i></button>
                <style type="text/css">
                  .button {
                       display: block;
@@ -14,7 +14,7 @@
                       font-weight: bold;
                   }
                </style>
-               <a class='button' href="http://web.colector.co/static/administrador/admin/dist/img/reporttq.xlsx"><i class="glyphicon glyphicon glyphicon-export"></i> Descargar Reporte</a>
+               <button id='loadexcelbutton' class="btn btn-primary" ng-click="loadExcel()"><i class="glyphicon glyphicon-export"></i> Generar Reporte </button>
 
           </div>
           <div class="col-md-4">
@@ -76,7 +76,7 @@
           </ui-gmap-marker>
      </ui-gmap-google-map>
 </div>
-<button id='loadexcelbutton' ng-click="loadExcel()"><i class="glyphicon glyphicon-export"></i> Exportar Todos los Registros</button>
+
 
 <script type="text/javascript">
      function openMedia(e){

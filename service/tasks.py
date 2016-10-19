@@ -202,7 +202,7 @@ def generate_xls_report(id, email):
 
 # from boto.s3.connection import S3Connection
 #
-# conn = S3Connection('AKIAICWTALYFX6UGE5UA','cKV/+7a8Ja/+C3fXvEpgvZ0Od+GlnkqrMFrxu6I3')
+# conn = S3Connection('AWSACCESSKEY','AWSSECRECTACCESSKEY')
 # bucket = conn.get_bucket('colector')
 # for key in bucket.list():
 #     print key.name.encode('utf-8')

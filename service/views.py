@@ -172,11 +172,13 @@ class GetForms(View):
 
                                     entrada = {}
                                     entrada['input_id'] = e.id
+
                                     entrada['name'] = e.nombre
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
                                     #Datos tabla intermedia de relacion ficha entrada
                                     asignacionentrada = e.asignacionentrada_set.get(ficha=f)
+                                    entrada['agregar_nuevo'] = asignacionentrada.agregar_nuevo
                                     entrada['orden'] = asignacionentrada.orden
                                     entrada['requerido'] = asignacionentrada.requerido
                                     entrada['oculto'] = asignacionentrada.oculto

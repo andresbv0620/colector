@@ -150,6 +150,7 @@ class AsignacionEntrada(models.Model):
     requerido = models.BooleanField(default=False)
     oculto = models.BooleanField(default=False)
     solo_lectura = models.BooleanField(default=False)
+    agregar_nuevo = models.BooleanField(default=False)
     defecto  = models.CharField(max_length=50, blank = True , unique=False)
     defecto_previo = models.BooleanField(default=False)
     maximo	= models.PositiveIntegerField(blank = True, null = True)

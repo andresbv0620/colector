@@ -1456,7 +1456,7 @@ def FormExcelReport(request, id):
         print 'NO HAY REGISTROS'
         data = {}
         data['response_code'] = '200'
-        data['response_description'] = 'Se están procesando sus registros en segundo plano'
+        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga al correo %s' % request.user.email
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')

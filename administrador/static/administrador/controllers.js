@@ -278,6 +278,7 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
     $scope.loadExcel = function() {
         colector_id = globales.user_id;
         defaultService.post(globales.static_url + '../service/filled/forms/report/excel/formid/' + $routeParams.form_id + '/', '{"colector_id":"' + colector_id + '}', function(data) {
+            alert(data['response_description']);
             console.log(data);
         }, function(error) {
             console.log(error)

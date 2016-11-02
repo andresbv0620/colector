@@ -1,0 +1,22 @@
+version: '2'
+services:
+  redis:
+    build: ./containers/redis
+    ports:
+      - "6379:6379"
+#    volumes:
+#      - ./dumps/redis:/data
+#volumes:
+#  data_redis:
+#    external: true
+
+  mongo:
+    build: ./containers/mongo
+    ports:
+      - "27017:27017"
+#    volumes:
+#      - .dumps/mongo:/data/db
+  postgres:
+    build: ./containers/postgres
+    ports:
+      - "5432:5432"

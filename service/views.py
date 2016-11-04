@@ -1306,8 +1306,12 @@ def FormIdReportPagServer(request, id):
                 if colectorinmongo != None:
                     colectorObj={}
                     colectorObj['colector_id'] = colectorindjango.id
-                    usuario = User.objects.get(id=colectorindjango.id)
+                    #Usuario y colector no tienen el mismo id, se consulta el colector y despues el usuario_id de ese colector para acceder a sus datos
+                    col = Colector.objects.get(id=colectorindjango.id)
+                    usuario = User.objects.get(id=col.usuario_id)
                     colectorObj['colector_name'] = usuario.username
+                    print "Nombre de usuario colector"
+                    print colectorObj['colector_name']
                     colectors.append(colectorObj)
 
             #colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]

@@ -452,6 +452,16 @@ class FillResponsesForm(View):
             for respuesta in tqobj['responses']:
                 tqarray.append(respuesta)
         return tqarray
+
+    def responseRecorded(self, colector_id, response_id):
+        record = database.filled_forms.find_one({"$and":[ 
+            {'responses': {"$elemMatch": {"input_id": "543","tipo": "4","value": str(response_id),"label": "Nombre del medico"}
+        }}, 
+            {'colector_id': str(colector_id)}]})
+        if record == None:
+            return False
+        else:
+            return True
     ####EXCLUSIVO PARA TECNOQUIMICAS####
 
     def post(self, request):
@@ -537,8 +547,19 @@ class FillResponsesForm(View):
                     response['tipo']=entrada.tipo
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
-                tqformid = '29'
-                tqformid2 = '30'
+                    if self.responseRecorded(colector_id, response['value']):
+                        resp={}
+                        # return HttpResponse("colector existe")
+                        resp['response_code'] = '202'
+                        resp['response_description'] = str('Ya ha realizado este registro')
+                        resp['body_received'] = str(request.body)
+                        resp['body_expected'] = \
+                            str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                        resp['response_data'] = request.body
+                        return HttpResponse(json.dumps(resp),content_type='application/json')
+
+                tqformid = '215'
+                tqformid2 = '30'                
                 if form_id == tqformid:
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)

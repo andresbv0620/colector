@@ -554,9 +554,12 @@ class FillResponsesForm(View):
                 errortrace='antes del if tq'
                 if form_id == tqformid:
                     aditionalcols = []
+                    errortrace='antes de llamar funcion tecnoquimica_cols'
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
-                    rep = User.objects.get(id=int(colector_id))
+                    col = Colector.objects.get(id=int(colector_id))
+                    rep = User.objects.get(id=col.usuario_id)
                     aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
+                    errortrace='despues de consultar usuario'
                     #aditionalcols.extend(responses)
                     responses.insert(0, aditionalcols[0])
                     responses.insert(0, aditionalcols[1])

@@ -101,16 +101,29 @@ class GetForms(View):
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
 
+    def responseRecorded(self, colector_id, response_id):
+        record = database.filled_forms.find_one({"$and":[ 
+            {'responses': {"$elemMatch": {"input_id": "543","tipo": "4","value": str(response_id),"label": "Nombre del medico"}
+        }}, 
+            {'colector_id': str(colector_id)}]})
+        if record == None:
+            return False
+        else:
+            return True
+
     def filterColector(self, colector_id):
         colector = Colector.objects.get(usuario = colector_id)
         print 'COLECTOR FILTRADO RESPUESTAS'
         if len(colector.respuesta.all()):
             respuestascolector = []
             for r in colector.respuesta.all():
-                respuesta = {}
-                respuesta['response_id'] = r.id
-                respuesta['value'] = r.valor
-                respuestascolector.append(respuesta)
+                if self.responseRecorded(colector_id, r.id):
+                    pass
+                else:
+                    respuesta = {}
+                    respuesta['response_id'] = r.id
+                    respuesta['value'] = r.valor
+                    respuestascolector.append(respuesta)
             return respuestascolector
 
 
@@ -1387,7 +1400,7 @@ def FormIdReportPagServer(request, id):
 
     return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
-#Permite precargar registros en un formulario con datos desde un archivo plano
+#Genera y envia todos los reportes en un archivo de excel a un correo
 def FormExcelReport(request, id):
 
     filled_forms=database.filled_forms.find({'form_id': str(id)}).sort("_id",-1)

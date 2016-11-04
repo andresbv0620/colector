@@ -547,19 +547,11 @@ class FillResponsesForm(View):
                     response['tipo']=entrada.tipo
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
-                    if self.responseRecorded(colector_id, response['value']):
-                        resp={}
-                        # return HttpResponse("colector existe")
-                        resp['response_code'] = '202'
-                        resp['response_description'] = str('Ya ha realizado este registro')
-                        resp['body_received'] = str(request.body)
-                        resp['body_expected'] = \
-                            str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
-                        resp['response_data'] = request.body
-                        return HttpResponse(json.dumps(resp),content_type='application/json')
+                    
 
                 tqformid = '215'
-                tqformid2 = '30'                
+                tqformid2 = '30'
+                errortrace='antes del if tq'
                 if form_id == tqformid:
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
@@ -569,13 +561,16 @@ class FillResponsesForm(View):
                     responses.insert(0, aditionalcols[0])
                     responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
+                    errortrace='en el if tq'
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
+                errortrace='despues del if tq' 
 
                 
                 colector = \
                     database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'colector_id': 1})                
+                        {'colector_id': 1})
+                errortrace='despues de consultar el colector_id'                 
 
                 # validando si existe un colector con esta id
                 if colector == None:
@@ -594,6 +589,7 @@ class FillResponsesForm(View):
                 database.filled_forms.create_index("form_id")
                 database.filled_forms.create_index("colector_id")
                 database.filled_forms.create_index("rows.record_id")
+                errortrace='despues de inserting' 
 
                 #Enviar correo
                 # imgurl="https://www.google.com.co/url?sa=t&rct=j&q=&esrc=s&source=web&cd=13&ved=0ahUKEwiDpKa52MnOAhUFXB4KHUTXADAQ8g0ITjAM&url=%2Fimgres%3Fimgurl%3Dhttps%3A%2F%2Fmedia.licdn.com%2Fmedia%2FAAEAAQAAAAAAAAbLAAAAJDUwOGQwN2QyLTA3ZGItNDcwNC1iN2E0LTY3ZTMwNzU4NzFlMQ.png%26imgrefurl%3Dhttps%3A%2F%2Fco.linkedin.com%2Fin%2Fandresbuitragof%26h%3D60%26w%3D60%26tbnid%3DwQK4SDF_D_ZGwM%26tbnh%3D60%26tbnw%3D60%26usg%3D__MLhkybNYaV66vDO9_vYV3iEjml0%3D%26docid%3D3a3EOf0w3y46iM&usg=AFQjCNFVRPhV_yTXa_ayXRanGcemGHBiqw&sig2=FjcBKuVJSLWHhOW5ScVeVQ"
@@ -650,7 +646,7 @@ class FillResponsesForm(View):
 
                 resp['response_code'] = '400'
                 resp['response_description'] = \
-                    str('Error inserting data in mongodb' + str(e.args))
+                    str(errortrace+' Error inserting data in mongodb: ' + str(e.args))
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = \
                     str('{"colector_id":"", "form_id":" ", "responses":"[]"  }'

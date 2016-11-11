@@ -103,7 +103,7 @@ class GetForms(View):
 
     def responseRecorded(self, colector_id, response_id, entrada_evaluada_id, entrada_evaluada_label):
         record = database.filled_forms.find_one({"$and":[ 
-            {'responses': {"$elemMatch": {"input_id": str(entrada_evaluada_id),"tipo": "4","value": str(response_id),"label": "Nombre del medico"}
+            {'responses': {"$elemMatch": {"input_id": str(entrada_evaluada_id),"tipo": "4","value": str(response_id),"label": str(entrada_evaluada_label)}
         }}, 
             {'colector_id': str(colector_id)}]})
         if record == None:

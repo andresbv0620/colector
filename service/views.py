@@ -547,16 +547,16 @@ class FillResponsesForm(View):
                     response['tipo']=entrada.tipo
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
-                    if self.responseRecorded(colector_id, response['value']):
-                        resp={}
-                        # return HttpResponse("colector existe")
-                        resp['response_code'] = '202'
-                        resp['response_description'] = str('Ya ha realizado este registro')
-                        resp['body_received'] = str(request.body)
-                        resp['body_expected'] = \
-                            str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
-                        resp['response_data'] = request.body
-                        return HttpResponse(json.dumps(resp),content_type='application/json')
+                    # if self.responseRecorded(colector_id, response['value']):
+                    #     resp={}
+                    #     # return HttpResponse("colector existe")
+                    #     resp['response_code'] = '202'
+                    #     resp['response_description'] = str('Ya ha realizado este registro')
+                    #     resp['body_received'] = str(request.body)
+                    #     resp['body_expected'] = \
+                    #         str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                    #     resp['response_data'] = request.body
+                    #     return HttpResponse(json.dumps(resp),content_type='application/json')
 
                 tqformid = '215'
                 tqformid2 = '30'                

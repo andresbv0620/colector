@@ -923,7 +923,7 @@ class UploadData(View):
                 records_counter+=1
                 data = {}
                 #####CONDICIONAL PARA TQ PARA REESTABLECER DEJAR SOLO EL ELSE######
-                if form_id=='30':
+                if form_id=='30' or form_id=='217':
                     data['colector_id'] = row[0]
                 else:
                     data['colector_id'] = colector_id

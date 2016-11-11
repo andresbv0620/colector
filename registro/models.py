@@ -163,7 +163,7 @@ class AsignacionEntrada(models.Model):
         ordering = ('orden',)
 
     def __unicode__(self):
-		return "Asignacion de entrada %s" % self.entrada + " a %s" % self.ficha
+		return "Asignacion de entrada %s" % unicode(self.entrada) + " a %s" % unicode(self.ficha)
 
 Iguala = 'igual_a'
 Noiguala = 'no_igual_a'

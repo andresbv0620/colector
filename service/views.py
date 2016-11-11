@@ -101,9 +101,9 @@ class GetForms(View):
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
 
-    def responseRecorded(self, colector_id, response_id):
+    def responseRecorded(self, colector_id, response_id, entrada_evaluada_id):
         record = database.filled_forms.find_one({"$and":[ 
-            {'responses': {"$elemMatch": {"input_id": "543","tipo": "4","value": str(response_id),"label": "Nombre del medico"}
+            {'responses': {"$elemMatch": {"input_id": str(entrada_evaluada_id),"tipo": "4","value": str(response_id),"label": "Nombre del medico"}
         }}, 
             {'colector_id': str(colector_id)}]})
         if record == None:
@@ -111,13 +111,13 @@ class GetForms(View):
         else:
             return True
 
-    def filterColector(self, colector_id):
+    def filterColector(self, colector_id, entrada_evaluada_id):
         colector = Colector.objects.get(usuario = colector_id)
         print 'COLECTOR FILTRADO RESPUESTAS'
         if len(colector.respuesta.all()):
             respuestascolector = []
             for r in colector.respuesta.all():
-                if self.responseRecorded(colector_id, r.id):
+                if self.responseRecorded(colector_id, r.id, entrada_evaluada_id):
                     pass
                 else:
                     respuesta = {}
@@ -341,7 +341,7 @@ class GetForms(View):
                                     ###########CONDICIONAL PARA TQ##################
                                     if e.id == 543 or e.id == 813:
                                         entrada['responses'] = []
-                                        entrada['responses'] = self.filterColector(colector_id)
+                                        entrada['responses'] = self.filterColector(colector_id, e.id)
                                         colector = Colector.objects.get(usuario = colector_id)
                                         formulario['form_description'] = str(colector)
                             else:
@@ -558,9 +558,25 @@ class FillResponsesForm(View):
                     #     resp['response_data'] = request.body
                     #     return HttpResponse(json.dumps(resp),content_type='application/json')
 
-                tqformid = '215'
-                tqformid2 = '30'                
+                
+                tqformid2 = '30'
+
+                ####FORM 215####
+                tqformid = '215'             
                 if form_id == tqformid:
+                    aditionalcols = []
+                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
+                    rep = User.objects.get(id=int(colector_id))
+                    aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
+                    #aditionalcols.extend(responses)
+                    responses.insert(0, aditionalcols[0])
+                    responses.insert(0, aditionalcols[1])
+                    responses.insert(0, aditionalcols[2])
+
+                ####FORM 216####
+                tqtdcid = '216'             
+                if form_id == tqtdcid:
+                    tqformid2 = '217'
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
                     rep = User.objects.get(id=int(colector_id))

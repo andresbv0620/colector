@@ -101,7 +101,7 @@ class GetForms(View):
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
 
-    def responseRecorded(self, colector_id, response_id, entrada_evaluada_id):
+    def responseRecorded(self, colector_id, response_id, entrada_evaluada_id, entrada_evaluada_label):
         record = database.filled_forms.find_one({"$and":[ 
             {'responses': {"$elemMatch": {"input_id": str(entrada_evaluada_id),"tipo": "4","value": str(response_id),"label": "Nombre del medico"}
         }}, 
@@ -111,13 +111,13 @@ class GetForms(View):
         else:
             return True
 
-    def filterColector(self, colector_id, entrada_evaluada_id):
+    def filterColector(self, colector_id, entrada_evaluada_id, entrada_evaluada_label):
         colector = Colector.objects.get(usuario = colector_id)
         print 'COLECTOR FILTRADO RESPUESTAS'
         if len(colector.respuesta.all()):
             respuestascolector = []
             for r in colector.respuesta.all():
-                if self.responseRecorded(colector_id, r.id, entrada_evaluada_id):
+                if self.responseRecorded(colector_id, r.id, entrada_evaluada_id, entrada_evaluada_label):
                     pass
                 else:
                     respuesta = {}
@@ -341,7 +341,7 @@ class GetForms(View):
                                     ###########CONDICIONAL PARA TQ##################
                                     if e.id == 543 or e.id == 813:
                                         entrada['responses'] = []
-                                        entrada['responses'] = self.filterColector(colector_id, e.id)
+                                        entrada['responses'] = self.filterColector(colector_id, e.id, e.nombre)
                                         colector = Colector.objects.get(usuario = colector_id)
                                         formulario['form_description'] = str(colector)
                             else:

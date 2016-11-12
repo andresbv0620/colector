@@ -461,8 +461,7 @@ class FillResponsesForm(View):
                 if response['input_id'] == '813':
                     represpuestaid = response['value']
 
-                    tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": "1","value": str(represpuestaid),"label": "Visitador"}
-                }}, {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+                    tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
                     tqarray = []
                     for tqobj in tqobjs:
                         for respuesta in tqobj['responses']:

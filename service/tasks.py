@@ -281,7 +281,14 @@ def send_record_email(id, email2, email3, responses):
                 "Nuevo Registro " + formulario.nombre,
                 "Consolidado de los datos registrados en "  + formulario.nombre,
                 "Andres de Colector <andres@colector.co>",
-                [email2,email3],
+                [email2],
+                html_message="<p>Datos registrados: </p>" + html_body,
+            )
+            send_mail(
+                "Nuevo Registro " + formulario.nombre,
+                "Consolidado de los datos registrados en "  + formulario.nombre,
+                "Andres de Colector <andres@colector.co>",
+                [email3],
                 html_message="<p>Datos registrados: </p>" + html_body,
             )
         else:

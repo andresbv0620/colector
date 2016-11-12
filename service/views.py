@@ -456,17 +456,19 @@ class FillResponsesForm(View):
 
         if tqformid2 == '217':
             for response in responses:
+                print response
                 if response['input_id'] == '881':
                     represpuestaid = response['value']
                     represpuestalabel = response['label']
+                    represpuestatipo = response['tipo']
 
-            tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": "4","value": str(represpuestaid),"label": str(represpuestalabel)}
-        }}, {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
-            tqarray = []
-            for tqobj in tqobjs:
-                for respuesta in tqobj['responses']:
-                    tqarray.append(respuesta)
-            return tqarray
+                    tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": str(represpuestatipo),"value": str(represpuestaid),"label": str(represpuestalabel)}
+                }}, {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+                    tqarray = []
+                    for tqobj in tqobjs:
+                        for respuesta in tqobj['responses']:
+                            tqarray.append(respuesta)
+                    return tqarray
 
     def responseRecorded(self, colector_id, response_id):
         record = database.filled_forms.find_one({"$and":[ 

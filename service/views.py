@@ -562,7 +562,7 @@ class FillResponsesForm(View):
                 tqformid2 = '30'
 
                 ####FORM 215####
-                tqformid = '215'             
+                tqformid = '215'
                 if form_id == tqformid:
                     aditionalcols = []
                     aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
@@ -585,6 +585,9 @@ class FillResponsesForm(View):
                     responses.insert(0, aditionalcols[0])
                     responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
+                    responses.insert(0, aditionalcols[3])
+
+                    celery_proccess = celery_tasks.send_record_email.apply_async((id,request.user.email,aditionalcols[4],aditionalcols[5],responses))
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 

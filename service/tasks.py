@@ -201,6 +201,107 @@ def generate_xls_report(id, email):
     # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
     # response.write(excelfilename)
 
+@shared_task
+def send_record_email(id, email, email2, email3, responses):
+    """
+    Run Worker: celery worker -A colector  -l info
+    Run workers on Background : celery multi start worker1 -A colector --pidfile="$ctp/colector/celery/%n%I.pid" --logfile="$ctp/colector/celery/%n%I.log"
+    Kill Workers: ps auxww | grep 'celery worker' | awk '{print $2}' | xargs kill -9
+    :param id: Form id
+    :param email: Mail to send report
+    :return: None
+    """
+    servidor = pymongo.MongoClient('localhost', 27017)
+    database = servidor.colector
+
+    rows = []  # rows array que contiene las filas de la tabla
+    row = {}
+    formulario = registro_models.Formulario.objects.get(id=int(id))
+    row['form_name'] = formulario.nombre
+    row['form_description'] = formulario.descripcion
+
+    html_body='<ul>'
+    for response in responses:
+        # input_id=response['input_id']
+        # entrada = Entrada.objects.get(id = int(input_id))
+        # response['label']=entrada.nombre
+        # response['tipo']=entrada.tipo
+        if response['tipo'] == "1" or response['tipo'] == "2":
+            html_body = html_body + '<li>' + response['label'] + ':' + response['value'] + '</li>'
+            
+        if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
+            try:
+                response_id = response['value']
+                respuesta = registro_models.Respuesta.objects.get(id=int(response_id))
+                html_body = html_body + '<li>' + response['label'] + ':' + respuesta.valor + '</li>'
+            except Exception, e:
+                html_body = html_body + '<li>Op_' + response['label'] + ':' + response['value'] + '</li>'
+
+        if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response[
+            'tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response[
+            'tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
+            html_body = html_body + '<li>' + response['label'] + ':' + response['value'] + '</li>'
+
+        # FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
+        if response['tipo'] == "6":
+            # src='/home/andres/media/'+response['value']
+            # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
+            # fileext = response['value'].split("_.",1)[1]
+            fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+
+            src = 'https://s3-us-west-2.amazonaws.com/colector.co/media/' + str(response['input_id']) + '/' + response['value'] + fileext
+            static_url = settings.STATIC_URL
+            if response['label'] in row:
+                html_body = html_body + '<li>' + response['label'] + ':' + row[response[
+                    'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /><p>' + tagfoto + '</p></a></div>' + '</li>'
+            else:
+                html_body = html_body + '<li>' + response['label'] + ':' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '"/><p>' + tagfoto + '</p></a></div>' + '</li>'
+
+        if response['tipo'] == "14" or response['tipo'] == "16":
+            # src='/home/andres/media/'+response['value']
+            # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+            # fileext = response['value'].split("_.",1)[1]
+            fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+
+            src = settings.MEDIA_URL + str(response['input_id']) + '/' + response['value'] + fileext
+            static_url = settings.STATIC_URL
+            if response['label'] in row:
+                html_body = html_body + '<li>' + response['label'] + ':' + ow[response[
+                    'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
+            else:
+                html_body = html_body + '<li>' + response['label'] + ':' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
+
+    html_body=html_body + '</ul>'
+
+    email='andresbuitragof@gmail.com'
+    flag_send_mail = True
+    flag_send_as_link = True
+    if flag_send_mail:
+        if flag_send_as_link:
+            send_mail(
+                "Reporte Colector",
+                "Datos registrados" ,
+                "Andres de Colector <andres@colector.co>",
+                [email],
+                html_message="<p>Datos registrados: </p>" + html_body,
+            )
+        else:
+            email = EmailMessage(
+                "Reporte Colector",
+                "Adjunto le enviamos el archivo con su reporte",
+                "Andres de Colector <andres@colector.co>",
+                [email],
+            )
+            file_to_attach = open('reporttq.xlsx', 'r')
+            data = file_to_attach.read()
+
+            email.attach('reporte.xlsx', data, 'application/vnd.ms-excel')
+            email.send()
+
+
+    # response = HttpResponse(content_type='application/vnd.ms-excel')
+    # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
+    # response.write(excelfilename)
 # from boto.s3.connection import S3Connection
 #
 # conn = S3Connection('AWSACCESSKEY','AWSSECRECTACCESSKEY')

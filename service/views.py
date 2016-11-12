@@ -457,12 +457,11 @@ class FillResponsesForm(View):
         if tqformid2 == '217':
             for response in responses:
                 print response
-                if response['input_id'] == '881':
+                #El siguiente es el input que en el formulario principal tiene el registro del representante que se debe filtrar en el form 217 input id 881
+                if response['input_id'] == '813':
                     represpuestaid = response['value']
-                    represpuestalabel = response['label']
-                    represpuestatipo = response['tipo']
 
-                    tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": str(represpuestatipo),"value": str(represpuestaid),"label": str(represpuestalabel)}
+                    tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": "1","value": str(represpuestaid),"label": "Visitador"}
                 }}, {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
                     tqarray = []
                     for tqobj in tqobjs:

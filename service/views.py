@@ -467,6 +467,7 @@ class FillResponsesForm(View):
                     for tqobj in tqobjs:
                         for respuesta in tqobj['responses']:
                             tqarray.append(respuesta)
+                            print respuesta
                     return tqarray
 
     def responseRecorded(self, colector_id, response_id):
@@ -599,7 +600,7 @@ class FillResponsesForm(View):
                     aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
                     #aditionalcols.extend(responses)
                     responses.insert(0, aditionalcols[0])
-                    #responses.insert(0, aditionalcols[1])
+                    responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
                     responses.insert(0, aditionalcols[3])
 

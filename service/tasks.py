@@ -202,7 +202,7 @@ def generate_xls_report(id, email):
     # response.write(excelfilename)
 
 @shared_task
-def send_record_email(id, email, email2, email3, responses):
+def send_record_email(id, email2, email3, responses):
     """
     Run Worker: celery worker -A colector  -l info
     Run workers on Background : celery multi start worker1 -A colector --pidfile="$ctp/colector/celery/%n%I.pid" --logfile="$ctp/colector/celery/%n%I.log"

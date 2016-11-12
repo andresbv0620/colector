@@ -585,7 +585,7 @@ class FillResponsesForm(View):
                 tqformid = '215'
                 if form_id == tqformid:
                     aditionalcols = []
-                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
+                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id, responses)
                     rep = User.objects.get(id=int(colector_id))
                     aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
                     #aditionalcols.extend(responses)

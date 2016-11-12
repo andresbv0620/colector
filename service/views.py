@@ -465,7 +465,8 @@ class FillResponsesForm(View):
                     tqarray = []
                     for tqobj in tqobjs:
                         for respuesta in tqobj['responses']:
-                            tqarray.append(respuesta)
+                            if respuesta['value'] == represpuestaid:
+                                tqarray.append(respuesta)
                             print respuesta
                     return tqarray
 

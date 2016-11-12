@@ -445,13 +445,28 @@ class FillResponsesForm(View):
         return response
 
     ####EXCLUSIVO PARA TECNOQUIMICAS####
-    def tecnoquimica_cols(self, tqformid2, colector_id):
-        tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
-        tqarray = []
-        for tqobj in tqobjs:
-            for respuesta in tqobj['responses']:
-                tqarray.append(respuesta)
-        return tqarray
+    def tecnoquimica_cols(self, tqformid2, colector_id, responses):
+        if tqformid2 == '30':
+            tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+            tqarray = []
+            for tqobj in tqobjs:
+                for respuesta in tqobj['responses']:
+                    tqarray.append(respuesta)
+            return tqarray
+
+        if tqformid2 == '217':
+            for response in responses:
+                if response['input_id'] == '881':
+                    represpuestaid = response['value']
+                    represpuestalabel = response['label']
+
+            tqobjs = database.filled_forms.find({"$and":[ {'responses': {"$elemMatch": {"input_id": "881","tipo": "4","value": str(represpuestaid),"label": str(represpuestalabel)}
+        }}, {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+            tqarray = []
+            for tqobj in tqobjs:
+                for respuesta in tqobj['responses']:
+                    tqarray.append(respuesta)
+            return tqarray
 
     def responseRecorded(self, colector_id, response_id):
         record = database.filled_forms.find_one({"$and":[ 
@@ -578,12 +593,12 @@ class FillResponsesForm(View):
                 if form_id == tqtdcid:
                     tqformid2 = '217'
                     aditionalcols = []
-                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
+                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id, responses)
                     rep = User.objects.get(id=int(colector_id))
                     aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
                     #aditionalcols.extend(responses)
                     responses.insert(0, aditionalcols[0])
-                    responses.insert(0, aditionalcols[1])
+                    #responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
                     responses.insert(0, aditionalcols[3])
 

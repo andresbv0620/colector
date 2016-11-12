@@ -607,7 +607,7 @@ class FillResponsesForm(View):
                     responses.insert(0, aditionalcols[2])
                     responses.insert(0, aditionalcols[3])
 
-                    celery_proccess = celery_tasks.send_record_email.apply_async((form_id,aditionalcols[4],aditionalcols[5],responses))
+                    celery_proccess = celery_tasks.send_record_email.apply_async((form_id,aditionalcols[4]['value'],aditionalcols[5]['value'],responses))
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 

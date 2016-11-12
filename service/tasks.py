@@ -227,70 +227,69 @@ def send_record_email(id, email2, email3, responses):
         # response['label']=entrada.nombre
         # response['tipo']=entrada.tipo
         if response['tipo'] == "1" or response['tipo'] == "2":
-            html_body = html_body + '<li>' + response['label'] + ':' + response['value'] + '</li>'
+            html_body = html_body + '<li>' + response['label'] + ': ' + response['value'] + '</li>'
             
         if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
             try:
                 response_id = response['value']
                 respuesta = registro_models.Respuesta.objects.get(id=int(response_id))
-                html_body = html_body + '<li>' + response['label'] + ':' + respuesta.valor + '</li>'
+                html_body = html_body + '<li>' + response['label'] + ': ' + respuesta.valor + '</li>'
             except Exception, e:
-                html_body = html_body + '<li>Op_' + response['label'] + ':' + response['value'] + '</li>'
+                html_body = html_body + '<li>Op_' + response['label'] + ': ' + response['value'] + '</li>'
 
         if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response[
             'tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response[
             'tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
-            html_body = html_body + '<li>' + response['label'] + ':' + response['value'] + '</li>'
+            html_body = html_body + '<li>' + response['label'] + ': ' + response['value'] + '</li>'
 
-        # FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
-        if response['tipo'] == "6":
-            # src='/home/andres/media/'+response['value']
-            # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
-            # fileext = response['value'].split("_.",1)[1]
-            fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+        # # FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
+        # if response['tipo'] == "6":
+        #     # src='/home/andres/media/'+response['value']
+        #     # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
+        #     # fileext = response['value'].split("_.",1)[1]
+        #     fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
 
-            src = 'https://s3-us-west-2.amazonaws.com/colector.co/media/' + str(response['input_id']) + '/' + response['value'] + fileext
-            static_url = settings.STATIC_URL
-            if response['label'] in row:
-                html_body = html_body + '<li>' + response['label'] + ':' + row[response[
-                    'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /><p>' + tagfoto + '</p></a></div>' + '</li>'
-            else:
-                html_body = html_body + '<li>' + response['label'] + ':' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '"/><p>' + tagfoto + '</p></a></div>' + '</li>'
+        #     src = 'https://s3-us-west-2.amazonaws.com/colector.co/media/' + str(response['input_id']) + '/' + response['value'] + fileext
+        #     static_url = settings.STATIC_URL
+        #     if response['label'] in row:
+        #         html_body = html_body + '<li>' + response['label'] + ': ' + row[response[
+        #             'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /><p>' + tagfoto + '</p></a></div>' + '</li>'
+        #     else:
+        #         html_body = html_body + '<li>' + response['label'] + ': ' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '"/><p>' + tagfoto + '</p></a></div>' + '</li>'
 
-        if response['tipo'] == "14" or response['tipo'] == "16":
-            # src='/home/andres/media/'+response['value']
-            # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-            # fileext = response['value'].split("_.",1)[1]
-            fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+        # if response['tipo'] == "14" or response['tipo'] == "16":
+        #     # src='/home/andres/media/'+response['value']
+        #     # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+        #     # fileext = response['value'].split("_.",1)[1]
+        #     fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
 
-            src = settings.MEDIA_URL + str(response['input_id']) + '/' + response['value'] + fileext
-            static_url = settings.STATIC_URL
-            if response['label'] in row:
-                html_body = html_body + '<li>' + response['label'] + ':' + ow[response[
-                    'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
-            else:
-                html_body = html_body + '<li>' + response['label'] + ':' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
+        #     src = settings.MEDIA_URL + str(response['input_id']) + '/' + response['value'] + fileext
+        #     static_url = settings.STATIC_URL
+        #     if response['label'] in row:
+        #         html_body = html_body + '<li>' + response['label'] + ': ' + row[response[
+        #             'label']] + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
+        #     else:
+        #         html_body = html_body + '<li>' + response['label'] + ': ' + '<div style="float:left"><a class="thumb"><img id="' + src + '" width="50px" height="50px" src="' + src + '" /></a></div>' + '</li>'
 
     html_body=html_body + '</ul>'
 
-    email='andresbuitragof@gmail.com'
     flag_send_mail = True
     flag_send_as_link = True
     if flag_send_mail:
         if flag_send_as_link:
             send_mail(
-                "Reporte Colector",
-                "Datos registrados" ,
+                "Nuevo Registro " + formulario.nombre,
+                "Consolidado de los datos registrados en "  + formulario.nombre,
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email2,email3],
                 html_message="<p>Datos registrados: </p>" + html_body,
             )
         else:
             email = EmailMessage(
-                "Reporte Colector",
-                "Adjunto le enviamos el archivo con su reporte",
+                "Nuevo Registro " + formulario.nombre,
+                "Consolidado de los datos registrados en "  + formulario.nombre,
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email2,email3],
             )
             file_to_attach = open('reporttq.xlsx', 'r')
             data = file_to_attach.read()

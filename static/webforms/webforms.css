@@ -1,0 +1,206 @@
+
+html { 
+background: url(http://finantic.co/wp-content/uploads/2016/12/Degradado-2.jpg) no-repeat center center fixed;
+-webkit-background-size: cover;
+-moz-background-size: cover;
+-o-background-size: cover;
+background-size: cover;
+}
+
+body{
+	background:transparent;
+}
+
+li{
+	font-size: 30px;
+}
+
+.onboarding-question {
+	font-family: 'Didact Gothic', sans-serif;
+    font: 700 16px/24px;
+    padding-left: 40px;
+    padding-right: 20px;
+    margin-top: 3px;
+    margin-bottom: 30px;
+    min-height: 48px;
+}
+
+
+.onboarding-input {
+    padding: 0 48px 0 40px;
+}
+
+.box-header{
+
+	font-family: 'Didact Gothic', sans-serif;
+    background-color: #2b479e;
+    color: #fff;
+    padding: 0;
+    min-height: 6px;
+}
+
+.pag-header{
+
+  font-family: 'Didact Gothic', sans-serif;
+    color: #fff;
+    padding-top: 50px;
+    padding-bottom: 50px;
+    min-height: 6px;
+}
+
+.box-header{
+    padding: 30px 20px 18px 40px;
+}
+
+.onboarding-branding {
+    color: #00accc;
+}
+.onboarding-progress {
+    color: #747679;
+    padding-left: 40px;
+}
+h4 {
+    font: 700 12px/24px;
+    text-transform: uppercase;
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+
+.p-text li h3 {
+    font-family: 'Didact Gothic', sans-serif;
+    font-size: 24px;
+
+}
+
+.onboarding-body {
+    padding-top: 36px;
+    min-height: 220px;
+}
+
+.btn-primary, .btn-primary:link, .btn-primary:visited {
+	width: 80%;
+    font-size: 18px;
+    color: #fff;
+    background: #6cc551;
+    border: 1px solid transparent;
+    
+    box-shadow: none;
+    font-weight: 300;
+    background-image: none;
+}
+
+button.btn {
+
+    padding: 20px;    
+    background-color: #FF0701;
+    
+}
+
+
+.label-text {
+    font: 300 16px/30px;
+}
+
+.onboarding-footer {
+    position: relative;
+    margin-top: 63px;
+    height: 40px;
+    padding: 0 30px;
+}
+/*FORM VALIDATION*/
+
+.ng-invalid.ng-dirty{
+  border-color:red;
+}
+.ng-valid.ng-dirty{
+  border-color:green;
+}
+
+
+/*INPUT TYPE RANGE*/
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  margin: 13.8px 0;
+}
+input[type=range]:focus {
+  outline: none;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-webkit-slider-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -14px;
+}
+input[type=range]:focus::-webkit-slider-runnable-track {
+  background: #367ebd;
+}
+input[type=range]::-moz-range-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  background: #3071a9;
+  border-radius: 1.3px;
+  border: 0.2px solid #010101;
+}
+input[type=range]::-moz-range-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+}
+input[type=range]::-ms-track {
+  width: 100%;
+  height: 8.4px;
+  cursor: pointer;
+  background: transparent;
+  border-color: transparent;
+  color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+  background: #2a6495;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-fill-upper {
+  background: #3071a9;
+  border: 0.2px solid #010101;
+  border-radius: 2.6px;
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+}
+input[type=range]::-ms-thumb {
+  box-shadow: 1px 1px 1px #000000, 0px 0px 1px #0d0d0d;
+  border: 1px solid #000000;
+  height: 36px;
+  width: 16px;
+  border-radius: 3px;
+  background: #ffffff;
+  cursor: pointer;
+  height: 8.4px;
+}
+input[type=range]:focus::-ms-fill-lower {
+  background: #3071a9;
+}
+input[type=range]:focus::-ms-fill-upper {
+  background: #367ebd;
+}

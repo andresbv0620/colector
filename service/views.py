@@ -44,6 +44,112 @@ def convert(data):
     else:
         return data
 
+
+#=======================================
+class SingleForm(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SingleForm, self).dispatch(*args, **kwargs)
+
+    def post(self, request):
+        resp = {}
+
+        # validando data del body
+
+        try:
+            data = json.loads(request.body)
+            form_id = data['form_id']
+
+            # validando de que exista el formulario"
+
+            try:
+                form = Formulario.objects.get(id=int(form_id))
+
+                formulario = {}
+                formulario['form_name'] = form.nombre
+                formulario['form_id'] = form.id
+                formulario['form_description'] = form.descripcion
+
+                # validando que el formulario tenga fichas asociadas
+
+                if len(form.ficha.all()):
+                    formulario['sections'] = []
+                    for f in form.ficha.all():
+                        ficha = {}
+                        ficha['section_id'] = f.id
+                        ficha['name'] = f.nombre
+                        ficha['description'] = f.descripcion
+
+                        # validando que la ficha tenga entradas asociadas
+
+                        if len(f.entrada.all()):
+                            ficha['inputs'] = []
+                            for e in f.entrada.all():
+
+                                entrada = {}
+                                entrada['input_id'] = e.id
+                                entrada['name'] = e.nombre
+                                entrada['description'] = e.descripcion
+                                entrada['type'] = e.tipo
+
+                               
+                                ficha['inputs'].append(entrada)
+
+                                if len(e.respuesta.all()):
+                                    entrada['responses'] = []
+                                    for r in e.respuesta.all():
+                                        respuesta = {}
+                                        respuesta['response_id'] = r.valor
+                                        respuesta['value'] = r.valor
+                                        entrada['responses'].append(respuesta)
+                                else:
+
+                                    entrada['responses'] = []
+                        else:
+
+                            ficha['entradas'] = []
+
+                        formulario['sections'].append(ficha)
+                else:
+
+                    formulario['sections'] = []
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form found')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = str('{"form_id":" "}')
+                resp['response_data'] = []
+                resp['response_data'].append(formulario)
+
+                return HttpResponse(json.dumps(resp,default=json_util.default),
+                                    content_type='application/json')
+            except Formulario.DoesNotExist:
+
+                resp['response_code'] = '404'
+            resp['response_description'] = str('form not found')
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"form_id":" "}')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+        except Exception, e:
+            print e
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"form_id":" "}')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+
+        return HttpResponse('Single form')
+
+#======================================
+
+
+
 # Create your views here.
 class AllowedForms(View):   
 

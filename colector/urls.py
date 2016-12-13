@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^authentication/', include('authentication.urls')),
     url(r'^service/', include('service.urls')),
     url(r'', include('administrador.urls')),
+    url(r'^finantic/', include('webforms.urls')),
 ]

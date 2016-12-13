@@ -299,33 +299,126 @@ app.controller('serverSidePagController', ['$scope', '$location', '$http', '$uib
 
 //////////////Llenar formulario web///////////////////////
 app.controller('llenarFormulario', ['$scope', '$routeParams', 'defaultService', 'globales', function($scope, $routeParams, defaultService, globales) {
+    
+
+    
+}]);
+
+app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'globales', '$window', function($scope, $routeParams, defaultService, globales, $window) {
+
     $scope.form_id = $routeParams.form_id;
-    $scope.newFilledForm = {}
+    
+    var tabsdata = this;
+
     defaultService.post(globales.static_url + '../service/form/single/', '{"form_id":"' + $routeParams.form_id + '"}', function(data) {
-        //console.log(d)
+        console.log(data['response_data'][0]);
         $scope.formulario = data['response_data'][0];
-        /*form_name=data['response_data'][0].name;
-        form_description=data['response_data'][0].description;
-        form_id=data['response_data'][0].id;
-        form_sections=data['response_data'][0].sections;*/
+
+        tabsdata.tabs=$scope.formulario.sections;
+        tabsdata.steps=tabsdata.tabs.length;
+        tabsdata.firsttab=tabsdata.tabs[0].section_id;
+        tabsdata.lasttab=tabsdata.tabs[tabsdata.tabs.length-1].section_id;
+        tabsdata.tab = tabsdata.firsttab;
+        tabsdata.btntext = "Comenzar";
+
+
     }, function(error) {
         console.log(error)
     });
 
-    $scope.enviarFormulario = function() {
-        formularioObject = $scope.formulario;
-        formularioObject.colector_id = globales.user_id;
-        formularioObject.form_id = formularioObject.form_id.toString();
+    this.setLayout = function(currentTab){
+        if (currentTab==this.firsttab) {
+            return 'col-md-5';
+        }else{
+            return 'col-md-8 col-md-offset-2';
+        }
+    };
 
-        console.log(formularioObject);
-        defaultService.post(globales.static_url + '../service/fill/form/', formularioObject, function(data) {
+
+    this.setTab = function(newValue){
+      this.tab = newValue;
+    };
+
+
+    this.isSet = function(tabName){
+      return this.tab === tabName;
+    };
+
+    this.backTab = function(currentTab){
+        if (currentTab!=this.firsttab) {
+            this.tab=currentTab-1;             
+        } 
+         
+    };
+
+    this.nextTab = function(currentTab){
+        this.btntext = "Continuar";
+        if (currentTab==this.lasttab) {
+            this.tab=this.firsttab;
+            this.sendForm($scope.formulario)
+        }else{ 
+            this.tab=currentTab+1;   
+        }
+    };
+
+    this.sendForm = function(filledform){
+        if(this.form.$valid) { 
+            // Save to db or whatever.
+            
+        this.datatoinsert = {
+        "colector_id":globales.user_id,
+        "form_id":$scope.form_id, 
+        "longitud":"-76.5205", 
+        "latitud":"3.42158", 
+        "horaini":"1461705682", 
+        "horafin":"1461705682",
+        "responses": []
+        }
+        this.formresponses = new Array();
+        sections = filledform.sections
+        for (section in sections) {
+            inputs = sections[section].inputs;
+            for (input in inputs) {
+                if (typeof inputs[input].record["value"] === 'undefined') {
+                    this.errortab=sections[section].section_id;
+                    inputs[input].record["value"]="vacio";
+                }
+                this.formresponses.push(inputs[input].record);
+            }
+        }
+        this.datatoinsert.responses = this.formresponses;
+        console.log(this.datatoinsert);
+
+        defaultService.post(globales.static_url + '../service/fill/responses/', this.datatoinsert, function(data) {
             console.log(data);
 
         }, function(error) {
             console.log(error)
         });
-    }
+            swal("Registro exitoso!", "Haz click en el boton para terminar", "success");
+            this.form.$setPristine();
+            $window.location.href = "http://finantic.co/lp/solicitud-realizada/";
+       }else{        
+
+        swal({   
+            title: "Oops...",   
+            text: "Algunas preguntas no han sido contestadas",   
+            type: "warning",   
+            showCancelButton: false,   
+            confirmButtonColor: "#DD6B55",   
+            confirmButtonText: "Aceptar",   
+            closeOnConfirm: true }, 
+            function(){   
+                this.tab=this.errortab;
+            });
+        
+        
+       }
+
+    };
 }]);
+
+
 //////////////////Reporte por colector id/////////////////////
 app.controller('reporteColector', ['$scope', 'defaultService', 'globales', function($scope, defaultService, globales) {
     console.log("iniciando controlador");

@@ -305,7 +305,7 @@ app.controller('llenarFormulario', ['$scope', '$routeParams', 'defaultService', 
 }]);
 
 app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'globales', '$window', function($scope, $routeParams, defaultService, globales, $window) {
-
+    this.loading=true;
     $scope.form_id = $routeParams.form_id;
     
     var tabsdata = this;
@@ -320,6 +320,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         tabsdata.lasttab=tabsdata.tabs[tabsdata.tabs.length-1].section_id;
         tabsdata.tab = tabsdata.firsttab;
         tabsdata.btntext = "Comenzar";
+        tabsdata.loading = false;
 
 
     }, function(error) {

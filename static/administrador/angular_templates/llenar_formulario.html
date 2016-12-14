@@ -36,6 +36,9 @@
 					  </ul> -->
 					  <!--  Form  -->
 						<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
+							<div class="text-center">
+								<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
+							</div>
 						  	<div ng-show="tabs.isSet(section.section_id)" ng-repeat="section in formulario.sections">
 						  		
 						  		<h4 class="onboarding-progress"><span>[[section.name]]</span></h4>
@@ -99,10 +102,10 @@
 									</span>
 									<span ng-if="input.type==8">
 										<h3>[[input.name]]</h3>
-										
-										<h3 class="text-center">[[input.record.value||0|currency]]</h3>
-										<input required ng-model="input.record.value" type="range" min ="500000" max="150000000" step ="500000" value ="2000000">
-										<h4 class="pull-left label-text">$500.000</h4><h4 class="pull-right label-text">$150.000.000</h4>
+										<h3 class="text-center">
+										<span class="label label-primary">[[input.record.value||0|currency]]</span></h3>
+										<input required ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
+										<h4 class="pull-left label-text">$500.000</h4><h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
 										<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 									</span>
 								</fieldset>

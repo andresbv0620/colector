@@ -27,6 +27,9 @@ import time
 import codecs
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlsxwriter
+
+from . import tasks as celery_tasks
+
 servidor = pymongo.MongoClient('localhost', 27017)
 database = servidor.colector
 
@@ -40,6 +43,112 @@ def convert(data):
         return type(data)(map(convert, data))
     else:
         return data
+
+
+#=======================================
+class SingleForm(View):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, *args, **kwargs):
+        return super(SingleForm, self).dispatch(*args, **kwargs)
+
+    def post(self, request):
+        resp = {}
+
+        # validando data del body
+
+        try:
+            data = json.loads(request.body)
+            form_id = data['form_id']
+
+            # validando de que exista el formulario"
+
+            try:
+                form = Formulario.objects.get(id=int(form_id))
+
+                formulario = {}
+                formulario['form_name'] = form.nombre
+                formulario['form_id'] = form.id
+                formulario['form_description'] = form.descripcion
+
+                # validando que el formulario tenga fichas asociadas
+
+                if len(form.ficha.all()):
+                    formulario['sections'] = []
+                    for f in form.ficha.all():
+                        ficha = {}
+                        ficha['section_id'] = f.id
+                        ficha['name'] = f.nombre
+                        ficha['description'] = f.descripcion
+
+                        # validando que la ficha tenga entradas asociadas
+
+                        if len(f.entrada.all()):
+                            ficha['inputs'] = []
+                            for e in f.entrada.all():
+
+                                entrada = {}
+                                entrada['input_id'] = e.id
+                                entrada['name'] = e.nombre
+                                entrada['description'] = e.descripcion
+                                entrada['type'] = e.tipo
+
+                               
+                                ficha['inputs'].append(entrada)
+
+                                if len(e.respuesta.all()):
+                                    entrada['responses'] = []
+                                    for r in e.respuesta.all():
+                                        respuesta = {}
+                                        respuesta['response_id'] = r.valor
+                                        respuesta['value'] = r.valor
+                                        entrada['responses'].append(respuesta)
+                                else:
+
+                                    entrada['responses'] = []
+                        else:
+
+                            ficha['entradas'] = []
+
+                        formulario['sections'].append(ficha)
+                else:
+
+                    formulario['sections'] = []
+
+                resp['response_code'] = '200'
+                resp['response_description'] = str('form found')
+                resp['body_received'] = str(request.body)
+                resp['body_expected'] = str('{"form_id":" "}')
+                resp['response_data'] = []
+                resp['response_data'].append(formulario)
+
+                return HttpResponse(json.dumps(resp,default=json_util.default),
+                                    content_type='application/json')
+            except Formulario.DoesNotExist:
+
+                resp['response_code'] = '404'
+            resp['response_description'] = str('form not found')
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"form_id":" "}')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+        except Exception, e:
+            print e
+            resp['response_code'] = '400'
+            resp['response_description'] = str('invalid body request '
+                    + str(e.args))
+            resp['body_received'] = str(request.body)
+            resp['body_expected'] = str('{"form_id":" "}')
+
+            return HttpResponse(json.dumps(resp),
+                                content_type='application/json')
+
+        return HttpResponse('Single form')
+
+#======================================
+
+
 
 # Create your views here.
 class AllowedForms(View):   
@@ -98,16 +207,29 @@ class GetForms(View):
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
 
-    def filterColector(self, colector_id):
+    def responseRecorded(self, colector_id, response_id, entrada_evaluada_id, entrada_evaluada_label):
+        record = database.filled_forms.find_one({"$and":[ 
+            {'responses': {"$elemMatch": {"input_id": str(entrada_evaluada_id),"tipo": "4","value": str(response_id),"label": str(entrada_evaluada_label)}
+        }}, 
+            {'colector_id': str(colector_id)}]})
+        if record == None:
+            return False
+        else:
+            return True
+
+    def filterColector(self, colector_id, entrada_evaluada_id, entrada_evaluada_label):
         colector = Colector.objects.get(usuario = colector_id)
         print 'COLECTOR FILTRADO RESPUESTAS'
         if len(colector.respuesta.all()):
             respuestascolector = []
             for r in colector.respuesta.all():
-                respuesta = {}
-                respuesta['response_id'] = r.id
-                respuesta['value'] = r.valor
-                respuestascolector.append(respuesta)
+                if self.responseRecorded(colector_id, r.id, entrada_evaluada_id, entrada_evaluada_label):
+                    pass
+                else:
+                    respuesta = {}
+                    respuesta['response_id'] = r.id
+                    respuesta['value'] = r.valor
+                    respuestascolector.append(respuesta)
             return respuestascolector
 
 
@@ -159,6 +281,7 @@ class GetForms(View):
                             ficha['section_id'] = f.id
                             ficha['name'] = f.nombre
                             ficha['description'] = f.descripcion
+                            ficha['repetible'] = f.repetible
                             #print f.nombre
 
                             # validando que la ficha tenga entradas asociadas
@@ -169,11 +292,13 @@ class GetForms(View):
 
                                     entrada = {}
                                     entrada['input_id'] = e.id
+
                                     entrada['name'] = e.nombre
                                     entrada['description'] = e.descripcion
                                     entrada['type'] = e.tipo
                                     #Datos tabla intermedia de relacion ficha entrada
                                     asignacionentrada = e.asignacionentrada_set.get(ficha=f)
+                                    entrada['agregar_nuevo'] = asignacionentrada.agregar_nuevo
                                     entrada['orden'] = asignacionentrada.orden
                                     entrada['requerido'] = asignacionentrada.requerido
                                     entrada['oculto'] = asignacionentrada.oculto
@@ -321,9 +446,9 @@ class GetForms(View):
                                         entrada['responses'] = []
 
                                     ###########CONDICIONAL PARA TQ##################
-                                    if e.id == 543:
+                                    if e.id == 543 or e.id == 813:
                                         entrada['responses'] = []
-                                        entrada['responses'] = self.filterColector(colector_id)
+                                        entrada['responses'] = self.filterColector(colector_id, e.id, e.nombre)
                                         colector = Colector.objects.get(usuario = colector_id)
                                         formulario['form_description'] = str(colector)
                             else:
@@ -427,13 +552,43 @@ class FillResponsesForm(View):
         return response
 
     ####EXCLUSIVO PARA TECNOQUIMICAS####
-    def tecnoquimica_cols(self, tqformid2, colector_id):
-        tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
-        tqarray = []
-        for tqobj in tqobjs:
-            for respuesta in tqobj['responses']:
-                tqarray.append(respuesta)
-        return tqarray
+    def tecnoquimica_cols(self, tqformid2, colector_id, responses):
+        if tqformid2 == '30':
+            tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+            tqarray = []
+            for tqobj in tqobjs:
+                for respuesta in tqobj['responses']:
+                    tqarray.append(respuesta)
+            return tqarray
+
+        if tqformid2 == '217':
+            for response in responses:
+                print response
+                #El siguiente es el input que en el formulario principal tiene el registro del representante que se debe filtrar en el form 217 input id 881
+                if response['input_id'] == '813':
+                    represpuestaid = response['value']
+
+                    #tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+                    tqobj = database.filled_forms.find_one({"$and":[ 
+            {'responses': {"$elemMatch": {"input_id": "881","tipo": "1","value": represpuestaid,"label": "Visitador"}
+        }}, 
+            {'colector_id': str(colector_id)}]})
+
+                    tqarray = []
+                    
+                    for respuesta in tqobj['responses']:
+                        tqarray.append(respuesta)
+                    return tqarray
+
+    def responseRecorded(self, colector_id, response_id):
+        record = database.filled_forms.find_one({"$and":[ 
+            {'responses': {"$elemMatch": {"input_id": "543","tipo": "4","value": str(response_id),"label": "Nombre del medico"}
+        }}, 
+            {'colector_id': str(colector_id)}]})
+        if record == None:
+            return False
+        else:
+            return True
     ####EXCLUSIVO PARA TECNOQUIMICAS####
 
     def post(self, request):
@@ -519,17 +674,47 @@ class FillResponsesForm(View):
                     response['tipo']=entrada.tipo
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
-                tqformid = '29'
+                    # if self.responseRecorded(colector_id, response['value']):
+                    #     resp={}
+                    #     # return HttpResponse("colector existe")
+                    #     resp['response_code'] = '202'
+                    #     resp['response_description'] = str('Ya ha realizado este registro')
+                    #     resp['body_received'] = str(request.body)
+                    #     resp['body_expected'] = \
+                    #         str('{"colector_id":"", "form_id":" ", "responses":"[]"  }')
+                    #     resp['response_data'] = request.body
+                    #     return HttpResponse(json.dumps(resp),content_type='application/json')
+
+                
                 tqformid2 = '30'
+
+                ####FORM 215####
+                tqformid = '215'
                 if form_id == tqformid:
                     aditionalcols = []
-                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id)
+                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id, responses)
                     rep = User.objects.get(id=int(colector_id))
                     aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
                     #aditionalcols.extend(responses)
                     responses.insert(0, aditionalcols[0])
                     responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
+
+                ####FORM 216####
+                tqtdcid = '216'             
+                if form_id == tqtdcid:
+                    tqformid2 = '217'
+                    aditionalcols = []
+                    aditionalcols = self.tecnoquimica_cols(tqformid2, colector_id, responses)
+                    rep = User.objects.get(id=int(colector_id))
+                    aditionalcols[0]['value'] = str(rep.first_name) +' '+ str(rep.last_name)
+                    #aditionalcols.extend(responses)
+                    responses.insert(0, aditionalcols[0])
+                    responses.insert(0, aditionalcols[1])
+                    responses.insert(0, aditionalcols[2])
+                    responses.insert(0, aditionalcols[3])
+
+                    celery_proccess = celery_tasks.send_record_email.apply_async((form_id,aditionalcols[4]['value'],aditionalcols[5]['value'],responses))
 
                 ####EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -868,7 +1053,7 @@ class UploadData(View):
                 records_counter+=1
                 data = {}
                 #####CONDICIONAL PARA TQ PARA REESTABLECER DEJAR SOLO EL ELSE######
-                if form_id=='30':
+                if form_id=='30' or form_id=='217':
                     data['colector_id'] = row[0]
                 else:
                     data['colector_id'] = colector_id
@@ -1382,75 +1567,84 @@ def FormIdReportPagServer(request, id):
 
     return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
-#Permite precargar registros en un formulario con datos desde un archivo plano
+#Genera y envia todos los reportes en un archivo de excel a un correo
 def FormExcelReport(request, id):
 
     filled_forms=database.filled_forms.find({'form_id': str(id)}).sort("_id",-1)
 
-    #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
+    # Si hay registros realizo preparo la respuesta http, iterating on filled_forms
     if filled_forms.count() != 0:
-        rows = []#rows array que contiene las filas de la tabla
-        #Below f is a document (a record)
-        for f in filled_forms:
-            f["rows"]["MongoId"]=str(f["_id"])
-            #rows.append(f["rows"])#list of records
-            mongoid= str(f["_id"])
+        # rows = [] # rows array que contiene las filas de la tabla
+        # # Below f is a document (a record)
+        # for f in filled_forms:
+        #     f["rows"]["MongoId"]=str(f["_id"])
+        #     # rows.append(f["rows"])#list of records
+        #     mongoid = str(f["_id"])
+        #
+        #     ############ ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
+        #     # ## LA OTRA FORMA DE HACERLO, ES CONSULTAR DIRECTAMENTE EL NODO ROWS
+        #     row = f["rows"]
+        #     formulario = Formulario.objects.get(id = int(id))
+        #     row['form_name'] = formulario.nombre
+        #     row['form_description'] = formulario.descripcion
+        #     for response in f["responses"]:
+        #         # input_id=response['input_id']
+        #         # entrada = Entrada.objects.get(id = int(input_id))
+        #         # response['label']=entrada.nombre
+        #         # response['tipo']=entrada.tipo
+        #         if response['tipo'] == "1" or response['tipo'] == "2":
+        #             row[response['label']] = response['value'].upper()
+        #
+        #         if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
+        #             try:
+        #                 response_id=response['value']
+        #                 respuesta = Respuesta.objects.get(id = int(response_id))
+        #                 row[response['label']]=respuesta.valor
+        #             except Exception, e:
+        #                 row[response['label']]="Op_" + response['value']
+        #
+        #         if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
+        #             row[response['label']]=response['value']
+        #         # FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
+        #         if response['tipo'] == "6":
+        #             # src='/home/andres/media/'+response['value']
+        #             # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
+        #             # fileext = response['value'].split("_.",1)[1]
+        #             fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+        #
+        #             src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
+        #             static_url=settings.STATIC_URL
+        #             if response['label'] in row:
+        #                 row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+        #             else:
+        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+        #
+        #         if response['tipo'] == "14" or response['tipo'] == "16":
+        #             # src='/home/andres/media/'+response['value']
+        #             # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+        #             # fileext = response['value'].split("_.",1)[1]
+        #             fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
+        #
+        #             src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
+        #             static_url=settings.STATIC_URL
+        #             if response['label'] in row:
+        #                 row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+        #             else:
+        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+        #
+        #     rows.append(row) # list of records
+        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email))
 
-            ############ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
-            # ##LA OTRA FORMA DE HACERLO, ES CONSULTAR DIRECTAMENTE EL NODO ROWS
-            row = f["rows"]
-            formulario = Formulario.objects.get(id = int(id))
-            row['form_name'] = formulario.nombre
-            row['form_description'] = formulario.descripcion
-            for response in f["responses"]:
-                #input_id=response['input_id']
-                #entrada = Entrada.objects.get(id = int(input_id))
-                #response['label']=entrada.nombre
-                #response['tipo']=entrada.tipo
-                if response['tipo'] == "1" or response['tipo'] == "2":
-                    row[response['label']]=response['value'].upper()
-
-                if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
-                    try:
-                        response_id=response['value']
-                        respuesta = Respuesta.objects.get(id = int(response_id))
-                        row[response['label']]=respuesta.valor
-                    except Exception, e:
-                        row[response['label']]="Op_" + response['value']
-
-                if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
-                    row[response['label']]=response['value']
-                #FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
-                if response['tipo'] == "6":
-                    #src='/home/andres/media/'+response['value']
-                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(response.id)+'/'+response['value']
-                    #fileext = response['value'].split("_.",1)[1]
-                    fid, tagfoto, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
-
-                    src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
-                    static_url=settings.STATIC_URL
-                    if response['label'] in row:
-                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
-                    else:
-                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
-
-                if response['tipo']=="14" or response['tipo']=="16":
-                    #src='/home/andres/media/'+response['value']
-                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                    #fileext = response['value'].split("_.",1)[1]
-                    fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
-
-                    src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
-                    static_url=settings.STATIC_URL
-                    if response['label'] in row:
-                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
-                    else:
-                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
-                
-            rows.append(row)#list of records
-
+        print 'NO HAY REGISTROS'
+        data = {}
+        data['response_code'] = '200'
+        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga al correo %s' % request.user.email
+        data['rows'] = []
+        data['total'] = 0
+        return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
     else:
         print 'NO HAY REGISTROS'
+        data = {}
         data['response_code'] = '404'
         data['response_description'] = 'No hay registros'
         data['rows'] = []
@@ -1476,12 +1670,12 @@ def FormExcelReport(request, id):
     col = 0
 
     # Iterate over the data and write it out row by row.
-    for record in (rows):
+    for record in rows:
         for recordnode in record:
-            if recordnode=='latitud' or recordnode=='longitud'\
-             or recordnode=='form_id' or recordnode=='form_description'\
-              or recordnode=='MongoId' or recordnode=='Hora Inicio' or recordnode=='Hora Fin'\
-               or recordnode=='record_id' or recordnode=='sincronizado_utc' or recordnode=='colector_id':
+            if recordnode == 'latitud' or recordnode == 'longitud'\
+             or recordnode == 'form_id' or recordnode == 'form_description'\
+              or recordnode == 'MongoId' or recordnode == 'Hora Inicio' or recordnode == 'Hora Fin'\
+               or recordnode == 'record_id' or recordnode == 'sincronizado_utc' or recordnode == 'colector_id':
                continue
             # Adjust the column width.
             worksheet.set_column(col, col, 30)
@@ -1500,8 +1694,10 @@ def FormExcelReport(request, id):
 
     workbook.close()
 
+    celery_tasks.add.apply_async((2, 2))
+
     response = HttpResponse(content_type='application/vnd.ms-excel')
     response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
     response.write(excelfilename)
     return response
-        
+

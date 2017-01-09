@@ -82,6 +82,7 @@ class Ficha(models.Model):
 	#entrada = SortedManyToManyField('Entrada')
 	#entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
 	entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
+	repetible = models.BooleanField(default = False)
 
 	class Meta:
 		ordering = ('id',)
@@ -150,6 +151,7 @@ class AsignacionEntrada(models.Model):
     requerido = models.BooleanField(default=False)
     oculto = models.BooleanField(default=False)
     solo_lectura = models.BooleanField(default=False)
+    agregar_nuevo = models.BooleanField(default=False)
     defecto  = models.CharField(max_length=50, blank = True , unique=False)
     defecto_previo = models.BooleanField(default=False)
     maximo	= models.PositiveIntegerField(blank = True, null = True)
@@ -162,7 +164,7 @@ class AsignacionEntrada(models.Model):
         ordering = ('orden',)
 
     def __unicode__(self):
-		return "Asignacion de entrada %s" % self.entrada + " a %s" % self.ficha
+		return "Asignacion de entrada %s" % unicode(self.entrada) + " a %s" % unicode(self.ficha)
 
 Iguala = 'igual_a'
 Noiguala = 'no_igual_a'

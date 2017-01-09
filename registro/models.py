@@ -82,6 +82,7 @@ class Ficha(models.Model):
 	#entrada = SortedManyToManyField('Entrada')
 	#entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
 	entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',  blank = True)
+	repetible = models.BooleanField(default = False)
 
 	class Meta:
 		ordering = ('id',)

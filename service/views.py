@@ -281,6 +281,7 @@ class GetForms(View):
                             ficha['section_id'] = f.id
                             ficha['name'] = f.nombre
                             ficha['description'] = f.descripcion
+                            ficha['repetible'] = f.repetible
                             #print f.nombre
 
                             # validando que la ficha tenga entradas asociadas

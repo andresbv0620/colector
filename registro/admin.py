@@ -52,7 +52,7 @@ class AsignacionEntradaInline(admin.TabularInline):
     extra = 1
 
 class FichaAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'descripcion', )    
+    list_display = ('nombre', 'descripcion', 'repetible',)    
     search_fields = ['nombre', ]
     #filter_horizontal = ('entrada',  )
     inlines = (AsignacionEntradaInline,)

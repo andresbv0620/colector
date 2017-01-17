@@ -28,6 +28,10 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 		controller:"llenarFormulario",
 		templateUrl:globales.static_url+"/administrador/angular_templates/llenar_formulario.html"
 	})
+	.when('/llenar2/:form_id',{
+		controller:"llenarFormulario",
+		templateUrl:globales.static_url+"/administrador/angular_templates/llenar_formulario2.html"
+	})
 	.when('/reporte/id/:form_id',{
 		controller:"reporteFormularioId",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_formulario.html"
@@ -46,6 +50,10 @@ app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	})
 	.when('/reportepag/id/:form_id',{
 		controller:"serverSidePagController",
+		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_server_pagination.html"
+	})
+	.when('/histograma/id/:form_id',{
+		controller:"generarHistograma",
 		templateUrl:globales.static_url+"/administrador/angular_templates/reporte_server_pagination.html"
 	})
 

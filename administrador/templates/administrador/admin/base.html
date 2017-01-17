@@ -79,6 +79,10 @@
   <script src="{% static 'administrador/admin/plugins/fastclick/fastclick.min.js' %}"></script>
 
 
+  <!-- swal Sweet alert -->
+    <script src="{% static 'webforms/sweetalert/dist/sweetalert.min.js'%}"></script> 
+    <link rel="stylesheet" type="text/css" href="{% static 'webforms/sweetalert/dist/sweetalert.css'%}">
+
 
   <!-- ANGULAR Latest compiled and minified Locales -->
   <script src="{% static 'assets/lodash.js' %}"></script>
@@ -252,7 +256,7 @@
    
               </ul>
             </li>
-            <!-- <li class="treeview">
+            <li class="treeview">
               <a href="#">
                 <i class="fa fa-edit"></i> <span>Llenar Formularios</span>
                 <i class="fa fa-angle-left pull-right"></i>
@@ -260,12 +264,12 @@
                   <ul class="treeview-menu">
                     {% for formulario in formularios %}
                         <li>
-                          <a href="#/llenar/{{formulario.id}}/"><i class="fa fa-circle-o"></i> {{ formulario}}</a>
+                          <a href="#/llenar2/{{formulario.id}}/"><i class="fa fa-circle-o"></i> {{ formulario}}</a>
                         </li>
                     {% endfor %}
                   </ul>
 
-            </li> -->
+            </li>
 
             
           </ul>

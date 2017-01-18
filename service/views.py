@@ -446,7 +446,8 @@ class GetForms(View):
                                         entrada['responses'] = []
 
                                     ###########CONDICIONAL PARA TQ##################
-                                    if e.id == 543 or e.id == 813:
+                                    #if e.id == 543 or e.id == 813:
+                                    if e.id == 543:
                                         entrada['responses'] = []
                                         entrada['responses'] = self.filterColector(colector_id, e.id, e.nombre)
                                         colector = Colector.objects.get(usuario = colector_id)

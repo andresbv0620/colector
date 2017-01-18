@@ -224,7 +224,11 @@ class GetForms(View):
             respuestascolector = []
             for r in colector.respuesta.all():
                 if self.responseRecorded(colector_id, r.id, entrada_evaluada_id, entrada_evaluada_label):
-                    pass
+                    if entrada_evaluada_id==813:
+                        respuesta = {}
+                        respuesta['response_id'] = r.id
+                        respuesta['value'] = r.valor
+                        respuestascolector.append(respuesta)
                 else:
                     respuesta = {}
                     respuesta['response_id'] = r.id
@@ -447,7 +451,6 @@ class GetForms(View):
 
                                     ###########CONDICIONAL PARA TQ##################
                                     if e.id == 543 or e.id == 813:
-                                    #if e.id == 543:
                                         entrada['responses'] = []
                                         entrada['responses'] = self.filterColector(colector_id, e.id, e.nombre)
                                         colector = Colector.objects.get(usuario = colector_id)

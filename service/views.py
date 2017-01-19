@@ -1637,12 +1637,13 @@ def FormExcelReport(request, id):
         #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
         #
         #     rows.append(row) # list of records
-        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email))
+
+        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email,request.user.empresa.email))
 
         print 'NO HAY REGISTROS'
         data = {}
         data['response_code'] = '200'
-        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga al correo %s' % request.user.email
+        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga a los correos %s, %s' % (request.user.email,request.user.empresa.email)
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')

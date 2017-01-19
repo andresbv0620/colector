@@ -18,7 +18,7 @@ from registro import models as registro_models
 from colector import settings as colector_settings
 
 @shared_task
-def generate_xls_report(id, email):
+def generate_xls_report(id, email, email2):
     """
     Run Worker: celery worker -A colector  -l info
     Run workers on Background : celery multi start worker1 -A colector --pidfile="$ctp/colector/celery/%n%I.pid" --logfile="$ctp/colector/celery/%n%I.log"
@@ -152,7 +152,7 @@ def generate_xls_report(id, email):
                 ),
 
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email,email2],
                 html_message="Por favor descargue su reporte desde <a href='http://%s.s3.amazonaws.com/%s'>esta url</a> " % (
                     colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
                     s3_file_name
@@ -163,7 +163,7 @@ def generate_xls_report(id, email):
                 "Reporte Colector",
                 "Adjunto le enviamos el archivo con su reporte",
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email,email2],
             )
             file_to_attach = open('reporttq.xlsx', 'r')
             data = file_to_attach.read()

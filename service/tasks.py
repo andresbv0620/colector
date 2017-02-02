@@ -55,16 +55,19 @@ def generate_xls_report(id, email, email2):
             hini={}
             hini['label']='Hora Inicio'
             hini["value"]=f["rows"]["Hora Inicio"]
+            hini["tipo"]='0'
             f["responses"].append(hini)
 
             hfin={}
             hfin['label']='Hora Fin'
             hfin["value"]=f["rows"]["Hora Fin"]
+            hfin["tipo"]='0'
             f["responses"].append(hfin)
 
             hsinc={}
             hsinc['label']='Sincronizado'
             hsinc["value"]=f["rows"]["Sincronizado"]
+            hsinc["tipo"]='0'
             f["responses"].append(hsinc)
             # rows.append(f["rows"])#list of records
             mongoid = str(f["_id"])

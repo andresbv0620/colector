@@ -50,6 +50,21 @@ def generate_xls_report(id, email, email2):
         col = 0
         for f in filled_forms:
             f["rows"]["MongoId"] = str(f["_id"])
+            #Addin cols to report
+            hini={}
+            hini['label']='Hora Inicio'
+            hini["value"]=f["rows"]["Hora Inicio"]
+            f["responses"].append(hini)
+
+            hfin={}
+            hfin['label']='Hora Fin'
+            hfin["value"]=f["rows"]["Hora Fin"]
+            f["responses"].append(hfin)
+
+            hsinc={}
+            hsinc['label']='Sincronizado'
+            hsinc["value"]=f["rows"]["Sincronizado"]
+            f["responses"].append(hsinc)
             # rows.append(f["rows"])#list of records
             mongoid = str(f["_id"])
 
@@ -58,11 +73,16 @@ def generate_xls_report(id, email, email2):
             row['form_name'] = formulario.nombre
             row['form_description'] = formulario.descripcion
             for response in f["responses"]:
+                if response['label'] == 'Hora Inicio' or response['label'] == 'Hora Fin':
+                    cellvalue = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(response['value']))
+
+                if response['label'] == 'Sincronizado':
+                    cellvalue = response['value']
 
                 if response['label'] == 'latitud' or response['label'] == 'longitud' \
                     or response['label'] == 'form_id' or response['label'] == 'form_description' \
-                    or response['label'] == 'MongoId' or response['label'] == 'Hora Inicio' or response['label'] == 'Hora Fin' \
-                    or response['label'] == 'record_id' or response['label'] == 'sincronizado_utc' or response['label'] == 'colector_id':
+                    or response['label'] == 'MongoId' \
+                    or response['label'] == 'record_id' or response['label'] == 'colector_id':
                     continue
                 # input_id=response['input_id']
                 # entrada = Entrada.objects.get(id = int(input_id))

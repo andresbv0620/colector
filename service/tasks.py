@@ -75,7 +75,8 @@ def generate_xls_report(id, email, email2):
             row['form_description'] = formulario.descripcion
             for response in f["responses"]:
                 if response['label'] == 'Hora Inicio' or response['label'] == 'Hora Fin':
-                    cellvalue = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(response['value']))
+                    floatepoch = float(response['value'])
+                    cellvalue = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(floatepoch))
 
                 if response['label'] == 'Sincronizado':
                     cellvalue = response['value']

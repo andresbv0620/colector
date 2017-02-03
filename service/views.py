@@ -892,7 +892,7 @@ class SaveImg(View):
             data_validator = self.dataValidator(array_validation)
 
             if data_validator['error'] == True:
-                resp['response_code'] = '400'
+                resp['response_code'] = '200'
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
@@ -921,7 +921,7 @@ class SaveImg(View):
                         content_type='application/json')
 
         except Exception, e:
-            resp['response_code'] = '400'
+            resp['response_code'] = '200'
             resp['response_description'] = str('invalid body request '
                     + str(e.args))
             resp['form_data_expected'] = \

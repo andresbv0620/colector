@@ -1,0 +1,117 @@
+
+<div class="row-fluid">
+	<div class="col-md-12">
+			<!-- /.box-header -->
+		<div class="box-body" ng-controller="TabController as tabs">
+			<div class="panel">
+				<div class="panel-heading box-header with-border">
+					<h2>[[formulario.form_name]]</h2>
+					<h4 class="onboarding-branding">[[formulario.form_description]]</h4>
+				</div>
+				<!-- Product Tabs  -->
+				<section class="onboarding-body panel-body">
+				  <!-- <ul class="nav nav-pills">
+					<li ng-class="{ active:tabs.isSet(section.section_id) }" ng-repeat="section in formulario.sections">
+					  <a href="" ng-click="tabs.setTab(section.section_id)">[[section.name]]</a>
+					</li>
+				  </ul> -->
+				  <!--  Form  -->
+					<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
+						<div class="text-center">
+							<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
+						</div>
+					  	<div ng-show="tabs.isSet(section.section_id)" ng-repeat="section in formulario.sections">
+					  		
+					  		<h4 class="onboarding-progress"><strong>[[section.name]]</strong></h4>
+					  		<p>[[section.description]]</p>
+					  		
+					  		<!--  Form Sections-->
+					  		<fieldset class="form-group onboarding-input" ng-repeat="input in section.inputs">
+								<span ng-if="input.type==1">
+									<h3>[[input.name]]</h3>
+									<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
+
+								<span ng-if="input.type==2">
+									<h3>[[input.name]]</h3>
+									<textarea name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" value="Opcional">Opcional...</textarea>
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
+								<span ng-if="input.type==4">
+									<h3>[[input.name]]: [[input.description]]</h3>
+									<select required name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
+										<option value=""> --- </option>
+									</select>
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
+								<span ng-if="input.type==3">
+									<div class="row-fluid">
+										<div class="col-md-8 col-lg-8">
+											<h4>[[input.name]]: [[input.description]]</h4>
+										</div>
+										<div class="col-md-4 col-lg-4">
+											<label class="radio-inline" ng-repeat="response in input.responses">
+												<input required type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
+												[[response.value]]
+											</label>
+										</div>
+										<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+									</div>
+								</span>
+								<span ng-if="input.type==5">
+									<h3>[[input.name]]: [[input.description]]</h3>
+									<div class="checkbox" ng-repeat="response in input.responses">
+										<h3>
+										<input type="checkbox" name="response_[[response.id]]" ng-model="input.responses[0].value" id="[[section.id]]_[[input.name]]_[[response.value]]" value="[[response.value]]" checked="">
+										[[response.value]]
+										</h3>
+									</div>
+								</span>
+								<span ng-if="input.type==6">
+									<div class="form-group">
+										<h3 for="exampleInputFile">[[input.name]]: [[input.description]]</h3>
+										<input name="input_[[input.id]]" type="file" id="exampleInputFile">
+										<p class="help-block">Suba una foto.</p>
+									</div>
+								</span>
+								<span ng-if="input.type==7">
+									<div class="form-group">
+										<h3>[[input.name]]: [[input.description]]</h3>
+										<div class="input-group">
+											<div class="input-group-addon">
+												<i class="fa fa-calendar"></i>
+											</div>
+											<input name="input_[[input.id]]" type="text" class="form-control" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask="">
+										</div>
+										<!-- /.input group -->
+									</div>
+								</span>
+								<span ng-if="input.type==8">
+									<h3>[[input.name]]</h3>
+									<h3 class="text-center">
+									<span class="label label-primary">[[input.record.value||0|currency]]</span></h3>
+									<input required ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
+									<h4 class="pull-left label-text">$500.000</h4><h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
+							</fieldset>
+
+					  		
+					  		<div class="col-md-4 col-md-offset-4 text-center">
+					  			<input type="submit" class="btn btn-primary" value="[[tabs.btntext]]" />
+					  		</div>
+					  		
+					  	</div>
+					  	<div class="onboarding-footer" ng-hide="tabs.tab===tabs.firsttab">
+					        <a href="" ng-click="tabs.backTab(tabs.tab)">Atras</a>
+					    </div><!-- /.box-footer-->	
+					</form>
+				</section>
+			</div>			
+		</div>
+		<!-- /.box-body -->
+	</div>
+</div>
+
+

@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^fill/csv/$', UploadData.as_view()),
     url(r'^form/delete/', DeleteResponsesForm.as_view()),
     url(r'^filled/forms/report/paginate/formid/(?P<id>.+)/', 'service.views.FormIdReportPagServer'),
+    url(r'^filled/forms/report/paginate/histograma/(?P<id>.+)/', 'service.views.FormIdReportHistograma'),
     url(r'^filled/forms/report/excel/formid/(?P<id>.+)/', 'service.views.FormExcelReport'),
     url(r'^registerusers/csv/$', RegisterUsersCsv.as_view()),
     

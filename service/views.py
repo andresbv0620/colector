@@ -224,7 +224,11 @@ class GetForms(View):
             respuestascolector = []
             for r in colector.respuesta.all():
                 if self.responseRecorded(colector_id, r.id, entrada_evaluada_id, entrada_evaluada_label):
-                    pass
+                    if entrada_evaluada_id==813:
+                        respuesta = {}
+                        respuesta['response_id'] = r.id
+                        respuesta['value'] = r.valor
+                        respuestascolector.append(respuesta)
                 else:
                     respuesta = {}
                     respuesta['response_id'] = r.id
@@ -888,7 +892,7 @@ class SaveImg(View):
             data_validator = self.dataValidator(array_validation)
 
             if data_validator['error'] == True:
-                resp['response_code'] = '400'
+                resp['response_code'] = '200'
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
                 resp['response_description'] = \
@@ -917,7 +921,7 @@ class SaveImg(View):
                         content_type='application/json')
 
         except Exception, e:
-            resp['response_code'] = '400'
+            resp['response_code'] = '200'
             resp['response_description'] = str('invalid body request '
                     + str(e.args))
             resp['form_data_expected'] = \
@@ -1633,12 +1637,13 @@ def FormExcelReport(request, id):
         #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
         #
         #     rows.append(row) # list of records
-        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email))
+
+        celery_proccess = celery_tasks.generate_xls_report.apply_async((id,request.user.email,request.user.empresa.email))
 
         print 'NO HAY REGISTROS'
         data = {}
         data['response_code'] = '200'
-        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga al correo %s' % request.user.email
+        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga a los correos %s, %s' % (request.user.email,request.user.empresa.email)
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
@@ -1701,3 +1706,200 @@ def FormExcelReport(request, id):
     response.write(excelfilename)
     return response
 
+
+#Genera un histograma del reporte
+def FormIdReportHistograma(request, id):
+    #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
+    getcolumns=request.GET.get('getcolumns')
+
+    if getcolumns=='true':
+        colrows = database.filled_forms.find_one({'form_id': str(id)})
+        if colrows!=None:
+            ########################CONSULTANDO COLECTOR IDS##################3
+            form_id = int(id)
+            empresas = Formulario.objects.get(id=form_id).empresa_set.all()
+            for empresa in empresas:
+                empresa = empresa
+
+            #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
+            #if user.groups.filter(name='administrador'):
+            colectors = []
+            for colectorindjango in empresa.colector.all():
+                colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 1})                
+                # validando si existe un colector con esta id
+                if colectorinmongo != None:
+                    colectorObj={}
+                    colectorObj['colector_id'] = colectorindjango.id
+                    usuario = User.objects.get(id=colectorindjango.id)
+                    colectorObj['colector_name'] = usuario.username
+                    colectors.append(colectorObj)
+
+            #colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]
+
+            data={
+                'columns': [],
+                'colectors':colectors
+                }
+            return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+        else:
+            resp={}
+            resp['columns'] = []
+            resp['response_code'] = '404'
+            resp['response_description'] = 'No hay registros'
+            return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
+
+    #Setting Pagination
+    offset=int(request.GET.get('offset', 10))
+    limit=int(request.GET.get('limit', 10))
+    #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
+    page=(int(request.GET.get('offset', 0)))/limit+1
+    #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
+    colector_id=request.GET.get('colector_id')
+
+    lastid=0
+
+    if page == 1:
+        filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
+        request.session['colector_'+str(colector_id)] = filled_forms.count()
+        #Determinar la estructura de filled_forms y hacer la suma correspondiente para cada pregunta y sacar el %
+    else:
+        lastid = str(request.session[str(page-1)])
+        filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
+        #filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+        #filled_forms = database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+
+    data = {}
+    #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
+    if filled_forms.count() != 0:
+        rows = []#rows array que contiene las filas de la tabla
+        preguntasarray=[]
+        preguntachecker=False
+
+        #Below f is a document (a record)
+        for f in filled_forms:
+            print '-------------------------EMPIEZA UN NUEVO CICLO-------------------------------'
+            f["rows"]["MongoId"]=str(f["_id"])
+            #rows.append(f["rows"])#list of records
+            mongoid= str(f["_id"])
+            request.session[str(page)] = mongoid
+
+            row = f["rows"]
+            formulario = Formulario.objects.get(id = int(id))
+            row['form_name'] = formulario.nombre
+            row['form_description'] = formulario.descripcion
+            for response in f["responses"]:
+                if response['tipo'] == "3" or response['tipo'] == "4" or response['tipo'] == "5":
+                    try:
+                        totalregistros=request.session['colector_'+str(colector_id)]
+                        if not any(p['Pregunta']==response['label'] for p in preguntasarray):
+                            print 'NO ESTA EN EL ARRAY'
+                            preguntaObj={}
+                            preguntaObj['Pregunta']=response['label']
+                            preguntaObj['Frecuencia 1']=0
+                            preguntaObj['Calificacion 1']=0
+                            preguntaObj['Frecuencia 2']=0
+                            preguntaObj['Calificacion 2']=0
+                            preguntaObj['Frecuencia 3']=0
+                            preguntaObj['Calificacion 3']=0
+                            preguntaObj['Frecuencia 4']=0
+                            preguntaObj['Calificacion 4']=0
+                            preguntaObj['Frecuencia 5']=0
+                            preguntaObj['Calificacion 5']=0
+                            preguntaObj['Frecuencia No Aplica']=0
+                            preguntaObj['No Aplica']=0
+
+
+                            response_id=response['value']
+                            respuesta = Respuesta.objects.get(id = int(response_id))
+                            input_id=response['input_id']
+                            entrada = Entrada.objects.get(id = int(input_id))
+                            entrada_id=entrada.id
+                            ficha = Entrada.objects.get(id=entrada_id).ficha_set.all()
+                            ficha = ficha[0]
+                            preguntaObj["Aspecto"]=ficha.nombre
+                            
+                            print ficha
+                            if respuesta.valor=='1':
+                                preguntaObj['Frecuencia 1']+=1
+                                preguntaObj["Calificacion 1"]=(preguntaObj['Frecuencia 1']/float(totalregistros))*100
+                                
+                                
+                            if respuesta.valor=='2':
+                                preguntaObj['Frecuencia 2']+=1
+                                preguntaObj["Calificacion 2"]=(preguntaObj['Frecuencia 2']/float(totalregistros))*100
+
+                            if respuesta.valor=='3':
+                                preguntaObj['Frecuencia 3']+=1
+                                preguntaObj["Calificacion 3"]=(preguntaObj['Frecuencia 3']/float(totalregistros))*100
+
+                            if respuesta.valor=='4':
+                                preguntaObj['Frecuencia 4']+=1
+                                preguntaObj["Calificacion 4"]=(preguntaObj['Frecuencia 4']/float(totalregistros))*100
+
+                            if respuesta.valor=='5':
+                                preguntaObj['Frecuencia 5']+=1
+                                preguntaObj["Calificacion 5"]=(preguntaObj['Frecuencia 5']/float(totalregistros))*100
+
+                            if respuesta.valor=='No Aplica':
+                                preguntaObj['Frecuencia No Aplica']+=1
+                                preguntaObj["No Aplica"]=(preguntaObj['Frecuencia No Aplica']/float(totalregistros))*100
+
+                            preguntasarray.append(preguntaObj)
+                            #print preguntasarray
+                        else:
+                            for p in preguntasarray:
+
+                                if p["Pregunta"]==response['label']:
+                                    #print totalregistros
+
+                                    response_id=response['value']
+                                    respuesta = Respuesta.objects.get(id = int(response_id))
+
+                                    if respuesta.valor=='1':
+                                        p['Frecuencia 1']+=1
+                                        p['Calificacion 1']=round((p['Frecuencia 1']/float(totalregistros))*100,2)
+
+                                    if respuesta.valor=='2':
+                                        p['Frecuencia 2']+=1
+                                        p['Calificacion 2']=round((p['Frecuencia 2']/float(totalregistros))*100,2)
+
+                                    if respuesta.valor=='3':
+                                        p['Frecuencia 3']+=1
+                                        p['Calificacion 3']=round((p['Frecuencia 3']/float(totalregistros))*100,2)
+
+                                    if respuesta.valor=='4':
+                                        p['Frecuencia 4']+=1
+                                        p['Calificacion 4']=round((p['Frecuencia 4']/float(totalregistros))*100,2)
+
+                                    if respuesta.valor=='5':
+                                        p['Frecuencia 5']+=1
+                                        p['Calificacion 5']=round((p['Frecuencia 5']/float(totalregistros))*100,2)
+
+                                    if respuesta.valor=='NA':
+                                        p['Frecuencia No Aplica']+=1
+                                        p['No Aplica']=round((p['Frecuencia 1']/float(totalregistros))*100,2)
+
+
+                    except Exception, e:
+                        row[response['label']]="Op_" + response['value']          
+               
+            rows.append(row)#list of records
+        print '---------------------------------------'
+
+        print preguntasarray
+        print '---------------------------------------'
+
+    else:
+        print 'NO HAY REGISTROS'
+        data['response_code'] = '404'
+        data['response_description'] = 'No hay registros'
+        data['rows'] = []
+        data['total'] = 0
+        return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+
+    data={
+            "total": request.session['colector_'+str(colector_id)],
+            "rows": preguntasarray,
+        }
+
+    return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')

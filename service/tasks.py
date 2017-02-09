@@ -1,6 +1,7 @@
 #! -*- coding: UTF-8 -*-
 from __future__ import absolute_import
 
+import time
 import base64
 import pymongo
 import xlsxwriter
@@ -18,7 +19,7 @@ from registro import models as registro_models
 from colector import settings as colector_settings
 
 @shared_task
-def generate_xls_report(id, email):
+def generate_xls_report(id, email, email2):
     """
     Run Worker: celery worker -A colector  -l info
     Run workers on Background : celery multi start worker1 -A colector --pidfile="$ctp/colector/celery/%n%I.pid" --logfile="$ctp/colector/celery/%n%I.log"
@@ -50,6 +51,24 @@ def generate_xls_report(id, email):
         col = 0
         for f in filled_forms:
             f["rows"]["MongoId"] = str(f["_id"])
+            #Addin cols to report
+            hini={}
+            hini['label']='Hora Inicio'
+            hini["value"]=f["rows"]["Hora Inicio"]
+            hini["tipo"]='0'
+            f["responses"].append(hini)
+
+            hfin={}
+            hfin['label']='Hora Fin'
+            hfin["value"]=f["rows"]["Hora Fin"]
+            hfin["tipo"]='0'
+            f["responses"].append(hfin)
+
+            hsinc={}
+            hsinc['label']='Sincronizado'
+            hsinc["value"]=f["rows"]["Sincronizado"]
+            hsinc["tipo"]='0'
+            f["responses"].append(hsinc)
             # rows.append(f["rows"])#list of records
             mongoid = str(f["_id"])
 
@@ -58,11 +77,17 @@ def generate_xls_report(id, email):
             row['form_name'] = formulario.nombre
             row['form_description'] = formulario.descripcion
             for response in f["responses"]:
+                if response['label'] == 'Hora Inicio' or response['label'] == 'Hora Fin':
+                    floatepoch = float(response['value'])
+                    cellvalue = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(floatepoch))
+
+                if response['label'] == 'Sincronizado':
+                    cellvalue = response['value']
 
                 if response['label'] == 'latitud' or response['label'] == 'longitud' \
                     or response['label'] == 'form_id' or response['label'] == 'form_description' \
-                    or response['label'] == 'MongoId' or response['label'] == 'Hora Inicio' or response['label'] == 'Hora Fin' \
-                    or response['label'] == 'record_id' or response['label'] == 'sincronizado_utc' or response['label'] == 'colector_id':
+                    or response['label'] == 'MongoId' \
+                    or response['label'] == 'record_id' or response['label'] == 'colector_id':
                     continue
                 # input_id=response['input_id']
                 # entrada = Entrada.objects.get(id = int(input_id))
@@ -152,7 +177,7 @@ def generate_xls_report(id, email):
                 ),
 
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email,email2],
                 html_message="Por favor descargue su reporte desde <a href='http://%s.s3.amazonaws.com/%s'>esta url</a> " % (
                     colector_settings.AWS_STORAGE_BUCKET_NAME_REPORTS,
                     s3_file_name
@@ -163,7 +188,7 @@ def generate_xls_report(id, email):
                 "Reporte Colector",
                 "Adjunto le enviamos el archivo con su reporte",
                 "Andres de Colector <andres@colector.co>",
-                [email],
+                [email,email2],
             )
             file_to_attach = open('reporttq.xlsx', 'r')
             data = file_to_attach.read()

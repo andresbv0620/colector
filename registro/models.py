@@ -1,3 +1,4 @@
+#! -*- coding: UTF-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
 # from sortedm2m.fields import SortedManyToManyField
@@ -5,6 +6,9 @@ from django.contrib.auth.models import User
 
 
 class Empresa(models.Model):
+    """
+    Entidad que agrupa colectorios con formularios y dispositivos
+    """
     usuario = models.OneToOneField(User)
     codigo_secreto = models.CharField(max_length=50)
     nombre = models.CharField(max_length=50, blank=True, unique=True)
@@ -27,6 +31,9 @@ class Empresa(models.Model):
 
 
 class Tablet(models.Model):
+    """
+    Identificador para tabletas
+    """
     codigo = models.CharField(max_length=50, blank=True, unique=True)
 
     def __unicode__(self):
@@ -34,6 +41,9 @@ class Tablet(models.Model):
 
 
 class Colector(models.Model):
+    """
+    Usuario del sistema que está asociado a una empresa y puede diligenciar formularios
+    """
     usuario = models.OneToOneField(User, blank=True)
     respuesta = models.ManyToManyField('Respuesta', blank=True)
 
@@ -42,6 +52,9 @@ class Colector(models.Model):
 
 
 class Plan(models.Model):
+    """
+    Entidad para el manejo de planes de recolección. Actualmente no está en uso
+    """
     nombre = models.CharField(max_length=50, blank=True, unique=True)
     almacenamiento = models.CharField(max_length=50, blank=True, unique=True)
     cantidad_colectores = models.IntegerField(blank=True, unique=True)
@@ -61,6 +74,9 @@ IF_CHOICES = (
 
 
 class Formulario(models.Model):
+    """
+    Entidad principal de agrupamiento. Una empresa tiene varios formularios
+    """
     nombre = models.CharField(max_length=50, blank=True, unique=False)
     descripcion = models.TextField(max_length=100, blank=True)
     ficha = models.ManyToManyField('Ficha', blank=True)
@@ -84,6 +100,10 @@ class Formulario(models.Model):
 
 
 class PermisoFormulario(models.Model):
+    """
+    Regla de visibilidad de formularios para colectores. Únicamente los colectores relacionados en esta relación
+    con los formularios podrán llenar los formularios
+    """
     formulario = models.ForeignKey('Formulario')
     colectores = models.ManyToManyField('Colector')
 
@@ -92,6 +112,9 @@ class PermisoFormulario(models.Model):
 
 
 class Ficha(models.Model):
+    """
+    Entidad de separación de los formularios. Un formulario está compuesto por muchas fichas
+    """
     nombre = models.CharField(max_length=50, blank=True, unique=False)
     descripcion = models.TextField(max_length=100, blank=True)
     # entrada = SortedManyToManyField('Entrada')
@@ -105,6 +128,9 @@ class Ficha(models.Model):
     def __unicode__(self):
         return self.nombre
 
+"""
+Tipos de preguntas
+"""
 TEXTO = '1'
 PARRAFO = '2'
 OPCION = '3'
@@ -145,6 +171,9 @@ ENTRADA_CHOICES = (
 
 
 class Entrada(models.Model):
+    """
+    Entidad central de respuesta. Relaciona un nombre de pregunta con un tipo de pregunta
+    """
     tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
     nombre = models.CharField(max_length=500, blank=True, unique=False)
     descripcion = models.TextField(max_length=100, blank=True)
@@ -160,6 +189,9 @@ class Entrada(models.Model):
 
 
 class AsignacionEntrada(models.Model):
+    """
+    Relaciona la visibilidad de una entrada dentro de una ficha de un formulario
+    """
     ficha = models.ForeignKey(Ficha, on_delete=models.CASCADE)
     entrada = models.ForeignKey(Entrada, on_delete=models.CASCADE)
     orden = models.PositiveIntegerField()
@@ -172,6 +204,7 @@ class AsignacionEntrada(models.Model):
     maximo = models.PositiveIntegerField(blank=True, null=True)
     minimo = models.PositiveIntegerField(blank=True, null=True)
     validacion = models.CharField(max_length=50, blank=True, unique=False)
+
     regla_visibilidad = models.ForeignKey(
         'ReglaVisibilidad',
         related_name='visibilizar',
@@ -179,6 +212,7 @@ class AsignacionEntrada(models.Model):
         null=True,
         unique=False
     )
+
     formulario_asociado = models.ForeignKey(
         'FormularioAsociado',
         related_name='formasociado',
@@ -193,6 +227,9 @@ class AsignacionEntrada(models.Model):
     def __unicode__(self):
         return "Asignacion de entrada %s" % unicode(self.entrada) + " a %s" % unicode(self.ficha)
 
+"""
+Reglas de visibilidad para las preguntas
+"""
 Iguala = 'igual_a'
 Noiguala = 'no_igual_a'
 Contiene = 'contiene'
@@ -214,6 +251,9 @@ OPERADOR_CHOICES = (
 
 
 class ReglaVisibilidad(models.Model):
+    """
+    Define cuando una encuesta es visible o no
+    """
     elemento = models.ForeignKey(Entrada, on_delete=models.CASCADE, blank=False, null=False)
     operador = models.CharField(max_length=50, choices=OPERADOR_CHOICES, blank=False, null=False, unique=False)
     valor = models.CharField(max_length=100, blank=False, null=False, unique=False)
@@ -248,7 +288,12 @@ class FormularioAsociado(models.Model):
 
 
 class ReglaAutollenado(models.Model):
-    asociacion = models.ForeignKey(FormularioAsociado, on_delete=models.CASCADE, blank=False, null=False)
+    asociacion = models.ForeignKey(
+        FormularioAsociado,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False
+    )
     entrada_fuente = models.ForeignKey(
         Entrada,
         related_name='entradafuente',

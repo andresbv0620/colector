@@ -4,6 +4,9 @@ import codecs
 from django.core import serializers
 # =============== Funciones para leer CSV formato UTF - 8 ===============
 
+PREGUNTA_FARMACIA = 997
+PREGUNTA_DEPENDIENTE = 998
+
 
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     """
@@ -43,7 +46,7 @@ def extract_tq_dependientes(path):
     Para usar desde consola.
     Uso:
 from registro import utils
-a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_simple.csv')
+a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
     :param path: Ruta del archivo TQ en formato CSV
     :return: a: Arbol de información, Lista con Representantes, Lista con Farmacias y Lista con Dependientes
     """
@@ -60,27 +63,27 @@ a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects
 
     arbol = dict()
     for r in reader:
-        print line
+        # print line
         line += 1
-        if line == 1:
+        if line < 3:
             continue
         if not r[2] in ids_representantes:
             ids_representantes.append(r[2])
             representantes.append(extraer_representante(r))
-            arbol[r[2]] = dict()
-            arbol[r[2]]['farmacias'] = []
-        print arbol
-        ubicacion_farmacia = buscar_en_arreglo(r[4], arbol[r[2]]['farmacias'])
+            arbol[r[2]] = []
+            # arbol[r[2]]['farmacias'] = []
+        # print arbol
+        ubicacion_farmacia = buscar_en_arreglo(r[4], arbol[r[2]])
         if ubicacion_farmacia == -1:
-            ubicacion_farmacia = len(arbol[r[2]]['farmacias'])
+            ubicacion_farmacia = len(arbol[r[2]])
             farmacias.append(extraer_farmacia(r))
-            arbol[r[2]]['farmacias'].append({'id': r[4], 'dependientes': []})
-        print arbol
-        ubicacion_dependiente = buscar_en_arreglo(r[7], arbol[r[2]]['farmacias'][ubicacion_farmacia]['dependientes'])
+            arbol[r[2]].append({'id': r[4], 'dependientes': []})
+        # print arbol
+        ubicacion_dependiente = buscar_en_arreglo(r[7], arbol[r[2]][ubicacion_farmacia]['dependientes'])
         if ubicacion_dependiente == -1:
             dependientes.append(extraer_dependiente(r))
-            arbol[r[2]]['farmacias'][ubicacion_farmacia]['dependientes'].append({'id': r[7]})
-        print arbol
+            arbol[r[2]][ubicacion_farmacia]['dependientes'].append({'id': r[7]})
+        # print arbol
 
     return (
         arbol,
@@ -125,10 +128,10 @@ def extraer_farmacia(r):
     """
     farmacia = dict()
     farmacia['id'] = r[4]
-    farmacia['nombre'] = r[6]
-    farmacia['codigo_tq'] = r[5]
-    farmacia['ciudad'] = r[1]
-    farmacia['departamento'] = r[0]
+    # farmacia['nombre'] = r[6]
+    # farmacia['codigo_tq'] = r[5]
+    farmacia['1000'] = r[1]
+    farmacia['999'] = r[0]
     return farmacia
 
 
@@ -140,28 +143,109 @@ def extraer_dependiente(r):
     """
     dependiente = dict()
     dependiente['id'] = r[7]
-    dependiente['tipoDocumento'] = r[8]
-    dependiente['documento'] = r[9]
-    dependiente['habeas_data'] = r[10]
-    dependiente['cedula_validada'] = r[11]
-    dependiente['nombres'] = r[12]
-    dependiente['apellidos'] = r[13]
-    dependiente['fecha_nacimiento'] = r[14]
-    dependiente['genero'] = r[15]
-    dependiente['estado_civil'] = r[16]
-    dependiente['email'] = r[17]
-    dependiente['telefono_fijo'] = r[18]
-    dependiente['telefono_celular'] = r[19]
-    dependiente['telefono_farmacia'] = r[20]
-    dependiente['tecnico_auxiliar'] = r[21]
-    dependiente['hijos'] = r[22]
-    dependiente['parentezco_familiar'] = r[23]
-    dependiente['nombre_familiar'] = r[24]
-    dependiente['nacimiento_familiar'] = r[25]
-    dependiente['sexo_familiar'] = r[26]
+    dependiente['1003'] = r[8]
+    dependiente['1004'] = r[9]
+    # dependiente['habeas_data'] = r[10]
+    # dependiente['cedula_validada'] = r[11]
+    dependiente['1005'] = r[12]
+    dependiente['1006'] = r[13]
+    dependiente['1007'] = r[14]
+    dependiente['1008'] = r[15]
+    dependiente['1009'] = r[16]
+    dependiente['1010'] = r[17]
+    dependiente['1012'] = r[18]
+    dependiente['1013'] = r[19]
+    dependiente['1014'] = r[20]
+    dependiente['1016'] = r[21]
+    # dependiente['hijos'] = r[22]
+    # dependiente['parentezco_familiar'] = r[23]
+    # dependiente['nombre_familiar'] = r[24]
+    # dependiente['nacimiento_familiar'] = r[25]
+    # dependiente['sexo_familiar'] = r[26]
 
     return dependiente
 
+
+def cargar_arbol_a_tuplas(arbol, representantes, farmacias, dependientes):
+    """
+    Carga toda la información de la estructura generada por extract_tq_dependientes a tuplas para insertar a la tabla respuesta
+from registro import utils
+a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d)
+    :param arbol: Arbol con los identificadores
+    :param representantes: información de los representantes
+    :param farmacias: Información de las farmacias
+    :param dependientes: Información de los dependientes
+    :return: Matriz con informacion insertada
+    """
+    tuplas_insertadas = []
+
+    for id_representante, farmacias_representante in arbol.iteritems():
+        for farmacia in farmacias_representante:
+            id_farmacia = farmacia['id']
+            dependientes_farmacia = farmacia['dependientes']
+            tuplas_insertadas.append(
+                (PREGUNTA_FARMACIA, id_farmacia, None, None)
+            )
+            for dependiente_farmacia in dependientes_farmacia:
+                id_dependiente = dependiente_farmacia['id']
+                tuplas_insertadas.append(
+                    (PREGUNTA_DEPENDIENTE, id_dependiente, PREGUNTA_FARMACIA, id_farmacia)
+                )
+                index_dependiente = buscar_en_arreglo(id_dependiente, dependientes)
+                if index_dependiente > -1:
+                    dependiente = dependientes[index_dependiente]
+                    dependientes.remove(dependiente)
+                    print "Dependiente", dependiente['1004']
+                    # print dependiente
+                    dependiente.pop('id')
+                    # print dependiente
+                    for id_entrada, valor in dependiente.iteritems():
+                        tuplas_insertadas.append(
+                            (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente)
+                        )
+                else:
+                    print ("Esto no debería pasar, revisar el id_dependiente %s" % id_dependiente['id'])
+    return tuplas_insertadas
+
+
+def cargar_tuplas_a_bd(lista_tuplas):
+    """
+    Recibe una lista de tuplas y las inserta a la bd, cuyo primer elemento es el ID de entrada, el segundo el valor, el
+    tercero el id de la entrada condicional y el 4 el valor de la entrada condicional
+from registro import utils
+a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d)
+utils.cargar_tuplas_a_bd(t)
+    :param lista_tuplas: Lista de tuplas
+    :return: None
+    """
+    from . import models
+    for id_entrada, valor, pregunta, valor_pregunta in lista_tuplas:
+        entrada = models.Entrada.objects.get(pk=id_entrada)
+        nueva_respuesta = models.Respuesta(
+            valor=valor,
+        )
+        if pregunta is not None:
+            nueva_respuesta.pregunta_id = int(pregunta)
+            nueva_respuesta.respuesta = valor_pregunta
+        nueva_respuesta.save()
+        entrada.respuesta.add(nueva_respuesta)
+        print nueva_respuesta
+
+
+def eliminar_todas_respuestas():
+    """
+    Elimina todas las respuestas de la base de datos
+    Usese con moderación
+from registro import utils
+utils.eliminar_todas_respuestas()
+    :return: None
+    """
+    from . import models
+    todas_las_respuestas = models.Respuesta.objects.all()
+    for r in todas_las_respuestas:
+        r.delete()
 
 # ============ Obtener todo lo relacionado con un formulario ===========
 

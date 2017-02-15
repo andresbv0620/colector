@@ -315,6 +315,10 @@ class ReglaAutollenado(models.Model):
 
 class Respuesta(models.Model):
     valor = models.CharField(max_length=500, blank=True, unique=False)
+    # Filtro condicional
+    pregunta_id = models.PositiveIntegerField(blank=True, null=True)
+    respuesta = models.CharField(max_length=500, blank=True, null=True)
+    usuario = models.ForeignKey(User, null=True)
 
     class Meta:
         ordering = ('id',)

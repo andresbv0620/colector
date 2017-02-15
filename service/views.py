@@ -368,8 +368,8 @@ class GetForms(View):
                                             for rautollenar in asignacionentrada.formulario_asociado.\
                                                     reglaautollenado_set.all():
                                                 regllenado={}
-                                                regllenado['entrada_fuente']=rautollenar.entrada_fuente.id
-                                                regllenado['entrada_destino']=rautollenar.entrada_destino.id
+                                                regllenado['entrada_fuente'] = rautollenar.entrada_fuente.id
+                                                regllenado['entrada_destino'] = rautollenar.entrada_destino.id
                                                 asociate_form['autollenar'].append(regllenado)
 
                                         else:
@@ -389,10 +389,10 @@ class GetForms(View):
                                         )
                                         arrayChecker=[]
                                         for record in document_filled_forms:
-                                            if record['form_id']!=str(formasociado.form_asociado.id):
+                                            if record['form_id'] != str(formasociado.form_asociado.id):
                                                 pass
                                             else:
-                                                record["rows"]["record_id"]=str(record["rows"]["record_id"])
+                                                record["rows"]["record_id"] = str(record["rows"]["record_id"])
 
                                                 # La siguiente linea crea el nodo formula para hacer el calculo del
                                                 # valor de cada producto SOLO EN ORDEN VENTA
@@ -465,6 +465,7 @@ class GetForms(View):
                                                         if len(entrada_anidada.respuesta.all()):
                                                             objeto_atributos["responses"]=[]
                                                             for r in entrada_anidada.respuesta.all():
+                                                                # TODO Filter by user
                                                                 respuestaAnidada = {}
                                                                 respuestaAnidada['response_id'] = r.id
                                                                 respuestaAnidada['value'] = r.valor
@@ -479,9 +480,12 @@ class GetForms(View):
                                     if len(e.respuesta.all()):
                                         entrada['responses'] = []
                                         for r in e.respuesta.all():
+                                            # TODO Filter by user
                                             respuesta = {}
                                             respuesta['response_id'] = r.id
                                             respuesta['value'] = r.valor
+                                            respuesta['pregunta'] = r.pregunta_id
+                                            respuesta['respuesta'] = r.respuesta
                                             entrada['responses'].append(respuesta)
                                     else:
                                         entrada['responses'] = []

@@ -185,12 +185,12 @@ t = utils.cargar_arbol_a_tuplas(a,b,c,d)
             id_farmacia = farmacia['id']
             dependientes_farmacia = farmacia['dependientes']
             tuplas_insertadas.append(
-                (PREGUNTA_FARMACIA, id_farmacia, None, None)
+                (PREGUNTA_FARMACIA, id_farmacia, None, None, id_representante)
             )
             for dependiente_farmacia in dependientes_farmacia:
                 id_dependiente = dependiente_farmacia['id']
                 tuplas_insertadas.append(
-                    (PREGUNTA_DEPENDIENTE, id_dependiente, PREGUNTA_FARMACIA, id_farmacia)
+                    (PREGUNTA_DEPENDIENTE, id_dependiente, PREGUNTA_FARMACIA, id_farmacia, id_representante)
                 )
                 index_dependiente = buscar_en_arreglo(id_dependiente, dependientes)
                 if index_dependiente > -1:
@@ -202,7 +202,7 @@ t = utils.cargar_arbol_a_tuplas(a,b,c,d)
                     # print dependiente
                     for id_entrada, valor in dependiente.iteritems():
                         tuplas_insertadas.append(
-                            (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente)
+                            (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente, id_representante)
                         )
                 else:
                     print ("Esto no debería pasar, revisar el id_dependiente %s" % id_dependiente['id'])
@@ -221,7 +221,7 @@ utils.cargar_tuplas_a_bd(t)
     :return: None
     """
     from . import models
-    for id_entrada, valor, pregunta, valor_pregunta in lista_tuplas:
+    for id_entrada, valor, pregunta, valor_pregunta, id_representante in lista_tuplas:
         entrada = models.Entrada.objects.get(pk=id_entrada)
         nueva_respuesta = models.Respuesta(
             valor=valor,
@@ -229,9 +229,19 @@ utils.cargar_tuplas_a_bd(t)
         if pregunta is not None:
             nueva_respuesta.pregunta_id = int(pregunta)
             nueva_respuesta.respuesta = valor_pregunta
+            nueva_respuesta.usuario = obtener_usuario_de_id_representante(id_representante)
         nueva_respuesta.save()
         entrada.respuesta.add(nueva_respuesta)
         print nueva_respuesta
+
+def obtener_usuario_de_id_representante(id_representante):
+    """
+    Obtiene un usuario dado un id de representante
+    :param id_representante: id del representante
+    :return:
+    """
+    from django.contrib.auth.models import User
+    return User.objects.get(pk=1)
 
 
 def eliminar_todas_respuestas():

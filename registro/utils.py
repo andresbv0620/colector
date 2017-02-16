@@ -46,7 +46,7 @@ def extract_tq_dependientes(path):
     Para usar desde consola.
     Uso:
 from registro import utils
-a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+a,b,c,d, e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
     :param path: Ruta del archivo TQ en formato CSV
     :return: a: Arbol de información, Lista con Representantes, Lista con Farmacias y Lista con Dependientes
     """
@@ -60,6 +60,8 @@ a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects
     farmacias = []
     ids_dependientes = []
     dependientes = []
+    ids_beneficiarios = []
+    beneficiarios = []
 
     arbol = dict()
     for r in reader:
@@ -82,6 +84,7 @@ a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects
         ubicacion_dependiente = buscar_en_arreglo(r[7], arbol[r[2]][ubicacion_farmacia]['dependientes'])
         if ubicacion_dependiente == -1:
             dependientes.append(extraer_dependiente(r))
+            beneficiarios.append(extraer_beneficiarios(r))
             arbol[r[2]][ubicacion_farmacia]['dependientes'].append({'id': r[7]})
         # print arbol
 
@@ -89,7 +92,8 @@ a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects
         arbol,
         representantes,
         farmacias,
-        dependientes
+        dependientes,
+        beneficiarios
     )
 
 
@@ -166,16 +170,66 @@ def extraer_dependiente(r):
     return dependiente
 
 
-def cargar_arbol_a_tuplas(arbol, representantes, farmacias, dependientes):
+def extraer_beneficiarios(r):
+    """
+    Dada una fila de un archivo CSV extrae la información de los beneficiarios
+    :param r: Fila de archivo CSv
+    :return: beneficiarios
+    """
+    beneficiario = dict()
+    beneficiario['id'] = r[7]
+    beneficiario['beneficiarios'] = []
+    parentescos = r[23].split(",")
+    nombres = r[24].split(",")
+    nacimientos = r[25].split(",")
+    sexos = r[26].split(",")
+    max_items = max(
+        len(parentescos),
+        len(nombres),
+        len(nacimientos),
+        len(sexos),
+    )
+    for i in range(max_items):
+        parentesco = ""
+        nombre = ""
+        nacimiento = ""
+        sexo = ""
+        try:
+            parentesco = parentescos[i]
+        except IndexError as ie:
+            pass
+        try:
+            nombre = nombres[i]
+        except IndexError as ie:
+            pass
+        try:
+            nacimiento = nacimientos[i]
+        except IndexError as ie:
+            pass
+        try:
+            sexo = sexos[i]
+        except IndexError as ie:
+            pass
+        b = dict()
+        b['1020'] = parentesco
+        b['1021'] = nombre
+        b['1022'] = nacimiento
+        b['1023'] = sexo
+        beneficiario['beneficiarios'].append(b)
+    return beneficiario
+
+
+def cargar_arbol_a_tuplas(arbol, representantes, farmacias, dependientes, beneficiarios):
     """
     Carga toda la información de la estructura generada por extract_tq_dependientes a tuplas para insertar a la tabla respuesta
 from registro import utils
-a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
-t = utils.cargar_arbol_a_tuplas(a,b,c,d)
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
     :param arbol: Arbol con los identificadores
     :param representantes: información de los representantes
     :param farmacias: Información de las farmacias
     :param dependientes: Información de los dependientes
+    :param beneificiarios: Información de los beneficiarios
     :return: Matriz con informacion insertada
     """
     tuplas_insertadas = []
@@ -194,6 +248,7 @@ t = utils.cargar_arbol_a_tuplas(a,b,c,d)
                 )
                 index_dependiente = buscar_en_arreglo(id_dependiente, dependientes)
                 if index_dependiente > -1:
+                    # Adding dependientes
                     dependiente = dependientes[index_dependiente]
                     dependientes.remove(dependiente)
                     print "Dependiente", dependiente['1004']
@@ -204,6 +259,15 @@ t = utils.cargar_arbol_a_tuplas(a,b,c,d)
                         tuplas_insertadas.append(
                             (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente, id_representante)
                         )
+
+                    # Adding beneficiarios
+                    beneficiario = beneficiarios[index_dependiente]
+                    beneficiarios.remove(beneficiario)
+                    for b in beneficiario['beneficiarios']:
+                        for id_entrada, valor in b.iteritems():
+                            tuplas_insertadas.append(
+                                (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente, id_representante)
+                            )
                 else:
                     print ("Esto no debería pasar, revisar el id_dependiente %s" % id_dependiente['id'])
     return tuplas_insertadas
@@ -233,6 +297,7 @@ utils.cargar_tuplas_a_bd(t)
         nueva_respuesta.save()
         entrada.respuesta.add(nueva_respuesta)
         print nueva_respuesta
+
 
 def obtener_usuario_de_id_representante(id_representante):
     """

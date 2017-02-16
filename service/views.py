@@ -484,8 +484,8 @@ class GetForms(View):
                                             respuesta = {}
                                             respuesta['response_id'] = r.id
                                             respuesta['value'] = r.valor
-                                            respuesta['pregunta'] = r.pregunta_id
-                                            respuesta['respuesta'] = r.respuesta
+                                            respuesta['question_id'] = r.pregunta_id
+                                            respuesta['answer'] = r.respuesta
                                             entrada['responses'].append(respuesta)
                                     else:
                                         entrada['responses'] = []

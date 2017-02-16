@@ -204,7 +204,7 @@ class AsignacionEntrada(models.Model):
     maximo = models.PositiveIntegerField(blank=True, null=True)
     minimo = models.PositiveIntegerField(blank=True, null=True)
     validacion = models.CharField(max_length=50, blank=True, unique=False)
-
+    filtrar = models.BooleanField(default=False)
     regla_visibilidad = models.ForeignKey(
         'ReglaVisibilidad',
         related_name='visibilizar',
@@ -318,7 +318,7 @@ class Respuesta(models.Model):
     # Filtro condicional
     pregunta_id = models.PositiveIntegerField(blank=True, null=True)
     respuesta = models.CharField(max_length=500, blank=True, null=True)
-    usuario = models.ForeignKey(User, null=True)
+    usuario = models.ForeignKey(User, null=True, blank=True)
 
     class Meta:
         ordering = ('id',)

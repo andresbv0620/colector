@@ -65,10 +65,10 @@ a,b,c,d, e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/proje
 
     arbol = dict()
     for r in reader:
-        # print line
         line += 1
         if line < 3:
             continue
+
         if not r[2] in ids_representantes:
             ids_representantes.append(r[2])
             representantes.append(extraer_representante(r))
@@ -225,6 +225,24 @@ def cargar_arbol_a_tuplas(arbol, representantes, farmacias, dependientes, benefi
 from registro import utils
 a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+
+# Solo para testing
+from registro import utils
+# Eliminamos las respuestas
+utils.eliminar_todas_respuestas()
+# Cargamos las respuestas del formulario
+utils.guardar_archivo_serializado_base_de_datos('data.json')
+# Cargamos la data al formulario
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+utils.cargar_tuplas_a_bd(t)
+
+# Verificar departamento y ciudad
+from pprint import pprint
+from registro import utils
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+pprint(t)
     :param arbol: Arbol con los identificadores
     :param representantes: información de los representantes
     :param farmacias: Información de las farmacias
@@ -241,6 +259,17 @@ t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
             tuplas_insertadas.append(
                 (PREGUNTA_FARMACIA, id_farmacia, None, None, id_representante)
             )
+            index_farmacia = buscar_en_arreglo(id_farmacia, farmacias)
+            if index_farmacia > -1:
+                print index_farmacia
+                farmacia = farmacias[index_farmacia]
+                farmacias.remove(farmacia)
+                farmacia.pop('id')
+                print farmacia
+                for id_entrada, valor in farmacia.iteritems():
+                    tuplas_insertadas.append(
+                        (id_entrada, valor, PREGUNTA_FARMACIA, id_farmacia, id_representante)
+                    )
             for dependiente_farmacia in dependientes_farmacia:
                 id_dependiente = dependiente_farmacia['id']
                 tuplas_insertadas.append(
@@ -278,8 +307,21 @@ def cargar_tuplas_a_bd(lista_tuplas):
     Recibe una lista de tuplas y las inserta a la bd, cuyo primer elemento es el ID de entrada, el segundo el valor, el
     tercero el id de la entrada condicional y el 4 el valor de la entrada condicional
 from registro import utils
-a,b,c,d = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
-t = utils.cargar_arbol_a_tuplas(a,b,c,d)
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+utils.cargar_tuplas_a_bd(t)
+
+
+# Prueba con archivo completo
+from registro import utils
+# Eliminamos las respuestas
+utils.eliminar_todas_respuestas()
+# Cargamos las respuestas del formulario
+utils.guardar_archivo_serializado_base_de_datos('data.json')
+# Cargamos la data al formulario
+from registro import utils
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_simple.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
 utils.cargar_tuplas_a_bd(t)
     :param lista_tuplas: Lista de tuplas
     :return: None
@@ -322,6 +364,32 @@ utils.eliminar_todas_respuestas()
     for r in todas_las_respuestas:
         r.delete()
 
+
+def eliminar_respuestas_formulario(id_formulario):
+    """
+    Elimina todas las respuestas relacionadas con un formulario de la base de datos
+    Usese con moderación
+from registro import utils
+utils.eliminar_respuestas_formulario(229)
+    :param id_formulario: Id del formulario
+    :return:
+    """
+    from . import models
+    try:
+        formulario = models.Formulario.objects.get(pk=id_formulario)
+        fichas = formulario.ficha.all()
+        entradas_ids = []
+        for ficha in fichas:
+            entradas_ids.extend([x.id for x in ficha.entrada.all()])
+        entradas = models.Entrada.objects.filter(id__in=entradas_ids)
+        respuestas_ids = []
+        for entrada in entradas:
+            respuestas_ids.extend([x.id for x in entrada.respuesta.all()])
+        respuestas = models.Respuesta.objects.filter(id__in=respuestas_ids)
+        for r in respuestas:
+            r.delete()
+    except models.Formulario.DoesNotExist:
+        print ("El formulario no existe")
 # ============ Obtener todo lo relacionado con un formulario ===========
 
 def extracer_formulario(id):

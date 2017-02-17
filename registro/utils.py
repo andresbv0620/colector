@@ -46,7 +46,7 @@ def extract_tq_dependientes(path):
     Para usar desde consola.
     Uso:
 from registro import utils
-a,b,c,d, e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+a,b,c,d, e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple_ajustado.csv')
     :param path: Ruta del archivo TQ en formato CSV
     :return: a: Arbol de información, Lista con Representantes, Lista con Farmacias y Lista con Dependientes
     """
@@ -240,7 +240,7 @@ utils.cargar_tuplas_a_bd(t)
 # Verificar departamento y ciudad
 from pprint import pprint
 from registro import utils
-a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple_ajustado.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
 pprint(t)
     :param arbol: Arbol con los identificadores
@@ -253,6 +253,7 @@ pprint(t)
     tuplas_insertadas = []
 
     for id_representante, farmacias_representante in arbol.iteritems():
+        print ("Id Representante", id_representante)
         for farmacia in farmacias_representante:
             id_farmacia = farmacia['id']
             dependientes_farmacia = farmacia['dependientes']
@@ -261,11 +262,9 @@ pprint(t)
             )
             index_farmacia = buscar_en_arreglo(id_farmacia, farmacias)
             if index_farmacia > -1:
-                print index_farmacia
                 farmacia = farmacias[index_farmacia]
                 farmacias.remove(farmacia)
                 farmacia.pop('id')
-                print farmacia
                 for id_entrada, valor in farmacia.iteritems():
                     tuplas_insertadas.append(
                         (id_entrada, valor, PREGUNTA_FARMACIA, id_farmacia, id_representante)
@@ -280,7 +279,6 @@ pprint(t)
                     # Adding dependientes
                     dependiente = dependientes[index_dependiente]
                     dependientes.remove(dependiente)
-                    print "Dependiente", dependiente['1004']
                     # print dependiente
                     dependiente.pop('id')
                     # print dependiente
@@ -307,7 +305,7 @@ def cargar_tuplas_a_bd(lista_tuplas):
     Recibe una lista de tuplas y las inserta a la bd, cuyo primer elemento es el ID de entrada, el segundo el valor, el
     tercero el id de la entrada condicional y el 4 el valor de la entrada condicional
 from registro import utils
-a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple_ajustado.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
 utils.cargar_tuplas_a_bd(t)
 
@@ -320,7 +318,8 @@ utils.eliminar_todas_respuestas()
 utils.guardar_archivo_serializado_base_de_datos('data.json')
 # Cargamos la data al formulario
 from registro import utils
-a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_simple.csv')
+utils.eliminar_respuestas_formulario(229)
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
 utils.cargar_tuplas_a_bd(t)
     :param lista_tuplas: Lista de tuplas
@@ -331,14 +330,55 @@ utils.cargar_tuplas_a_bd(t)
         entrada = models.Entrada.objects.get(pk=id_entrada)
         nueva_respuesta = models.Respuesta(
             valor=valor,
+            usuario=obtener_usuario_de_id_representante(id_representante)
         )
         if pregunta is not None:
             nueva_respuesta.pregunta_id = int(pregunta)
             nueva_respuesta.respuesta = valor_pregunta
-            nueva_respuesta.usuario = obtener_usuario_de_id_representante(id_representante)
         nueva_respuesta.save()
         entrada.respuesta.add(nueva_respuesta)
-        print nueva_respuesta
+
+
+def generar_archivo_sql(lista_tuplas, archivo):
+    """
+    Genera un archivo sql de nombre archivo para agilizar el proceso de subida de datos
+from registro import utils
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+utils.generar_archivo_sql(t, 'tq_dependientes_2.sql')
+    :param lista_tuplas: lista de tuplas
+    :param archivo nombre del archivo
+    :return:
+    """
+    archivo = codecs.open(archivo, 'w+', encoding="UTF-8")
+    from . import models
+    for id_entrada, valor, pregunta, valor_pregunta, id_representante in lista_tuplas:
+        entrada = models.Entrada.objects.get(pk=id_entrada)
+        nueva_respuesta = models.Respuesta(
+            valor=valor,
+        )
+        pregunta_id = 0
+        respuesta = ""
+        usuario=obtener_usuario_de_id_representante(id_representante).id
+
+        if pregunta is not None:
+            pregunta_id = int(pregunta)
+            respuesta = valor_pregunta
+        else:
+            pregunta_id = "NULL"
+            respuesta = ""
+        archivo.write(
+            "WITH X AS (INSERT INTO registro_respuesta (valor, pregunta_id, respuesta, usuario_id) VALUES ('%s',%s,'%s',%s) RETURNING id)\n" % (
+                nueva_respuesta.valor,
+                pregunta_id,
+                respuesta,
+                usuario
+            )
+        )
+        archivo.write(
+            "INSERT INTO registro_entrada_respuesta (entrada_id, respuesta_id) SELECT %d, id from X;\n" % entrada.id
+        )
+    archivo.close()
 
 
 def obtener_usuario_de_id_representante(id_representante):
@@ -348,7 +388,37 @@ def obtener_usuario_de_id_representante(id_representante):
     :return:
     """
     from django.contrib.auth.models import User
-    return User.objects.get(pk=1)
+    # Leer un archivo es muy pesado, así que se carga en memoria
+    a = dict()
+    a['10870'] = 577
+    a['14722'] = 578
+    a['6143'] = 579
+    a['7041'] = 580
+    a['6223'] = 581
+    a['10706'] = 582
+    a['10861'] = 583
+    a['10862'] = 584
+    a['10869'] = 585
+    a['10863'] = 586
+    a['9375'] = 587
+    a['5643'] = 588
+    a['5902'] = 589
+    a['8976'] = 590
+    a['8946'] = 591
+    a['11191'] = 592
+    a['12886'] = 593
+    a['11602'] = 594
+    a['14290'] = 595
+    a['12909'] = 596
+    a['11520'] = 597
+    a['13433'] = 598
+    a['2161'] = 599
+    a['7165'] = 600
+    a['14007'] = 601
+    a['13757'] = 602
+    a['4407'] = 603
+    a['14291'] = 604
+    return User.objects.get(pk=a[id_representante])
 
 
 def eliminar_todas_respuestas():

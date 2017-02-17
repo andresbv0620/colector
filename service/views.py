@@ -14,6 +14,7 @@ from django.views.generic import View
 from django.utils.decorators import method_decorator
 from django.utils.encoding import smart_str, smart_unicode
 from django.views.decorators.csrf import csrf_exempt
+from django.db.models import Q
 from registro.models import PermisoFormulario, Colector, Formulario, Entrada, Empresa, Entrada, Respuesta, ReglaVisibilidad, FormularioAsociado, AsignacionEntrada
 import json
 from bson import json_util
@@ -480,7 +481,8 @@ class GetForms(View):
 
                                     if len(e.respuesta.all()):
                                         entrada['responses'] = []
-                                        for r in e.respuesta.all():
+                                        usuario = Colector.objects.get(usuario=colector_id).usuario
+                                        for r in e.respuesta.filter(Q(usuario=usuario) | Q(usuario=None)):
                                             # TODO Filter by user
                                             respuesta = {}
                                             respuesta['response_id'] = r.id

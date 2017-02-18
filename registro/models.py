@@ -175,7 +175,7 @@ class Entrada(models.Model):
     Entidad central de respuesta. Relaciona un nombre de pregunta con un tipo de pregunta
     """
     tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
-    nombre = models.CharField(max_length=2000, blank=True, unique=False)
+    nombre = models.CharField(max_length=3000, blank=True, unique=False)
     descripcion = models.TextField(max_length=100, blank=True)
     respuesta = models.ManyToManyField('Respuesta', blank=True)
 

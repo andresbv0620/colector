@@ -322,6 +322,14 @@ utils.eliminar_respuestas_formulario(229)
 a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ultra_simple.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
 utils.cargar_tuplas_a_bd(t)
+# Corregir el problema de beneficiarios
+from registro import utils
+utils.eliminar_respuestas_formulario(229)
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado_corregido_minimo.csv')
+t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
+# from pprint import pprint
+# pprint(t)
+utils.cargar_tuplas_a_bd(t)
     :param lista_tuplas: Lista de tuplas
     :return: None
     """
@@ -343,9 +351,9 @@ def generar_archivo_sql(lista_tuplas, archivo):
     """
     Genera un archivo sql de nombre archivo para agilizar el proceso de subida de datos
 from registro import utils
-a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado.csv')
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado_corregido.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
-utils.generar_archivo_sql(t, 'tq_dependientes_2.sql')
+utils.generar_archivo_sql(t, 'tq_dependientes_4.sql')
     :param lista_tuplas: lista de tuplas
     :param archivo nombre del archivo
     :return:
@@ -421,6 +429,113 @@ def obtener_usuario_de_id_representante(id_representante):
     return User.objects.get(pk=a[id_representante])
 
 
+
+def cargar_arbol_a_diccionario(arbol, representantes, farmacias, dependientes, beneficiarios):
+    """
+    Carga toda la información de la estructura generada por extract_tq_dependientes a documento json para insertar a mongo
+from registro import utils
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado_corregido_minimo.csv')
+t = utils.cargar_arbol_a_diccionario(a,b,c,d,e)
+from pprint import pprint
+pprint(t)
+    :param arbol: Arbol con los identificadores
+    :param representantes: información de los representantes
+    :param farmacias: Información de las farmacias
+    :param dependientes: Información de los dependientes
+    :param beneificiarios: Información de los beneficiarios
+    :return: Matriz con informacion insertada
+    """
+    documentos_insertados = []
+
+    for id_representante, farmacias_representante in arbol.iteritems():
+        print ("Id Representante", id_representante)
+        for farmacia in farmacias_representante:
+            id_farmacia = farmacia['id']
+            dependientes_farmacia = farmacia['dependientes']
+            # tuplas_insertadas.append(
+            #     (PREGUNTA_FARMACIA, id_farmacia, None, None, id_representante)
+            # )
+            index_farmacia = buscar_en_arreglo(id_farmacia, farmacias)
+            if index_farmacia > -1:
+                farmacia = farmacias[index_farmacia]
+                farmacias.remove(farmacia)
+                farmacia.pop('id')
+                # for id_entrada, valor in farmacia.iteritems():
+                #     tuplas_insertadas.append(
+                #         (id_entrada, valor, PREGUNTA_FARMACIA, id_farmacia, id_representante)
+                #     )
+            documento = dict()
+            documento['colector_id'] = obtener_usuario_de_id_representante(id_representante).id
+            for dependiente_farmacia in dependientes_farmacia:
+                id_dependiente = dependiente_farmacia['id']
+                # tuplas_insertadas.append(
+                #     (PREGUNTA_DEPENDIENTE, id_dependiente, PREGUNTA_FARMACIA, id_farmacia, id_representante)
+                # )
+                index_dependiente = buscar_en_arreglo(id_dependiente, dependientes)
+                if index_dependiente > -1:
+                    # Adding dependientes
+                    dependiente = dependientes[index_dependiente]
+                    dependientes.remove(dependiente)
+                    # print dependiente
+                    dependiente.pop('id')
+                    # print dependiente
+                    responses = transformar_dicionario_a_json(dependiente)
+                    # Agregamos valores comunes
+                    responses += [
+                        {'input_id': PREGUNTA_FARMACIA, 'value': id_farmacia},
+                        {'input_id': PREGUNTA_DEPENDIENTE, 'value': id_dependiente},
+                    ]
+
+                    documento['responses']  = responses
+
+                    # Adding beneficiarios
+                    # beneficiario = beneficiarios[index_dependiente]
+                    # beneficiarios.remove(beneficiario)
+                    # for b in beneficiario['beneficiarios']:
+                    #     for id_entrada, valor in b.iteritems():
+                    #         tuplas_insertadas.append(
+                    #             (id_entrada, valor, PREGUNTA_DEPENDIENTE, id_dependiente, id_representante)
+                    #         )
+                else:
+                    print ("Esto no debería pasar, revisar el id_dependiente %s" % id_dependiente['id'])
+                documentos_insertados.append(documento)
+    return documentos_insertados
+
+
+def cargar_documentos_a_mongo(documentos):
+    """
+    Carga una lista de documentos a MongoDB
+from registro import utils
+a,b,c,d,e  = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado_corregido_minimo.csv')
+t = utils.cargar_arbol_a_diccionario(a,b,c,d,e)
+utils.cargar_documentos_a_mongo(t)
+    :param documentos: Lista de docmentos
+    :return: None
+    """
+    import pymongo
+    servidor = pymongo.MongoClient('localhost', 27017)
+    database = servidor.colector
+    for data in documentos:
+        database.filled_forms.insert(data)
+
+def transformar_dicionario_a_json(diccionario):
+    """
+    Transforma un diccionario a un documento json
+    :param diccionario: diccionario python
+    :return: documento string json
+    """
+    import json
+    documento_json = ""
+    respuestas = []
+    for id_entrada, valor in diccionario.iteritems():
+        d = dict()
+        d['input_id'] = id_entrada
+        d['value'] = valor
+        respuestas.append(d)
+    # documento_json = json.dumps(diccionario)
+    # return documento_json
+    return respuestas
+
 def eliminar_todas_respuestas():
     """
     Elimina todas las respuestas de la base de datos
@@ -456,6 +571,29 @@ utils.eliminar_respuestas_formulario(229)
         for entrada in entradas:
             respuestas_ids.extend([x.id for x in entrada.respuesta.all()])
         respuestas = models.Respuesta.objects.filter(id__in=respuestas_ids)
+        for r in respuestas:
+            r.delete()
+    except models.Formulario.DoesNotExist:
+        print ("El formulario no existe")
+
+
+def eliminar_respuestas_entrada(id_entrada):
+    """
+    Elimina todas las respuestas relacionadas a una entrada
+from registro import utils
+utils.eliminar_respuestas_entrada(1020)
+utils.eliminar_respuestas_entrada(1021)
+utils.eliminar_respuestas_entrada(1022)
+utils.eliminar_respuestas_entrada(1023)
+    :param id_entrada:
+    :return:
+    """
+    from . import models
+    try:
+        entrada = models.Entrada.objects.get(pk=id_entrada)
+        respuestas_ids = [x.id for x in entrada.respuesta.all()]
+        respuestas = models.Respuesta.objects.filter(id__in=respuestas_ids)
+        print (len(respuestas))
         for r in respuestas:
             r.delete()
     except models.Formulario.DoesNotExist:

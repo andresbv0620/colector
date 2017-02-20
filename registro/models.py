@@ -48,7 +48,7 @@ class Colector(models.Model):
     respuesta = models.ManyToManyField('Respuesta', blank=True)
 
     def __unicode__(self):
-        return self.usuario.username
+        return unicode(self.id) + " " + self.usuario.username
 
 
 class Plan(models.Model):

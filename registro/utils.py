@@ -6,6 +6,7 @@ from django.core import serializers
 
 PREGUNTA_FARMACIA = 997
 PREGUNTA_DEPENDIENTE = 998
+PREGUNTA_CEDULA = 1004
 
 
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
@@ -35,6 +36,37 @@ def utf_8_encoder(unicode_csv_data):
     """
     for line in unicode_csv_data:
         yield line.encode('utf-8')
+
+
+def merge_columns(path, output_path, column1, column2):
+    """
+    Toma un archivo csv y junta las columnas column1 y column2
+from registro import utils
+# utils.merge_columns('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep.csv', "/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep1.csv", 2, 4)
+# utils.merge_columns('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep1.csv', "/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep2.csv", 9, 7)
+# utils.merge_columns('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep2.csv', "/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep3.csv", 12, 7)
+utils.merge_columns('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep3.csv', "/Users/ma0/Desktop/contraslash/projects/colector_project/colector/nuevo_dep4.csv", 13, 7)
+    :param path: Ruta del archivo
+    :param output_path: Ruta destino del archivo
+    :param column1: Columna para juntar
+    :param column2: Columna para juntar
+    :return:
+    """
+    archivo = codecs.open(path, 'r', encoding="utf-8", errors='ignore')
+    salida = codecs.open(output_path, 'w+', encoding="utf-8")
+    lineas = archivo.readlines()
+    reader = unicode_csv_reader(lineas)
+
+    for r in reader:
+        for i in range(len(r)):
+            a = ""
+            if i == column2:
+                a = "\"%s %s\"," % (r[i], r[column1])
+            else:
+                a = "\"%s\"," % (r[i])
+            salida.write(a)
+        salida.write("\n")
+    salida.close()
 
 
 # ============== Extraer dependientes de TQ ===================
@@ -146,21 +178,46 @@ def extraer_dependiente(r):
     :return: Dependiente
     """
     dependiente = dict()
+    # Id Dependiente
     dependiente['id'] = r[7]
+    # Tipo Documento
     dependiente['1003'] = r[8]
+    # Identificacion
     dependiente['1004'] = r[9]
     # dependiente['habeas_data'] = r[10]
     # dependiente['cedula_validada'] = r[11]
+    # Nombres
     dependiente['1005'] = r[12]
+    # Apellidos
     dependiente['1006'] = r[13]
+    # Fecha de Nacimiento
     dependiente['1007'] = r[14]
+    # Genero
     dependiente['1008'] = r[15]
+    # Estado Civil
     dependiente['1009'] = r[16]
+    # Correo electrónico
     dependiente['1010'] = r[17]
-    dependiente['1012'] = r[18]
-    dependiente['1013'] = r[19]
-    dependiente['1014'] = r[20]
-    dependiente['1016'] = r[21]
+    # Deportes
+    dependiente['1026'] = r[18]
+    # Hobby Personal
+    dependiente['1027'] = r[19]
+    # Hobby Familiar
+    dependiente['1028'] = r[20]
+    # Nivel de Escolaridad
+    dependiente['1025'] = r[21]
+    # Telefono Fijo
+    dependiente['1012'] = r[22]
+    # Telefono Celular
+    dependiente['1013'] = r[23]
+    # Direccion
+    dependiente['1014'] = r[24]
+    # Numero de Hijos
+    dependiente['1029'] = r[25]
+    # Titulo Profesional
+    dependiente['1016'] = r[26]
+    # Servicios Adicionales
+    dependiente['1032'] = r[27]
     # dependiente['hijos'] = r[22]
     # dependiente['parentezco_familiar'] = r[23]
     # dependiente['nombre_familiar'] = r[24]
@@ -179,10 +236,10 @@ def extraer_beneficiarios(r):
     beneficiario = dict()
     beneficiario['id'] = r[7]
     beneficiario['beneficiarios'] = []
-    parentescos = r[23].split(",")
-    nombres = r[24].split(",")
-    nacimientos = r[25].split(",")
-    sexos = r[26].split(",")
+    parentescos = r[28].split(",")
+    nombres = r[29].split(",")
+    nacimientos = r[30].split(",")
+    sexos = r[31].split(",")
     max_items = max(
         len(parentescos),
         len(nombres),
@@ -351,9 +408,9 @@ def generar_archivo_sql(lista_tuplas, archivo):
     """
     Genera un archivo sql de nombre archivo para agilizar el proceso de subida de datos
 from registro import utils
-a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_ajustado_corregido.csv')
+a,b,c,d,e = utils.extract_tq_dependientes('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_definitivo.csv')
 t = utils.cargar_arbol_a_tuplas(a,b,c,d,e)
-utils.generar_archivo_sql(t, 'tq_dependientes_4.sql')
+utils.generar_archivo_sql(t, 'tq_dependientes_5.sql')
     :param lista_tuplas: lista de tuplas
     :param archivo nombre del archivo
     :return:
@@ -427,7 +484,6 @@ def obtener_usuario_de_id_representante(id_representante):
     a['4407'] = 603
     a['14291'] = 604
     return User.objects.get(pk=a[id_representante])
-
 
 
 def cargar_arbol_a_diccionario(arbol, representantes, farmacias, dependientes, beneficiarios):
@@ -513,10 +569,16 @@ utils.cargar_documentos_a_mongo(t)
     :return: None
     """
     import pymongo
+    from pymongo.errors import BulkWriteError
     servidor = pymongo.MongoClient('localhost', 27017)
     database = servidor.colector
-    for data in documentos:
-        database.filled_forms.insert(data)
+    try:
+        database.filled_forms.insert_many(documentos)
+    except BulkWriteError as bwe:
+        print(bwe.details)
+    # for data in documentos:
+    #     database.filled_forms.insert(data)
+
 
 def transformar_dicionario_a_json(diccionario):
     """
@@ -535,6 +597,55 @@ def transformar_dicionario_a_json(diccionario):
     # documento_json = json.dumps(diccionario)
     # return documento_json
     return respuestas
+
+
+def extraer_cedulas_no_validadas(path):
+    """
+    Recibe un archivo CSV de TQ y extrae una lista de las cedulas que deben ser validadas
+from registro import utils
+e = utils.extraer_cedulas_no_validadas('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_definitivo.csv')
+
+    :param path:
+    :return:
+    """
+    archivo = codecs.open(path, 'r', encoding="utf-8", errors='ignore')
+    lineas = archivo.readlines()
+    reader = unicode_csv_reader(lineas)
+    line = 0
+    cedulas_no_validadadas = set()
+
+    for r in reader:
+        line += 1
+        if line < 3:
+            continue
+
+        if r[11] == "0":
+            cedulas_no_validadadas.add(r[9])
+    return cedulas_no_validadadas
+
+
+def cambiar_texto_cedulas_no_validadas(cedulas_no_validadas):
+    """
+    Cambia el valor de una cédula
+from registro import utils
+e = utils.extraer_cedulas_no_validadas('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_definitivo.csv')
+utils.cambiar_texto_cedulas_no_validadas(e)
+    :param cedulas_no_validadas:
+    :return:
+    """
+    from registro import models
+    pregunta_cedula = models.Entrada.objects.get(pk=PREGUNTA_CEDULA)
+    todas_las_respuestas = pregunta_cedula.respuesta
+    for c in cedulas_no_validadas:
+        respuestas = todas_las_respuestas.filter(
+            valor=c
+        )
+        # for r in respuestas:
+        #     r.valor = "%s (verificar)" % r.valor
+        #     r.save()
+        if len(respuestas) > 1:
+            print (len(respuestas), respuestas)
+
 
 def eliminar_todas_respuestas():
     """
@@ -660,6 +771,7 @@ utils.guardar_tupla_archivo('data.json', utils.extracer_formulario(1))
     for elemento in tupla:
         archivo.write("%s\n" % elemento)
     archivo.close()
+
 
 def guardar_archivo_serializado_base_de_datos(path):
     """

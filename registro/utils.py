@@ -640,11 +640,11 @@ utils.cambiar_texto_cedulas_no_validadas(e)
         respuestas = todas_las_respuestas.filter(
             valor=c
         )
-        # for r in respuestas:
-        #     r.valor = "%s (verificar)" % r.valor
-        #     r.save()
-        if len(respuestas) > 1:
-            print (len(respuestas), respuestas)
+        for r in respuestas:
+            r.valor = "%s (verificar)" % r.valor
+            r.save()
+        # if len(respuestas) > 1:
+        #     print (len(respuestas), respuestas)
 
 
 def eliminar_todas_respuestas():

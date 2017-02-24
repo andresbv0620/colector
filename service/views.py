@@ -523,7 +523,14 @@ class GetForms(View):
                     f['latitude'] = formulario['rows']['latitud']
                     f['longitude'] = formulario['rows']['longitud']
                     f['record_id'] = formulario['rows']['record_id']
-                    f['responses'] = formulario['responses']
+                    responses = []
+                    for r in formulario['responses']:
+                        res = dict()
+                        res['idQuestion'] = r['input_id']
+                        res['value'] = [{'value': r['value']}]
+                        res['mType'] = r['tipo']
+                        responses.append(res)
+                    f['responses'] = responses
                     f['instanceId'] = formulario['rows']['form_id']
                     adapted_forms.append(f)
 

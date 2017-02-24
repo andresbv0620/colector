@@ -629,6 +629,10 @@ def cambiar_texto_cedulas_no_validadas(cedulas_no_validadas):
     Cambia el valor de una cédula
 from registro import utils
 e = utils.extraer_cedulas_no_validadas('/Users/ma0/Desktop/contraslash/projects/colector_project/colector/dependientes_definitivo.csv')
+
+# Produccion
+from registro import utils
+e = utils.extraer_cedulas_no_validadas('/home/ubuntu/colector/dependientes_definitivo.csv')
 utils.cambiar_texto_cedulas_no_validadas(e)
     :param cedulas_no_validadas:
     :return:

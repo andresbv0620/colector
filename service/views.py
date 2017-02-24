@@ -277,10 +277,13 @@ class GetForms(View):
                 # parseando formularios a json
                 resp['response_data'] = []
 
-                #Se genera el listado de formularios con su respectiva informacion
+                # Lista de todos los formularios llenados por el colector
+                formularios_llenados= []
+
+                # Se genera el listado de formularios con su respectiva informacion
                 for p in permiso_formularios:
 
-                    formulario = {}
+                    formulario = dict()
                     formulario['form_name'] = p.formulario.nombre
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
@@ -312,7 +315,7 @@ class GetForms(View):
                                 # Se genera la lista de inputs o entradas
                                 for e in f.entrada.all().order_by('asignacionentrada'):
 
-                                    entrada = {}
+                                    entrada = dict()
                                     entrada['input_id'] = e.id
 
                                     entrada['name'] = e.nombre
@@ -332,11 +335,11 @@ class GetForms(View):
                                     entrada['validacion'] = asignacionentrada.validacion
                                     entrada['filtrar'] = asignacionentrada.filtrar
 
-                                    if (asignacionentrada.regla_visibilidad == None):
-                                        entrada['valorvisibility'] =[]
+                                    if asignacionentrada.regla_visibilidad is None:
+                                        entrada['valorvisibility'] = []
                                     else:
-                                        entrada['valorvisibility']=[]
-                                        reglavisibilidadobject ={}
+                                        entrada['valorvisibility'] = []
+                                        reglavisibilidadobject = {}
                                         reglavisibilidad = ReglaVisibilidad.objects.get(visibilizar=asignacionentrada)
                                         reglavisibilidadobject['elemento'] = reglavisibilidad.elemento.id
                                         reglavisibilidadobject['operador'] = reglavisibilidad.operador
@@ -344,15 +347,14 @@ class GetForms(View):
 
                                         entrada['valorvisibility'].append(reglavisibilidadobject)
 
-
                                     # Se valida si tiene algun formulario asociado para precargar datos
-                                    if asignacionentrada.formulario_asociado == None:
-                                        entrada['asociate_form']=[]
+                                    if asignacionentrada.formulario_asociado is None:
+                                        entrada['asociate_form'] = []
                                     else:
-                                        entrada['asociate_form']=[]
-                                        atributos=[]
-                                        objetos=[]
-                                        registroOpcion={}                                        
+                                        entrada['asociate_form'] = []
+                                        atributos = []
+                                        objetos = []
+                                        registroOpcion = {}
                                         asociate_form = {}
                                         formasociado = FormularioAsociado.objects.get(formasociado=asignacionentrada)
 
@@ -369,7 +371,7 @@ class GetForms(View):
                                             
                                             for rautollenar in asignacionentrada.formulario_asociado.\
                                                     reglaautollenado_set.all():
-                                                regllenado={}
+                                                regllenado = {}
                                                 regllenado['entrada_fuente'] = rautollenar.entrada_fuente.id
                                                 regllenado['entrada_destino'] = rautollenar.entrada_destino.id
                                                 asociate_form['autollenar'].append(regllenado)
@@ -380,7 +382,6 @@ class GetForms(View):
                                         # asociate_form['entrada_fuente'] = formasociado.entrada_fuente.id
                                         # asociate_form['entrada_destino'] = formasociado.entrada_destino.id
 
-
                                         entrada['asociate_form'].append(asociate_form)
                                         entrada['options'] = []
                                         entrada['atributos'] = []
@@ -389,7 +390,7 @@ class GetForms(View):
                                                 "form_id": str(formasociado.form_asociado.id)
                                             }
                                         )
-                                        arrayChecker=[]
+                                        arrayChecker = []
                                         for record in document_filled_forms:
                                             if record['form_id'] != str(formasociado.form_asociado.id):
                                                 pass
@@ -404,8 +405,8 @@ class GetForms(View):
                                                 
                                                 # print record["responses"]
                                                 # Se itera sobre la opcion para sacar las variables de cada formula
-                                                precioProducto=0
-                                                ivaProducto=0
+                                                precioProducto = 0
+                                                ivaProducto = 0
                                                 for option_response in record["responses"]:
                                                     if option_response['tipo'] == "3" \
                                                             or option_response['tipo'] == "4" \
@@ -424,7 +425,7 @@ class GetForms(View):
                                                         ivaProducto=option_response["value"]
 
                                                 # Crea el nodo opciones en base a el registro en mongodb
-                                                optionsObject = {}
+                                                optionsObject = dict()
                                                 # TODO Transform String to Format String
                                                 optionsObject["formula"] = '('\
                                                                            + str(precioProducto)\
@@ -442,7 +443,6 @@ class GetForms(View):
 
                                                 # (json.dumps(f,default=json_util.default))
                                                 entrada['options'].append(optionsObject)
-
 
                                                 # Crear nodo ATRIBUTOS para cargar los campos de formulario anidado en
                                                 # caso de un nuevo registro
@@ -483,8 +483,7 @@ class GetForms(View):
                                         entrada['responses'] = []
                                         usuario = Colector.objects.get(usuario=colector_id).usuario
                                         for r in e.respuesta.filter(Q(usuario=usuario) | Q(usuario=None)):
-                                            # TODO Filter by user
-                                            respuesta = {}
+                                            respuesta = dict()
                                             respuesta['response_id'] = r.id
                                             respuesta['value'] = r.valor
                                             respuesta['question_id'] = r.pregunta_id
@@ -507,12 +506,34 @@ class GetForms(View):
 
                     resp['response_data'].append(formulario)
 
+                    formularios_llenados_del_form = []
+
+                    cursor = database.filled_forms.find({
+                        'colector_id': str(colector_id),
+                        'form_id': str(p.formulario.id)
+                    })
+
+                    for elemento in cursor:
+                        formularios_llenados.append(elemento)
+
+                adapted_forms = []
+
+                for formulario in formularios_llenados:
+                    f = dict()
+                    f['latitude'] = formulario['rows']['latitud']
+                    f['longitude'] = formulario['rows']['longitud']
+                    f['record_id'] = formulario['rows']['record_id']
+                    f['responses'] = formulario['responses']
+                    f['instanceId'] = formulario['rows']['form_id']
+                    adapted_forms.append(f)
+
                 resp['response_code'] = '200'
                 resp['response_description'] = str('forms found')
                 resp['body_received'] = str(request.body)
                 resp['body_expected'] = str('{"colector_id":" "}')
+                resp['filled_forms'] = adapted_forms
 
-                return HttpResponse(json.dumps(resp,default=json_util.default),
+                return HttpResponse(json.dumps(resp, default=json_util.default),
                                     content_type='application/json')
             else:
                 resp['response_code'] = '400'
@@ -790,7 +811,12 @@ class FillResponsesForm(View):
                 database.filled_forms.create_index("rows.record_id")
 
                 #Enviar correo
-                # imgurl="https://www.google.com.co/url?sa=t&rct=j&q=&esrc=s&source=web&cd=13&ved=0ahUKEwiDpKa52MnOAhUFXB4KHUTXADAQ8g0ITjAM&url=%2Fimgres%3Fimgurl%3Dhttps%3A%2F%2Fmedia.licdn.com%2Fmedia%2FAAEAAQAAAAAAAAbLAAAAJDUwOGQwN2QyLTA3ZGItNDcwNC1iN2E0LTY3ZTMwNzU4NzFlMQ.png%26imgrefurl%3Dhttps%3A%2F%2Fco.linkedin.com%2Fin%2Fandresbuitragof%26h%3D60%26w%3D60%26tbnid%3DwQK4SDF_D_ZGwM%26tbnh%3D60%26tbnw%3D60%26usg%3D__MLhkybNYaV66vDO9_vYV3iEjml0%3D%26docid%3D3a3EOf0w3y46iM&usg=AFQjCNFVRPhV_yTXa_ayXRanGcemGHBiqw&sig2=FjcBKuVJSLWHhOW5ScVeVQ"
+                imgurl="https://www.google.com.co/url?sa=t&rct=j&q=&esrc=s&source=web&cd=13&ved=0ahUKEwiDpKa52MnOAh" \
+                       "UFXB4KHUTXADAQ8g0ITjAM&url=%2Fimgres%3Fimgurl%3Dhttps%3A%2F%2Fmedia.licdn.com%2Fmedia%2FAAE" \
+                       "AAQAAAAAAAAbLAAAAJDUwOGQwN2QyLTA3ZGItNDcwNC1iN2E0LTY3ZTMwNzU4NzFlMQ.png%26imgrefurl%3Dhttps" \
+                       "%3A%2F%2Fco.linkedin.com%2Fin%2Fandresbuitragof%26h%3D60%26w%3D60%26tbnid%3DwQK4SDF_D_ZGwM%" \
+                       "26tbnh%3D60%26tbnw%3D60%26usg%3D__MLhkybNYaV66vDO9_vYV3iEjml0%3D%26docid%3D3a3EOf0w3y46iM&u" \
+                       "sg=AFQjCNFVRPhV_yTXa_ayXRanGcemGHBiqw&sig2=FjcBKuVJSLWHhOW5ScVeVQ"
                 # imgalt = "alternativa"
                 # useremail = "andresbuitragof@gmail.com"
 
@@ -1336,6 +1362,7 @@ class EditResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
+
 class RegisterUsersCsv(UploadData, View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -1452,10 +1479,14 @@ def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, *
     if colector_id==None and page!=1:
         return database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
     else:
-        return database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+        return database.filled_forms.find({
+            "$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}],
+            '_id':{"$lt": ObjectId(lastid)}}
+        ).limit(limit).sort("_id",-1)
+
 
 def FormIdReportPagServer(request, id):
-    #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
+    # Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
     getcolumns=request.GET.get('getcolumns')
 
     if getcolumns=='true':
@@ -1517,12 +1548,12 @@ def FormIdReportPagServer(request, id):
             resp['response_code'] = '404'
             resp['response_description'] = 'No hay registros'
             return HttpResponse(json.dumps(resp, default=json_util.default), content_type='application/json')
-    #Setting Pagination
+    # Setting Pagination
     offset=int(request.GET.get('offset', 10))
     limit=int(request.GET.get('limit', 10))
-    #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
+    # sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
     page=(int(request.GET.get('offset', 0)))/limit+1
-    #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
+    # filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
     colector_id=request.GET.get('colector_id')
 
     lastid=0
@@ -1533,8 +1564,14 @@ def FormIdReportPagServer(request, id):
     else:
         lastid = str(request.session[str(page-1)])
         filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
-        #filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
-        #filled_forms = database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+        # filled_forms = database.filled_forms.find({
+        #     'form_id': str(id),
+        #     '_id':{"$lt": ObjectId(lastid)}}
+        # ).limit(limit).sort("_id",-1)
+        # filled_forms = database.filled_forms.find({
+        #     "$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}],
+        #     '_id':{"$lt": ObjectId(lastid)}}
+        # ).limit(limit).sort("_id",-1)
 
     data = {}
     #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
@@ -1569,7 +1606,9 @@ def FormIdReportPagServer(request, id):
                     except Exception, e:
                         row[response['label']]="Op_" + response['value']
 
-                if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
+                if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" \
+                        or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" \
+                        or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
                     row[response['label']]=response['value']
                 #FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
                 if response['tipo'] == "6":
@@ -1581,9 +1620,25 @@ def FormIdReportPagServer(request, id):
                     src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
                     static_url=settings.STATIC_URL
                     if response['label'] in row:
-                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+                        row[response['label']] = row[response['label']]\
+                                                 + '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+                                                 + src\
+                                                 + '" width="50px" height="50px" src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png"/><p>'\
+                                                 + tagfoto\
+                                                 + '</p></a></div>'
                     else:
-                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+                                                 + src\
+                                                 + '" width="50px" height="50px" src="' \
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png"/><p>'\
+                                                 + tagfoto+'</p></a></div>'
 
                 if response['tipo']=="14" or response['tipo']=="16":
                     #src='/home/andres/media/'+response['value']
@@ -1594,9 +1649,22 @@ def FormIdReportPagServer(request, id):
                     src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
                     static_url=settings.STATIC_URL
                     if response['label'] in row:
-                        row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+                        row[response['label']] = row[response['label']]\
+                                                 + '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+                                                 + src\
+                                                 + '" width="50px" height="50px" src="' \
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png"/></a></div>'
                     else:
-                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+                        row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+                                                 + src\
+                                                 + '" width="50px" height="50px" src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+                                                 + static_url\
+                                                 + 'administrador/admin/dist/img/avatar.png"/></a></div>'
                 
             rows.append(row)#list of records
 
@@ -1651,7 +1719,9 @@ def FormExcelReport(request, id):
         #             except Exception, e:
         #                 row[response['label']]="Op_" + response['value']
         #
-        #         if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
+                # if response['tipo'] == "7" or response['tipo'] == "8" or response['tipo'] == "9" \
+                #         or response['tipo'] == "10" or response['tipo'] == "11" or response['tipo'] == "12" \
+                #         or response['tipo'] == "13" or response['tipo'] == "15" or response['tipo'] == "17":
         #             row[response['label']]=response['value']
         #         # FOTOS TIENEN UN TAG ADICIONAL A FOTOS Y DOCUMENTOS
         #         if response['tipo'] == "6":
@@ -1663,9 +1733,26 @@ def FormExcelReport(request, id):
         #             src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
         #             static_url=settings.STATIC_URL
         #             if response['label'] in row:
-        #                 row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+        #                 row[response['label']]=row[response['label']]\
+        #                                        + '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+        #                                        + src\
+        #                                        + '" width="50px" height="50px" src="'\
+        #                                        + static_url\
+        #                                        + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+        #                                        + static_url\
+        #                                        + 'administrador/admin/dist/img/avatar.png"/><p>'\
+        #                                        + tagfoto\
+        #                                        + '</p></a></div>'
         #             else:
-        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/><p>'+tagfoto+'</p></a></div>'
+        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+        #                                          + src\
+        #                                          + '" width="50px" height="50px" src="'\
+        #                                          + static_url\
+        #                                          + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+        #                                          + static_url\
+        #                                          + 'administrador/admin/dist/img/avatar.png"/><p>'\
+        #                                          + tagfoto\
+        #                                          + '</p></a></div>'
         #
         #         if response['tipo'] == "14" or response['tipo'] == "16":
         #             # src='/home/andres/media/'+response['value']
@@ -1676,9 +1763,22 @@ def FormExcelReport(request, id):
         #             src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
         #             static_url=settings.STATIC_URL
         #             if response['label'] in row:
-        #                 row[response['label']]=row[response['label']]+'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+        #                 row[response['label']]=row[response['label']]\
+        #                                        +'<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+        #                                        + src\
+        #                                        + '" width="50px" height="50px" src="'\
+        #                                        + static_url\
+        #                                        + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+        #                                        + static_url\
+        #                                        + 'administrador/admin/dist/img/avatar.png"/></a></div>'
         #             else:
-        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'+src+'" width="50px" height="50px" src="'+static_url+'administrador/admin/dist/img/avatar.png" data-err-src="'+static_url+'administrador/admin/dist/img/avatar.png"/></a></div>'
+        #                 row[response['label']] = '<div style="float:left"><a class="thumb"><img onClick="openMedia()" id="'\
+        #                                          + src\
+        #                                          + '" width="50px" height="50px" src="'\
+        #                                          + static_url\
+        #                                          + 'administrador/admin/dist/img/avatar.png" data-err-src="'\
+        #                                          + static_url\
+        #                                          + 'administrador/admin/dist/img/avatar.png"/></a></div>'
         #
         #     rows.append(row) # list of records
 
@@ -1687,7 +1787,10 @@ def FormExcelReport(request, id):
         print 'NO HAY REGISTROS'
         data = {}
         data['response_code'] = '200'
-        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga a los correos %s, %s' % (request.user.email,request.user.empresa.email)
+        data['response_description'] = 'El reporte se esta procesando cuando este listo enviaremos una url de descarga a los correos %s, %s' % (
+            request.user.email,
+            request.user.empresa.email
+        )
         data['rows'] = []
         data['total'] = 0
         return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
@@ -1805,21 +1908,27 @@ def FormIdReportHistograma(request, id):
     if page == 1:
         filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
         request.session['colector_'+str(colector_id)] = filled_forms.count()
-        #Determinar la estructura de filled_forms y hacer la suma correspondiente para cada pregunta y sacar el %
+        # Determinar la estructura de filled_forms y hacer la suma correspondiente para cada pregunta y sacar el %
     else:
         lastid = str(request.session[str(page-1)])
         filled_forms = FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid)
-        #filled_forms = database.filled_forms.find({'form_id': str(id), '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
-        #filled_forms = database.filled_forms.find({"$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}], '_id':{"$lt": ObjectId(lastid)}}).limit(limit).sort("_id",-1)
+        # filled_forms = database.filled_forms.find({
+        #     'form_id': str(id),
+        #     '_id' : {"$lt": ObjectId(lastid)}}
+        # ).limit(limit).sort("_id",-1)
+        # filled_forms = database.filled_forms.find({
+        #     "$and":[ {'form_id': str(id)}, {'colector_id': str(colector_id)}],
+        #     '_id':{"$lt": ObjectId(lastid)}}
+        # ).limit(limit).sort("_id",-1)
 
     data = {}
-    #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
+    # Si hay registros realizo preparo la respuesta http, iterating on filled_forms
     if filled_forms.count() != 0:
         rows = []#rows array que contiene las filas de la tabla
         preguntasarray=[]
         preguntachecker=False
 
-        #Below f is a document (a record)
+        # Below f is a document (a record)
         for f in filled_forms:
             print '-------------------------EMPIEZA UN NUEVO CICLO-------------------------------'
             f["rows"]["MongoId"]=str(f["_id"])

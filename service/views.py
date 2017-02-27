@@ -208,6 +208,11 @@ class AllowedForms(View):
 
 
 class GetForms(View):
+    """
+    Method to get all forms associated to a colector
+    """
+
+
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(GetForms, self).dispatch(*args, **kwargs)
@@ -496,7 +501,7 @@ class GetForms(View):
                                     if e.id == 543 or e.id == 813:
                                         entrada['responses'] = []
                                         entrada['responses'] = self.filterColector(colector_id, e.id, e.nombre)
-                                        colector = Colector.objects.get(usuario = colector_id)
+                                        colector = Colector.objects.get(usuario=colector_id)
                                         formulario['form_description'] = str(colector)
                             else:
                                 ficha['inputs'] = []
@@ -523,6 +528,8 @@ class GetForms(View):
                     f['latitude'] = formulario['rows']['latitud']
                     f['longitude'] = formulario['rows']['longitud']
                     f['record_id'] = formulario['rows']['record_id']
+                    f['HoraIni'] = formulario['rows']['Hora Inicio']
+                    f['HoraFin'] = formulario['rows']['Hora Fin']
                     responses = []
                     for r in formulario['responses']:
                         res = dict()
@@ -567,7 +574,9 @@ class GetForms(View):
 # Guarda una estructura simple de las respuestas, colector_id, form_id, rows{} las respuestas no estan referenciadas
 # estan embebidas en rows y se hace referencia al colector id
 class FillResponsesForm(View):
-
+    """
+    Upload a single form to the server
+    """
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(FillResponsesForm, self).dispatch(*args, **kwargs)
@@ -627,7 +636,7 @@ class FillResponsesForm(View):
 
         return response
 
-    ####EXCLUSIVO PARA TECNOQUIMICAS####
+    # ###EXCLUSIVO PARA TECNOQUIMICAS####
     def tecnoquimica_cols(self, tqformid2, colector_id, responses):
         if tqformid2 == '30':
             tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
@@ -640,15 +649,30 @@ class FillResponsesForm(View):
         if tqformid2 == '217':
             for response in responses:
                 print response
-                #El siguiente es el input que en el formulario principal tiene el registro del representante que se debe filtrar en el form 217 input id 881
+                # El siguiente es el input que en el formulario principal tiene el registro del representante que se
+                # debe filtrar en el form 217 input id 881
                 if response['input_id'] == '813':
                     represpuestaid = response['value']
 
-                    #tqobjs = database.filled_forms.find({"$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
-                    tqobj = database.filled_forms.find_one({"$and":[ 
-            {'responses': {"$elemMatch": {"input_id": "881","tipo": "1","value": represpuestaid,"label": "Visitador"}
-        }}, 
-            {'colector_id': str(colector_id)}]})
+                    # tqobjs = database.filled_forms.find({
+                    #     "$and":[ {'form_id': tqformid2}, {'colector_id': str(colector_id)}]})
+                    tqobj = database.filled_forms.find_one({
+                        "$and": [
+                            {
+                                'responses': {
+                                    "$elemMatch": {
+                                        "input_id": "881",
+                                        "tipo": "1",
+                                        "value": represpuestaid,
+                                        "label": "Visitador"
+                                    }
+                                }
+                            },
+                            {
+                                'colector_id': str(colector_id)
+                            }
+                        ]
+                    })
 
                     tqarray = []
                     
@@ -657,15 +681,28 @@ class FillResponsesForm(View):
                     return tqarray
 
     def responseRecorded(self, colector_id, response_id):
-        record = database.filled_forms.find_one({"$and":[ 
-            {'responses': {"$elemMatch": {"input_id": "543","tipo": "4","value": str(response_id),"label": "Nombre del medico"}
-        }}, 
-            {'colector_id': str(colector_id)}]})
-        if record == None:
+        record = database.filled_forms.find_one({
+            "$and": [
+                {
+                    'responses': {
+                        "$elemMatch": {
+                            "input_id": "543",
+                            "tipo": "4",
+                            "value": str(response_id),
+                            "label": "Nombre del medico"
+                        }
+                    }
+                },
+                {
+                    'colector_id': str(colector_id)
+                }
+            ]
+        })
+        if record is None:
             return False
         else:
             return True
-    ####EXCLUSIVO PARA TECNOQUIMICAS####
+    # ###EXCLUSIVO PARA TECNOQUIMICAS####
 
     def post(self, request):
         resp = {}
@@ -673,8 +710,8 @@ class FillResponsesForm(View):
         try:
             data = json.loads(request.body)
             if 'longitud' not in data:
-                data['latitud']='0.0'
-                data['longitud']='0.0'
+                data['latitud'] = '0.0'
+                data['longitud'] = '0.0'
             
             longitud = data['longitud']
             latitud = data['latitud']
@@ -682,9 +719,10 @@ class FillResponsesForm(View):
             horafin = data['horafin']
             colector_id = data['colector_id']
             form_id = data['form_id']
+            record_id = data['record_id']
             responses = data['responses']            
 
-            array_validation = {}
+            array_validation = dict()
             array_validation['longitud'] = longitud
             array_validation['latitud'] = latitud
             array_validation['horaini'] = horaini
@@ -695,7 +733,7 @@ class FillResponsesForm(View):
 
             data_validator = self.dataValidator(array_validation)
 
-            if data_validator['error'] == True:
+            if data_validator['error']:
                 resp['response_code'] = '400'
                 resp['validation_errors'] = \
                     data_validator['validation_errors']
@@ -714,20 +752,26 @@ class FillResponsesForm(View):
             # construyendo json para insertar en mongodb
             try:
 
-                form = {}
-                rows = {}
+                form = dict()
+                rows = dict()
                 rows['colector_id'] = colector_id
                 rows['sincronizado_utc'] = datetime.utcnow()
-                #rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                # rows['sincronizado'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 rows['Sincronizado'] = datetime.now().strftime("%Y-%m-%d")
                 rows['Hora Sincronizado'] = datetime.now().strftime("%H:%M:%S")
-                rows['record_id']=str(uuid.uuid4())
+                if record_id:
+                    print("RECORD ID", record_id)
+                    rows['record_id'] = record_id
+                else:
+                    print("NOT RECORD ID", record_id)
+                    rows['record_id'] = str(uuid.uuid4())
+
                 rows['longitud'] = longitud
                 rows['latitud'] = latitud
                 rows['Hora Inicio'] = horaini
                 rows['Hora Fin'] = horafin
                 rows['form_id'] = form_id
-                formulario = Formulario.objects.get(id = int(form_id))
+                formulario = Formulario.objects.get(id=int(form_id))
                 rows['form_name'] = formulario.nombre
                 rows['form_description'] = formulario.descripcion
 
@@ -749,7 +793,7 @@ class FillResponsesForm(View):
                     response['label']=entrada.nombre
                     response['tipo']=entrada.tipo
 
-                ####EXCLUSIVO PARA TECNOQUIMICAS####
+                # ###EXCLUSIVO PARA TECNOQUIMICAS####
                     # if self.responseRecorded(colector_id, response['value']):
                     #     resp={}
                     #     # return HttpResponse("colector existe")
@@ -764,7 +808,7 @@ class FillResponsesForm(View):
                 
                 tqformid2 = '30'
 
-                ####FORM 215####
+                # ###FORM 215####
                 tqformid = '215'
                 if form_id == tqformid:
                     aditionalcols = []
@@ -776,7 +820,7 @@ class FillResponsesForm(View):
                     responses.insert(0, aditionalcols[1])
                     responses.insert(0, aditionalcols[2])
 
-                ####FORM 216####
+                # ###FORM 216####
                 tqtdcid = '216'             
                 if form_id == tqtdcid:
                     tqformid2 = '217'
@@ -792,12 +836,14 @@ class FillResponsesForm(View):
 
                     celery_proccess = celery_tasks.send_record_email.apply_async((form_id,aditionalcols[4]['value'],aditionalcols[5]['value'],responses))
 
-                ####EXCLUSIVO PARA TECNOQUIMICAS####
+                # ###EXCLUSIVO PARA TECNOQUIMICAS####
 
                 
                 colector = \
-                    database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'colector_id': 1})                
+                    database.filled_forms.find_one({
+                        'colector_id': str(colector_id)},
+                        {'colector_id': 1}
+                    )
 
                 # validando si existe un colector con esta id
                 if colector == None:
@@ -810,15 +856,35 @@ class FillResponsesForm(View):
                 data['form_id'] = form_id
                 data['rows'] = rows
                 data['responses'] = responses
-                
-                #Se crean los indices para agilizar la consulta
-                database.filled_forms.insert(data)
-                database.filled_forms.create_index("form_id")
-                database.filled_forms.create_index("colector_id")
-                database.filled_forms.create_index("rows.record_id")
 
-                #Enviar correo
-                imgurl="https://www.google.com.co/url?sa=t&rct=j&q=&esrc=s&source=web&cd=13&ved=0ahUKEwiDpKa52MnOAh" \
+                print("rid", record_id)
+
+                if record_id:
+                    print("RECORD ID")
+                    filled_form = database.filled_forms.find_one({'rows.record_id': record_id})
+                    if filled_form:
+                        filled_form_updated = database.filled_forms.find_one_and_update(
+                            {
+                                'rows.record_id': record_id
+                            },
+                            {
+                                '$set': data
+                            }
+                        )
+                        print ("Record_Id FOUND")
+                        print(filled_form_updated)
+                    else:
+                        print ("Record_Id not found")
+                else:
+                    print("NOT RECORD ID")
+                    # Se crean los indices para agilizar la consulta
+                    database.filled_forms.insert(data)
+                    database.filled_forms.create_index("form_id")
+                    database.filled_forms.create_index("colector_id")
+                    database.filled_forms.create_index("rows.record_id")
+
+                # Enviar correo
+                imgurl = "https://www.google.com.co/url?sa=t&rct=j&q=&esrc=s&source=web&cd=13&ved=0ahUKEwiDpKa52MnOAh" \
                        "UFXB4KHUTXADAQ8g0ITjAM&url=%2Fimgres%3Fimgurl%3Dhttps%3A%2F%2Fmedia.licdn.com%2Fmedia%2FAAE" \
                        "AAQAAAAAAAAbLAAAAJDUwOGQwN2QyLTA3ZGItNDcwNC1iN2E0LTY3ZTMwNzU4NzFlMQ.png%26imgrefurl%3Dhttps" \
                        "%3A%2F%2Fco.linkedin.com%2Fin%2Fandresbuitragof%26h%3D60%26w%3D60%26tbnid%3DwQK4SDF_D_ZGwM%" \
@@ -859,9 +925,7 @@ class FillResponsesForm(View):
                 #     fail_silently=False,
                 # )
 
-            
-
-                    # return HttpResponse("colector existe")
+                # return HttpResponse("colector existe")
                 resp['response_code'] = '200'
                 resp['response_description'] = str('form filled')
                 resp['body_received'] = str(request.body)
@@ -897,7 +961,8 @@ class FillResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')            
 
-#Guarda una foto a la vez (En base64)
+
+# Guarda una foto a la vez (En base64)
 class SaveImg(View):
 
     @method_decorator(csrf_exempt)
@@ -1005,7 +1070,7 @@ class SaveImg(View):
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
 
-#Permite precargar registros en un formulario con datos desde un archivo plano
+# Permite precargar registros en un formulario con datos desde un archivo plano
 class UploadData(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
@@ -1231,7 +1296,7 @@ class UploadData(View):
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
 
-#ELIMINA UN REGISTRO
+# ELIMINA UN REGISTRO
 class DeleteResponsesForm(View):
 
     @method_decorator(csrf_exempt)
@@ -1301,7 +1366,7 @@ class DeleteResponsesForm(View):
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
 
-#EDITA UN REGISTRO
+# EDITA UN REGISTRO
 class EditResponsesForm(View):
 
     @method_decorator(csrf_exempt)
@@ -1320,8 +1385,10 @@ class EditResponsesForm(View):
 
             try:
                 colector = \
-                    database.filled_forms.find_one({'colector_id': str(colector_id)},
-                        {'_id': 0})                
+                    database.filled_forms.find_one(
+                        {'colector_id': str(colector_id)},
+                        {'_id': 0}
+                    )
 
                 # validando si existe un colector con esta id
 
@@ -1330,8 +1397,10 @@ class EditResponsesForm(View):
 
                 else:
 
-                    database.filled_forms.update({'colector_id': str(colector_id)},
-                            {'$pull': {'filled_forms':{'record_id':record_id} }})
+                    database.filled_forms.update(
+                        {'colector_id': str(colector_id)},
+                        {'$pull': {'filled_forms':{'record_id':record_id} }}
+                    )
 
                     # return HttpResponse("colector existe")
 

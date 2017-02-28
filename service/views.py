@@ -779,7 +779,7 @@ class FillResponsesForm(View):
                 newresponses = []
                 for response in responses:
                     if response['value'] == "99270":
-                        resp={}
+                        resp = dict()
                         # return HttpResponse("colector existe")
                         resp['response_code'] = '202'
                         resp['response_description'] = str('Registro en edicion')
@@ -789,10 +789,35 @@ class FillResponsesForm(View):
                         resp['response_data'] = request.body
                         return HttpResponse(json.dumps(resp),content_type='application/json')
 
-                    input_id=response['input_id']
-                    entrada = Entrada.objects.get(id = int(input_id))
-                    response['label']=entrada.nombre
-                    response['tipo']=entrada.tipo
+                    input_id = response['input_id']
+                    entrada = Entrada.objects.get(id=int(input_id))
+                    response['label'] = entrada.nombre
+                    response['tipo'] = entrada.tipo
+
+                    # Validate if entrada is UNIQUE
+                    try:
+                        asignaciones_entrada = AsignacionEntrada.objects.filter(
+                            entrada=entrada
+                        )
+                        if asignaciones_entrada.count() > 0:
+                            # TODO debería existir solo una, pero si existen varias, es necesario definir un método para
+                            # definir cual es la correcta
+                            asignacion_entrada = asignaciones_entrada[0]
+                            if asignacion_entrada.respuesta_unica:
+                                respuesta = Respuesta.objects.get(pk=int(response['value']))
+                                if respuesta.ingresada:
+                                    # TODO definir cual va a ser el error que se levanta acá
+
+                                    print ("Error")
+                                else:
+                                    respuesta.ingresada = True
+                                    respuesta.save()
+                        else:
+                            # TODO revisar porque no está, posiblemente sea un error y deba levantarse
+                            print ("No hay asignacion de entrada")
+                    except Entrada.DoesNotExist:
+                        # TODO should return a form error
+                        print ("Entrada no existe")
 
                 # ###EXCLUSIVO PARA TECNOQUIMICAS####
                     # if self.responseRecorded(colector_id, response['value']):
@@ -835,7 +860,14 @@ class FillResponsesForm(View):
                     responses.insert(0, aditionalcols[2])
                     responses.insert(0, aditionalcols[3])
 
-                    celery_proccess = celery_tasks.send_record_email.apply_async((form_id,aditionalcols[4]['value'],aditionalcols[5]['value'],responses))
+                    celery_proccess = celery_tasks.send_record_email.apply_async(
+                        (
+                            form_id,
+                            aditionalcols[4]['value'],
+                            aditionalcols[5]['value'],
+                            responses
+                        )
+                    )
 
                 # ###EXCLUSIVO PARA TECNOQUIMICAS####
 
@@ -1071,6 +1103,7 @@ class SaveImg(View):
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
 
+
 # Permite precargar registros en un formulario con datos desde un archivo plano
 class UploadData(View):
     @method_decorator(csrf_exempt)
@@ -1297,6 +1330,7 @@ class UploadData(View):
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
 
+
 # ELIMINA UN REGISTRO
 class DeleteResponsesForm(View):
 
@@ -1366,6 +1400,7 @@ class DeleteResponsesForm(View):
 
             return HttpResponse(json.dumps(resp),
                                 content_type='application/json')
+
 
 # EDITA UN REGISTRO
 class EditResponsesForm(View):
@@ -1546,7 +1581,8 @@ class RegisterUsersCsv(UploadData, View):
                 str('{"fileSend":"", "extensionFile":" ","question_id":" ","survey_id":" " ,"nameFile":" ", colector_id  }')
             return HttpResponse(json.dumps(resp), content_type='application/json')
 
-#Reporte pagina directamente sobre django usando el paginador de bootstrat table
+
+# Reporte pagina directamente sobre django usando el paginador de bootstrat table
 def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, **kwargs):
     if colector_id==None and page==1:
         return database.filled_forms.find({'form_id': str(id)}).limit(limit).sort("_id",-1)
@@ -1563,7 +1599,8 @@ def FormIdReportPagServerConsulta(id, colector_id, limit, page, lastid, *args, *
 
 
 def FormIdReportPagServer(request, id):
-    # Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
+    # Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro
+    # getcolumns=true
     getcolumns=request.GET.get('getcolumns')
 
     if getcolumns=='true':
@@ -1593,14 +1630,14 @@ def FormIdReportPagServer(request, id):
                         column['filterControl'] = "select"
                     columns.append(column)
 
-            ########################CONSULTANDO COLECTOR IDS##################3
+            # #######################CONSULTANDO COLECTOR IDS##################3
             form_id = int(id)
             empresas = Formulario.objects.get(id=form_id).empresa_set.all()
             for empresa in empresas:
                 empresa = empresa
 
-            #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
-            #if user.groups.filter(name='administrador'):
+            # Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
+            # if user.groups.filter(name='administrador'):
             colectors = []
             for colectorindjango in empresa.colector.all():
                 colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 1})                
@@ -1628,7 +1665,8 @@ def FormIdReportPagServer(request, id):
     # Setting Pagination
     offset=int(request.GET.get('offset', 10))
     limit=int(request.GET.get('limit', 10))
-    # sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
+    # sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la
+    # paginacion no empieza desde 0, empieza desde 1
     page=(int(request.GET.get('offset', 0)))/limit+1
     # filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
     colector_id=request.GET.get('colector_id')
@@ -1651,17 +1689,17 @@ def FormIdReportPagServer(request, id):
         # ).limit(limit).sort("_id",-1)
 
     data = {}
-    #Si hay registros realizo preparo la respuesta http, iterating on filled_forms
+    # Si hay registros realizo preparo la respuesta http, iterating on filled_forms
     if filled_forms.count() != 0:
         rows = []#rows array que contiene las filas de la tabla
-        #Below f is a document (a record)
+        # Below f is a document (a record)
         for f in filled_forms:
             f["rows"]["MongoId"]=str(f["_id"])
-            #rows.append(f["rows"])#list of records
+            # rows.append(f["rows"])#list of records
             mongoid= str(f["_id"])
             request.session[str(page)] = mongoid
 
-            ############ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
+            # ###########ESTO DEMUESTRA QUE SE PUEDE SIMPLIFICAR EL SERVICIO PARA SINCRONIZAR REGISTROS, ESTA CARGA SE PUEDE PASAR AQUI
             # ##LA OTRA FORMA DE HACERLO, ES CONSULTAR DIRECTAMENTE EL NODO ROWS
             row = f["rows"]
             formulario = Formulario.objects.get(id = int(id))
@@ -1718,9 +1756,9 @@ def FormIdReportPagServer(request, id):
                                                  + tagfoto+'</p></a></div>'
 
                 if response['tipo']=="14" or response['tipo']=="16":
-                    #src='/home/andres/media/'+response['value']
-                    #src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
-                    #fileext = response['value'].split("_.",1)[1]
+                    # src='/home/andres/media/'+response['value']
+                    # src='https://s3-us-west-2.amazonaws.com/colector.co/media/'+str(entrada.id)+'/'+response['value']
+                    # fileext = response['value'].split("_.",1)[1]
                     fid, tipoarchivo, fechafoto, algo, fileext = response['value'].split('_')
 
                     src=settings.MEDIA_URL+str(response['input_id'])+'/'+response['value']+fileext
@@ -1760,7 +1798,7 @@ def FormIdReportPagServer(request, id):
 
     return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
 
-#Genera y envia todos los reportes en un archivo de excel a un correo
+# Genera y envia todos los reportes en un archivo de excel a un correo
 def FormExcelReport(request, id):
 
     filled_forms=database.filled_forms.find({'form_id': str(id)}).sort("_id",-1)
@@ -1931,22 +1969,22 @@ def FormExcelReport(request, id):
     return response
 
 
-#Genera un histograma del reporte
+# Genera un histograma del reporte
 def FormIdReportHistograma(request, id):
-    #Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
+    # Ejecuta esto para obtener los headers o columnas de la tabla, el controller llama este servicio con el parametro getcolumns=true
     getcolumns=request.GET.get('getcolumns')
 
     if getcolumns=='true':
         colrows = database.filled_forms.find_one({'form_id': str(id)})
         if colrows!=None:
-            ########################CONSULTANDO COLECTOR IDS##################3
+            # #######################CONSULTANDO COLECTOR IDS##################3
             form_id = int(id)
             empresas = Formulario.objects.get(id=form_id).empresa_set.all()
             for empresa in empresas:
                 empresa = empresa
 
-            #Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
-            #if user.groups.filter(name='administrador'):
+            # Colocar este condicional para aumentar seguridad, sedebe crear un grupo de administradores
+            # if user.groups.filter(name='administrador'):
             colectors = []
             for colectorindjango in empresa.colector.all():
                 colectorinmongo = database.filled_forms.find_one({'colector_id': str(colectorindjango.id)}, {'_id': 1})                
@@ -1958,7 +1996,7 @@ def FormIdReportHistograma(request, id):
                     colectorObj['colector_name'] = usuario.username
                     colectors.append(colectorObj)
 
-            #colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]
+            # colectors = [{'colector_id':1,'colector_name':'Andres'},{'colector_id':2,'colector_name':'Migue'}]
 
             data={
                 'columns': [],
@@ -1975,9 +2013,10 @@ def FormIdReportHistograma(request, id):
     #Setting Pagination
     offset=int(request.GET.get('offset', 10))
     limit=int(request.GET.get('limit', 10))
-    #sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la paginacion no empieza desde 0, empieza desde 1
+    # sumo divido el offset entre el limit y sumo 1 porque en django se usa el parametro pagina no offset y la
+    # paginacion no empieza desde 0, empieza desde 1
     page=(int(request.GET.get('offset', 0)))/limit+1
-    #filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
+    # filled_forms = database.filled_forms.find({'form_id': str(id)}, {'_id': 0})
     colector_id=request.GET.get('colector_id')
 
     lastid=0

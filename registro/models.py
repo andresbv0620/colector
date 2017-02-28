@@ -320,6 +320,7 @@ class Respuesta(models.Model):
     pregunta_id = models.PositiveIntegerField(blank=True, null=True)
     respuesta = models.CharField(max_length=500, blank=True, null=True)
     usuario = models.ForeignKey(User, null=True, blank=True)
+    ingresada = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('id',)

@@ -34,10 +34,10 @@ class OneStepAuth(View):
                         data['token'] = str(token.valor)
 
                         user = authenticate(username = data['username'], password = data['password'])
-                        #validando que exista un usuario
+                        # validando que exista un usuario
                         if user is not None:
                             try:
-                                #validando que exista un colector 
+                                # validando que exista un colector
                                 colector = Colector.objects.get(usuario = user)
                                 resp['response_code'] = '200'
                                 resp['response_description'] = str('colector found and device id found')

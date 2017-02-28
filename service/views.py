@@ -339,6 +339,7 @@ class GetForms(View):
                                     entrada['minimo'] = asignacionentrada.minimo
                                     entrada['validacion'] = asignacionentrada.validacion
                                     entrada['filtrar'] = asignacionentrada.filtrar
+                                    entrada['respuesta_unica'] = asignacionentrada.respuesta_unica
 
                                     if asignacionentrada.regla_visibilidad is None:
                                         entrada['valorvisibility'] = []

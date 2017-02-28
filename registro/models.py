@@ -205,6 +205,7 @@ class AsignacionEntrada(models.Model):
     minimo = models.PositiveIntegerField(blank=True, null=True)
     validacion = models.CharField(max_length=50, blank=True, unique=False)
     filtrar = models.BooleanField(default=False)
+    respuesta_unica = models.BooleanField(default=False)
     regla_visibilidad = models.ForeignKey(
         'ReglaVisibilidad',
         related_name='visibilizar',

@@ -721,7 +721,7 @@ class FillResponsesForm(View):
             horafin = data['horafin']
             colector_id = data['colector_id']
             form_id = data['form_id']
-            record_id = data['record_id']
+            record_id = data.get('record_id', "")
             responses = data['responses']            
 
             array_validation = dict()

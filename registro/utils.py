@@ -734,6 +734,7 @@ a,b,c,d,e = utils.extracer_formulario(1)
     entradas_serializadas = []
     asignacion_entradas_serializadas = []
     respuestas_serializadas = []
+    permisos_serializadas = []
 
     if formulario.count() > 0:
         fichas = formulario[0].ficha.all()
@@ -752,12 +753,16 @@ a,b,c,d,e = utils.extracer_formulario(1)
         respuestas = models.Respuesta.objects.filter(id__in=respuestas_ids)
         respuestas_serializadas = serializers.serialize('json', respuestas)
 
+        permisos_formularios = models.PermisoFormulario.objects.filter(formulario=formulario[0])
+        permisos_serializadas = serializers.serialize('json', permisos_formularios)
+
     return (
-        formulario_serializado,
-        fichas_serializadas,
+        respuestas_serializadas,
         entradas_serializadas,
+        fichas_serializadas,
+        formulario_serializado,
         asignacion_entradas_serializadas,
-        respuestas_serializadas
+        permisos_serializadas
     )
 
 
@@ -792,3 +797,28 @@ utils.guardar_archivo_serializado_base_de_datos('data.json')
         for deserialized_object in serializers.deserialize('json', linea):
             deserialized_object.save()
     archivo.close()
+
+
+def clean_users(path, output):
+    """
+    Elimina el arreglo de respuestas asociadas a un colector después del dump ./manage.py dumpdata auth.User registro.colector
+from registro import utils
+utils.clean_users('users.json', 'users_mod.json')
+    :param path: Ruta al archivo con el dump
+    :param output: Ruta de salida del archivo
+    :return: None
+    """
+
+    import codecs
+    import json
+    f = codecs.open(path, 'rb', encoding='utf-8')
+    data = json.load(f)
+    for d in data:
+        if d['model'] == "registro.colector":
+            print d['fields']['respuesta']
+            d['fields']['respuesta'] = []
+            print d['fields']['respuesta']
+
+    o = codecs.open(output, 'w+', encoding='utf-8')
+    o.write(json.dumps(data))
+    o.close()

@@ -489,12 +489,13 @@ class GetForms(View):
                                         entrada['responses'] = []
                                         usuario = Colector.objects.get(usuario=colector_id).usuario
                                         for r in e.respuesta.filter(Q(usuario=usuario) | Q(usuario=None)):
-                                            respuesta = dict()
-                                            respuesta['response_id'] = r.id
-                                            respuesta['value'] = r.valor
-                                            respuesta['question_id'] = r.pregunta_id
-                                            respuesta['answer'] = r.respuesta
-                                            entrada['responses'].append(respuesta)
+                                            if not r.ingresada:
+                                                respuesta = dict()
+                                                respuesta['response_id'] = r.id
+                                                respuesta['value'] = r.valor
+                                                respuesta['question_id'] = r.pregunta_id
+                                                respuesta['answer'] = r.respuesta
+                                                entrada['responses'].append(respuesta)
                                     else:
                                         entrada['responses'] = []
 

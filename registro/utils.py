@@ -8,6 +8,11 @@ PREGUNTA_FARMACIA = 997
 PREGUNTA_DEPENDIENTE = 998
 PREGUNTA_CEDULA = 1004
 
+PREGUNTA_ESCOLARIDAD = 1025
+RESPUESTA_PRIMARIA = 193934
+RESPUESTA_BACHILLERATO = 193931
+RESPUESTA_TECNICO = 193935
+RESPUESTA_UNIVERSITARIO = 193933
 
 def unicode_csv_reader(unicode_csv_data, dialect=csv.excel, **kwargs):
     """
@@ -484,6 +489,93 @@ def obtener_usuario_de_id_representante(id_representante):
     a['4407'] = 603
     a['14291'] = 604
     return User.objects.get(pk=a[id_representante])
+
+
+def agregar_maximo_grado(maximo_grado_id):
+    """
+    Agregar las opciones de maximo grado al que llegó
+from registro import utils
+utils.agregar_maximo_grado(37)
+    :param maximo_grado_id:  Identificador de la pregunta con la pregunta de máximo grado
+    :return: None
+    """
+    from . import models
+
+    OPCIONES_PRIMARIA = [
+        "Primero de primaria",
+        "Segundo de primaria",
+        "Tercero de primaria",
+        "Cuarto de primaria",
+        "Quinto de primaria",
+        "Terminado"
+    ]
+    OPCIONES_BACHILLERATO = [
+        "Primero de bachillerato",
+        "Segundo de bachillerato",
+        "Tercero de bachillerato",
+        "Cuarto de bachillerato",
+        "Quinto de bachillerato",
+        "Sexto de bachillerato",
+        "Terminado"
+    ]
+    OPCIONES_TECNICO = [
+        "Primer semestre Técnico",
+        "Segundo semestre Técnico",
+        "Tercer semestre Técnico",
+        "Cuarto semestre Técnico",
+        "Quinto semestre Técnico",
+        "Sexto semestre Técnico",
+        "Terminado"
+    ]
+    OPCIONES_PREGRADO = [
+        "Primer semestre Universitario",
+        "Segundo semestre Universitario",
+        "Tercero semestre Universitario",
+        "Cuarto semestre Universitario",
+        "Quinto semestre Universitario",
+        "Sexto semestre Universitario",
+        "Séptimo semestre Universitario",
+        "Octavo semestre Universitario",
+        "Noveno semestre Universitario",
+        "Décimo semestre Universitario",
+        "Terminado"
+    ]
+    entrada_grado = models.Entrada.objects.get(pk=maximo_grado_id)
+    respuesta_primaria = models.Respuesta.objects.get(pk=RESPUESTA_PRIMARIA)
+    for primaria in OPCIONES_PRIMARIA:
+        respuesta = models.Respuesta.objects.create(
+            valor=primaria,
+            pregunta_id=PREGUNTA_ESCOLARIDAD,
+            respuesta=respuesta_primaria.valor
+        )
+        entrada_grado.respuesta.add(respuesta)
+
+    respuesta_bachillerato = models.Respuesta.objects.get(pk=RESPUESTA_BACHILLERATO)
+    for bachillerato in OPCIONES_BACHILLERATO:
+        respuesta = models.Respuesta.objects.create(
+            valor=bachillerato,
+            pregunta_id=PREGUNTA_ESCOLARIDAD,
+            respuesta=respuesta_bachillerato.valor
+        )
+        entrada_grado.respuesta.add(respuesta)
+
+    respuesta_tecnico = models.Respuesta.objects.get(pk=RESPUESTA_TECNICO)
+    for tecnico in OPCIONES_TECNICO:
+        respuesta = models.Respuesta.objects.create(
+            valor=tecnico,
+            pregunta_id=PREGUNTA_ESCOLARIDAD,
+            respuesta=respuesta_tecnico.valor
+        )
+        entrada_grado.respuesta.add(respuesta)
+
+    respuesta_pregrado = models.Respuesta.objects.get(pk=RESPUESTA_UNIVERSITARIO)
+    for pregrado in OPCIONES_PREGRADO:
+        respuesta = models.Respuesta.objects.create(
+            valor=pregrado,
+            pregunta_id=PREGUNTA_ESCOLARIDAD,
+            respuesta=respuesta_pregrado.valor
+        )
+        entrada_grado.respuesta.add(respuesta)
 
 
 def cargar_arbol_a_diccionario(arbol, representantes, farmacias, dependientes, beneficiarios):

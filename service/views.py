@@ -292,6 +292,7 @@ class GetForms(View):
                     formulario['form_name'] = p.formulario.nombre
                     formulario['form_id'] = p.formulario.id
                     formulario['form_description'] = p.formulario.descripcion
+                    formulario['validacion'] = p.formulario.validacion
                     if not p.formulario.titulo_reporte:
                         formulario['titulo_reporte'] = 0                   
                     else:

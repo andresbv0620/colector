@@ -94,6 +94,8 @@ class Formulario(models.Model):
         blank=True,
         null=True
     )
+
+    validacion = models.TextField(default="")
     
     def __unicode__(self):
         return self.nombre

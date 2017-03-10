@@ -95,7 +95,7 @@ class Formulario(models.Model):
         null=True
     )
 
-    validacion = models.TextField(default="")
+    validacion = models.TextField(default="", blank=True)
     
     def __unicode__(self):
         return self.nombre
@@ -150,6 +150,7 @@ FIRMA = '14'
 DECIMAL = '15'
 DOCUMENTO = '16'
 TIEMPO = '17'
+LABEL = '18'
 ENTRADA_CHOICES = (
         (TEXTO, 'TEXTO'),
         (PARRAFO, 'PARRAFO'),
@@ -168,7 +169,8 @@ ENTRADA_CHOICES = (
         (DECIMAL, 'DECIMAL'),
         (DOCUMENTO, 'DOCUMENTO'),
         (TIEMPO, 'TIEMPO'),
-        
+        (LABEL, 'LABEL'),
+
     )
 
 
@@ -178,7 +180,7 @@ class Entrada(models.Model):
     """
     tipo = models.CharField(max_length=2, choices=ENTRADA_CHOICES, default=TEXTO)
     nombre = models.CharField(max_length=3000, blank=True, unique=False)
-    descripcion = models.TextField(max_length=100, blank=True)
+    descripcion = models.TextField(blank=True)
     respuesta = models.ManyToManyField('Respuesta', blank=True)
 
     class Meta:

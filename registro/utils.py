@@ -495,7 +495,7 @@ def agregar_maximo_grado(maximo_grado_id):
     """
     Agregar las opciones de maximo grado al que llegó
 from registro import utils
-utils.agregar_maximo_grado(37)
+utils.agregar_maximo_grado(1043)
     :param maximo_grado_id:  Identificador de la pregunta con la pregunta de máximo grado
     :return: None
     """

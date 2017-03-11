@@ -488,7 +488,10 @@ def obtener_usuario_de_id_representante(id_representante):
     a['13757'] = 602
     a['4407'] = 603
     a['14291'] = 604
-    return User.objects.get(pk=a[id_representante])
+    try:
+        return User.objects.get(pk=a[id_representante])
+    except KeyError:
+        return None
 
 
 def agregar_maximo_grado(maximo_grado_id):
@@ -742,6 +745,59 @@ utils.cambiar_texto_cedulas_no_validadas(e)
         # if len(respuestas) > 1:
         #     print (len(respuestas), respuestas)
 
+# ======== Extractor genérico =============
+
+
+def extractor_generico(path, llave=0):
+    """
+    Dado un archivo CSV donde la primera fila es un identificador de pregunta, la segunda fila es el título de la pregunta
+    y el resto del contenido está completo, retorna una lista de tuplas para ingresar a la bd.
+from registro import utils
+a = utils.extractor_generico("dummy_carvajal.csv")
+    :param path: Ruta de archivo CSV
+    :return: Lista de tuplas
+    """
+
+    archivo = codecs.open(path, 'r', encoding="utf-8", errors='ignore')
+    lineas = archivo.readlines()
+    reader = unicode_csv_reader(lineas)
+    line = 0
+
+    lista_de_tuplas = []
+    header = []
+    for r in reader:
+        line += 1
+        if line == 1:
+            for c in r:
+                header.append(c)
+        if line < 3:
+            continue
+        counter = 0
+        for c in r:
+            if counter != llave:
+                lista_de_tuplas.append(
+                    (
+                        header[counter],
+                        c,
+                        header[llave],
+                        r[llave],
+                        None
+                    )
+                )
+            else:
+                lista_de_tuplas.append(
+                    (
+                        header[counter],
+                        c,
+                        None,
+                        None,
+                        None
+                    )
+                )
+
+            counter += 1
+    return lista_de_tuplas
+# ========= Eliminar respuestas ===========
 
 def eliminar_todas_respuestas():
     """

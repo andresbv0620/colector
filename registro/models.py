@@ -151,6 +151,8 @@ DECIMAL = '15'
 DOCUMENTO = '16'
 TIEMPO = '17'
 LABEL = '18'
+CHECKBOX = '19'
+GRUPOBOTONES = '20'
 ENTRADA_CHOICES = (
         (TEXTO, 'TEXTO'),
         (PARRAFO, 'PARRAFO'),
@@ -170,7 +172,8 @@ ENTRADA_CHOICES = (
         (DOCUMENTO, 'DOCUMENTO'),
         (TIEMPO, 'TIEMPO'),
         (LABEL, 'LABEL'),
-
+        (CHECKBOX, 'CHECKBOX'),
+        (GRUPOBOTONES, 'GRUPO BOTONES'),
     )
 
 

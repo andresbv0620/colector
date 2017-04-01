@@ -112,17 +112,26 @@ class PermisoFormulario(models.Model):
     def __unicode__(self):
         return self.formulario.nombre
 
+normal = 'normal'
+agrupada = 'agrupada'
+parrafo = 'parrafo'
+TIPO_CHOICES = (
+        (normal, 'normal'),
+        (agrupada, 'agrupada'),
+        (parrafo, 'parrafo'),
+    )
 
 class Ficha(models.Model):
     """
     Entidad de separación de los formularios. Un formulario está compuesto por muchas fichas
     """
     nombre = models.CharField(max_length=50, blank=True, unique=False)
-    descripcion = models.TextField(max_length=100, blank=True)
+    descripcion = models.TextField(max_length=500, blank=True)
     # entrada = SortedManyToManyField('Entrada')
     # entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',blank=True)
     entrada = models.ManyToManyField('Entrada', through='AsignacionEntrada', blank=True)
     repetible = models.BooleanField(default=False)
+    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=normal)
 
     class Meta:
         ordering = ('id',)

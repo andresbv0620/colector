@@ -16,7 +16,7 @@
 					</li>
 				  </ul>
 				  <!--  Form  -->
-					<form name="tabs.form" class="form-inline" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
+					<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
 						<div class="text-center">
 							<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
 						</div>
@@ -24,9 +24,16 @@
 					  		
 					  		<h4 class="onboarding-progress"><strong>[[section.name]]</strong></h4>
 					  		<p>[[section.description]]</p>
+
+					  		
+
+
+					  		<grouped-inputs ng-show='section.section_id==1'></grouped-inputs>
+					  		<paragraph-form ng-show='section.section_id==1'></paragraph-form>
+
 					  		
 					  		<!--  Form Sections-->
-					  		<fieldset class="form-group onboarding-input" ng-repeat="input in section.inputs">
+					  		<fieldset ng-hide='section.section_id==1' class="form-group onboarding-input" ng-repeat="input in section.inputs">
 								<span ng-if="input.type==1">
 									<h3>[[input.name]]</h3>
 									<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
@@ -97,13 +104,11 @@
 								</span>
 								
 								<span ng-if="input.type==15">
-								<table>
-								<tr>
-									<td><h3>[[input.name]]</h3></td>
-									<td><input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
-									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]"></td>
-								</tr>
-								</table>
+
+									<h3>[[input.name]]</h3>
+									<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+
 								</span>
 							</fieldset>
 

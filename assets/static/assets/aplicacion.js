@@ -25,7 +25,6 @@ app.config(['$httpProvider', function($httpProvider) {
 app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	$routeProvider
 	.when('/form/:form_id',{
-		controller:"llenarFormulario",
 		templateUrl:globales.static_url+"/webforms/angular_templates/fill_form.html"
 	})
 	.when('/llenar/:form_id',{

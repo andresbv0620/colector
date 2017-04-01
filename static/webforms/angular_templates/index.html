@@ -1,0 +1,47 @@
+<div class="row-fluid">
+	<div class="col-md-10 col-md-offset-1">
+		<!-- /.box-header -->
+		<div class="box-body" ng-controller="TabController as tabs">
+			<div class="panel">
+				<div class="panel-heading box-header with-border">
+					<h2>[[formulario.form_name]]</h2>
+					<h4 class="onboarding-branding">[[formulario.form_description]]</h4>
+				</div>
+				<!-- Tabs  -->
+				<ul class="nav nav-pills">
+					<li ng-class="{ active:tabs.isSet(section.section_id) }" ng-repeat="section in formulario.sections">
+						<a href="" ng-click="tabs.setTab(section.section_id)">[[section.name]]</a>
+					</li>
+				</ul>
+				<section class="onboarding-body panel-body">
+					<!--  Form  -->
+					<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab, tabs.step)" novalidate>
+						<div ng-show="tabs.isSet(section.section_id)" ng-repeat="section in formulario.sections">
+							<div class="row-fluid">
+								<div class="col-md-10">
+									<!--  Form Section types-->
+									<normal-sesion ng-show='section.tipo=="normal"'></normal-sesion>
+									<grouped-sesion ng-show='section.tipo=="agrupada"'></grouped-sesion>
+									<paragraph-sesion ng-show='section.tipo=="parrafo"'></paragraph-sesion>
+								</div>
+								<div class="col-md-2">
+									<h4 class="onboarding-progress"><strong>[[section.name]]</strong></h4>
+									<p>[[section.description]]</p>
+								</div>
+							</div>
+						</div>
+						<div class="text-center">
+							<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
+						</div>
+					</form>
+				</section>
+				<div class="panel-footer">
+					<div class="onboarding-footer" ng-hide="tabs.tab===tabs.firsttab">
+						<a href="" ng-click="tabs.backTab(tabs.tab, tabs.step)">Atras</a>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /.box-body -->
+	</div>
+</div>

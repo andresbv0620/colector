@@ -12,7 +12,7 @@ body{
 }
 
 li{
-	font-size: 15px;
+	font-size: 30px;
 }
 
 .onboarding-question {
@@ -203,4 +203,97 @@ input[type=range]:focus::-ms-fill-lower {
 }
 input[type=range]:focus::-ms-fill-upper {
   background: #367ebd;
+}
+
+.nav-pills>li>a {
+  border-radius: 0px;
+  font-size: 20px;
+}
+
+.btn-sesion{
+    padding-top: 30px;
+    padding-bottom: 30px;
+}
+
+
+
+/*Paragrah Form*/
+
+.paragraph-sesion {
+    padding: 100px 0;
+    background-color: #f0f0f0;
+    text-align: center;
+}
+.lead-big {
+    font-size: 28px;
+    line-height: 48px;
+    color: #999;
+}
+.form-inline input,
+.form-inline textarea,
+.form-inline select {
+    max-width: 300px;
+    height: 40px;
+    overflow: hidden;
+    line-height: 40px;
+    background-color: transparent;
+    border: none;
+    border-bottom: 1px dotted;
+    vertical-align: text-bottom;
+    cursor: pointer;    
+    padding-left: 10px;
+}
+.form-inline .form-group label {
+    position: relative;
+}
+.form-inline .form-group label > span {
+    position: absolute;
+    top: -25px;
+    left: 0;
+    font-size: 12px;
+    color: #bdc3c7; 
+    opacity: 1;
+}
+.submit.btn.btn-lg {
+    font-size: 28px;
+    color: #999;
+    border: 1px dotted;
+    background-color: transparent;
+    border-radius: 0;
+    height: 62px;
+    padding: 10px;
+    width: auto;
+}
+
+/*Grouped Inputs*/
+
+
+/* 
+    Selects 
+*/
+
+div.input-group-multiple-select:last-child span.input-group-addon-remove{
+  display: none;
+}
+
+div.input-group-multiple-select:last-child .hide-last{
+  display: none;
+}
+
+div.input-group-multiple-select:last-child input.form-control{
+  border-bottom-right-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+div.input-group-multiple-select span.input-group-addon-remove{
+  cursor: pointer;
+    background: none;
+    border: none;
+}
+
+div.input-group-multiple-select{
+    margin-bottom: 5px;
+}
+.f-label{
+    margin-bottom: 5px;
 }

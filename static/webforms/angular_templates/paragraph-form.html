@@ -1,0 +1,53 @@
+<section class="paragraph-form">
+  <div class="container">
+	<div class="row">
+		<div action="#" class="form-inline lead-big" role="form">
+            <div class="form-group">
+              <label for="name">Hola, Mi nombre es <span>Su nombre</span></label>
+              <input name="input_[[input.id]]" ng-model="input.record.value" type="text" id="name" placeholder="" required>
+              <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+               
+            </div>
+            <div class="form-group">
+              <label for="company"> Soy <span>Genero</span></label>
+              <select id="freelancer" name="input_[[input.id]]" ng-model="input.record.value" required>
+                  <option value="0" selected>Seleccione</option>
+                  <option value="1">Masculino</option>
+                  <option value="2">Femenino</option>
+                  <option value="3">Otro</option>
+
+              </select>
+              <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+
+
+              .
+            </div>
+            <div class="form-group">
+              <label for="freelancer"> Mi hogar esta compuesto por <span>Composicion del hogar</span></label>
+              <select id="freelancer">
+                  <option value="0" selected>Solo yo</option>
+                  <option value="1">Mi pareja y yo</option>
+                  <option value="2">Mi pareja mis hijos y yo</option>
+
+              </select>
+              ademas
+            </div>
+            <div class="form-group">
+              <label for="time"> Estoy a cargo de <span>Personas a cargo</span></label>
+              <select id="time">
+                  <option value="0" selected>Nadie</option>
+                  <option value="1">Mis padres</option>
+              </select>
+              y Quiero mejorar mi situacion financiera.
+            </div>
+            <div class="form-group">
+              <label for="email"> Mi correo es <span>Su correo</span></label>
+              <input type="email" id="email" placeholder="name@mail.com" required>
+              .
+            </div>
+            <button type="submit" class="btn btn-default btn-lg submit"> Iniciar Diagnostico </button>
+            .
+        </div>
+	</div>
+  </div>
+</section>

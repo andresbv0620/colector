@@ -1,4 +1,4 @@
-var app = angular.module('app', ['ngRoute','uiGmapgoogle-maps','ui.bootstrap','bsTable']);
+var app = angular.module('app', ['ngRoute']);
 
 app.config(function($interpolateProvider) {
   $interpolateProvider.startSymbol('[[');
@@ -25,7 +25,7 @@ app.config(['$httpProvider', function($httpProvider) {
 app.config(['$routeProvider','globales', function($routeProvider, globales) {
 	$routeProvider
 	.when('/form/:form_id',{
-		templateUrl:globales.static_url+"/webforms/angular_templates/fill_form.html"
+		templateUrl:globales.static_url+"/webforms/angular_templates/index.html"
 	})
 	.when('/llenar/:form_id',{
 		controller:"llenarFormulario",

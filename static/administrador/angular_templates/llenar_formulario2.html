@@ -10,13 +10,13 @@
 				</div>
 				<!-- Product Tabs  -->
 				<section class="onboarding-body panel-body">
-				  <!-- <ul class="nav nav-pills">
+				  <ul class="nav nav-pills">
 					<li ng-class="{ active:tabs.isSet(section.section_id) }" ng-repeat="section in formulario.sections">
 					  <a href="" ng-click="tabs.setTab(section.section_id)">[[section.name]]</a>
 					</li>
-				  </ul> -->
+				  </ul>
 				  <!--  Form  -->
-					<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
+					<form name="tabs.form" class="form-inline" ng-submit="tabs.nextTab(tabs.tab)" novalidate>
 						<div class="text-center">
 							<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
 						</div>
@@ -94,6 +94,16 @@
 									<input required ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
 									<h4 class="pull-left label-text">$500.000</h4><h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
 									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
+								
+								<span ng-if="input.type==15">
+								<table>
+								<tr>
+									<td><h3>[[input.name]]</h3></td>
+									<td><input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]"></td>
+								</tr>
+								</table>
 								</span>
 							</fieldset>
 

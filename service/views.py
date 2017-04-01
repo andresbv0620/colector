@@ -84,6 +84,8 @@ class SingleForm(View):
                         ficha['section_id'] = f.id
                         ficha['name'] = f.nombre
                         ficha['description'] = f.descripcion
+                        ficha['repetible'] = f.repetible
+                        ficha['tipo'] = f.tipo
 
                         # validando que la ficha tenga entradas asociadas
 

@@ -161,12 +161,16 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         });
             swal("Registro exitoso!", "Haz click en el boton para terminar", "success");
             this.form.$setPristine();
-            $window.location.href = "http://finantic.co/dashboard/";
+            $window.location.href = "http://finantic.co/dashboard/users/";
             //$window.location.href = "http://finantic.co/lp/solicitud-realizada/";
             //$window.location.href = "#/histograma/id/"+$scope.form_id;
-       }else{        
+       }else{
+            ////OOOOJO PROVISIONAL QUITAR PORQUE DEJA PASAR DE CUALQUIER FORMA///////
+            swal("Registro exitoso!", "Estamos procesando tus datos. Haz click en el boton para continuar", "success");
+            this.form.$setPristine();
+            $window.location.href = "http://finantic.co/dashboard/users/";        
 
-        swal({   
+        /*swal({   
             title: "Oops...",   
             text: "Algunas preguntas no han sido contestadas",   
             type: "warning",   
@@ -176,7 +180,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
             closeOnConfirm: true }, 
             function(){   
                 this.tab=this.errortab;
-            });
+            });*/
         
         
        }

@@ -108,6 +108,11 @@
 										<h4 class="pull-left label-text">$500.000</h4><h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
 										<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 									</span>
+									<span ng-if="input.type==15">
+									<h3>[[input.name]]</h3>
+									<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+									<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+								</span>
 								</fieldset>
 
 						  		

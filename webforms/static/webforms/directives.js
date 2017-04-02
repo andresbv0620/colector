@@ -161,8 +161,9 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         });
             swal("Registro exitoso!", "Haz click en el boton para terminar", "success");
             this.form.$setPristine();
+            $window.location.href = "http://finantic.co/dashboard/";
             //$window.location.href = "http://finantic.co/lp/solicitud-realizada/";
-            $window.location.href = "#/histograma/id/"+$scope.form_id;
+            //$window.location.href = "#/histograma/id/"+$scope.form_id;
        }else{        
 
         swal({   

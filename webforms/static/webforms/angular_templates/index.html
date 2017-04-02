@@ -8,11 +8,16 @@
 					<h4 class="onboarding-branding">[[formulario.form_description]]</h4>
 				</div>
 				<!-- Tabs  -->
-				<ul class="nav nav-pills">
+				<!-- <ul class="nav nav-pills">
 					<li ng-class="{ active:tabs.isSet(section.section_id) }" ng-repeat="section in formulario.sections">
 						<a href="" ng-click="tabs.setTab(section.section_id)">[[section.name]]</a>
 					</li>
-				</ul>
+				</ul> -->
+				<div class="progress">
+				  <div class="progress-bar" role="progressbar" aria-valuenow="[[(tabs.step+1)*100/tabs.steps| number : 0]]" aria-valuemin="0" aria-valuemax="100" style="width: [[(tabs.step+1)*100/tabs.steps| number : 2]]%;">
+				    [[(tabs.step+1)*100/tabs.steps| number : 0]] %
+				  </div>
+				</div>
 				<section class="onboarding-body panel-body">
 					<!--  Form  -->
 					<form name="tabs.form" ng-submit="tabs.nextTab(tabs.tab, tabs.step)" novalidate>
@@ -24,7 +29,7 @@
 									<grouped-sesion ng-show='section.tipo=="agrupada"'></grouped-sesion>
 									<paragraph-sesion ng-show='section.tipo=="parrafo"'></paragraph-sesion>
 								</div>
-								<div class="col-md-2">
+								<div class="col-md-2 section-description">
 									<h4 class="onboarding-progress"><strong>[[section.name]]</strong></h4>
 									<p>[[section.description]]</p>
 								</div>

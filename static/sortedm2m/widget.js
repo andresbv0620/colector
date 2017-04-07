@@ -1,16 +1,33 @@
-if (jQuery === undefined) {
-    jQuery = django.jQuery;
+if (typeof jQuery === 'undefined') {
+    var jQuery = django.jQuery;
 }
 
 (function ($) {
     $(function () {
-        $('.sortedm2m-container').find('ul').addClass('hide');
+        $('.sortedm2m-container').find('.sortedm2m-items').addClass('hide');
         function prepareUl(ul) {
             ul.addClass('sortedm2m');
             var checkboxes = ul.find('input[type=checkbox]');
-            var id = checkboxes.first().attr('id').match(/^(.*)_\d+$/)[1];
-            var name = checkboxes.first().attr('name');
-            checkboxes.removeAttr('name');
+            var id;
+            var name;
+
+            if (checkboxes.length) {
+                id = checkboxes.first().attr('id').match(/^(.*)_\d+$/)[1];
+                name = checkboxes.first().attr('name');
+                checkboxes.removeAttr('name');
+            } else {
+                var label;
+                var currentElement = ul;
+
+                while (!label || !label.length) {
+                    currentElement = currentElement.parent();
+                    label = currentElement.siblings('label');
+                }
+
+                id = label.attr('for').match(/^(.*)_\d+$/)[1];
+                name = id.replace(/^id_/, '');
+            }
+
             ul.before('<input type="hidden" id="' + id + '" name="' + name + '" />');
             var recalculate_value = function () {
                 var values = [];
@@ -30,9 +47,11 @@ if (jQuery === undefined) {
         }
 
         function iterateUl() {
-            $('ul:has(.sortedm2m)').each(function () {
-                prepareUl( $(this) );
-                $(this).removeClass('hide');
+            $('.sortedm2m-items').each(function () {
+                var ul = $(this);
+
+                prepareUl(ul);
+                ul.removeClass('hide');
             });
         }
 
@@ -44,7 +63,7 @@ if (jQuery === undefined) {
             $(this).bind('input', function() {
                 var search = $(this).val().toLowerCase();
                 var $el = $(this).closest('.selector-filter');
-                var $container = $el.siblings('ul').each(function() {
+                var $container = $el.siblings('.sortedm2m-items').each(function() {
                     // walk over each child list el and do name comparisons
                     $(this).children().each(function() {
                         var curr = $(this).find('label').text().toLowerCase();
@@ -58,16 +77,22 @@ if (jQuery === undefined) {
             });
         });
 
+        var dismissPopupFnName = 'dismissAddAnotherPopup';
+        // django 1.8+
+        if (window.dismissAddRelatedObjectPopup) {
+            dismissPopupFnName = 'dismissAddRelatedObjectPopup';
+        }
+
         if (window.showAddAnotherPopup) {
-            var django_dismissAddAnotherPopup = window.dismissAddAnotherPopup;
-            window.dismissAddAnotherPopup = function (win, newId, newRepr) {
+            var django_dismissAddAnotherPopup = window[dismissPopupFnName];
+            window[dismissPopupFnName] = function (win, newId, newRepr) {
                 // newId and newRepr are expected to have previously been escaped by
                 // django.utils.html.escape.
                 newId = html_unescape(newId);
                 newRepr = html_unescape(newRepr);
                 var name = windowname_to_id(win.name);
                 var elem = $('#' + name);
-                var sortedm2m = elem.siblings('ul.sortedm2m');
+                var sortedm2m = elem.siblings('.sortedm2m-items.sortedm2m');
                 if (sortedm2m.length == 0) {
                     // no sortedm2m widget, fall back to django's default
                     // behaviour
@@ -81,7 +106,7 @@ if (jQuery === undefined) {
 
                 var id_template = '';
                 var maxid = 0;
-                sortedm2m.find('li input').each(function () {
+                sortedm2m.find('.sortedm2m-item input').each(function () {
                     var match = this.id.match(/^(.+)_(\d+)$/);
                     id_template = match[1];
                     id = parseInt(match[2]);

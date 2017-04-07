@@ -132,6 +132,7 @@ class Ficha(models.Model):
     entrada = models.ManyToManyField('Entrada', through='AsignacionEntrada', blank=True)
     repetible = models.BooleanField(default=False)
     tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, default=normal)
+    grupo = models.CharField(max_length=50, blank=True, unique=False)
 
     class Meta:
         ordering = ('id',)

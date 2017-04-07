@@ -73,9 +73,13 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
 
         tabsdata.tabs=$scope.formulario.sections;
         tabsdata.steps=tabsdata.tabs.length;
-        tabsdata.firsttab=tabsdata.tabs[0].section_id;
-        tabsdata.lasttab=tabsdata.tabs[tabsdata.tabs.length-1].section_id;
+        tabsdata.firsttab=parseInt(tabsdata.tabs[0].section_id);
+        tabsdata.firstgroup=parseInt(tabsdata.tabs[0].grupo);
+        tabsdata.lasttab=parseInt(tabsdata.tabs[tabsdata.tabs.length-1].section_id);
+        tabsdata.lastgroup=tabsdata.tabs[tabsdata.tabs.length-1].grupo;
+        tabsdata.steps=tabsdata.lastgroup;
         tabsdata.tab = tabsdata.firsttab;
+        tabsdata.group = tabsdata.firstgroup;
         tabsdata.btntext = " Iniciar Diagnostico ";
         tabsdata.loading = false;
 
@@ -94,34 +98,37 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
 
 
     this.setTab = function(newValue){
-      this.tab = newValue;
+      this.group = newValue;
     };
 
 
-    this.isSet = function(tabName){
-      return this.tab === tabName;
+    this.isSet = function(tabId){
+
+        return this.group == tabId;
+
+      
     };
 
     this.step=0;
 
     this.backTab = function(currentTab, currentStep){
-        if (currentTab!=this.firsttab) {
-            priorTab = this.tabs[currentStep-1].section_id;
-            this.tab=priorTab;
+        if (currentTab!=this.firstgroup) {
+            priorTab = this.tabs[currentStep-1].grupo;
+            this.group=priorTab;
             this.step=currentStep-1;              
         } 
          
     };
 
     this.nextTab = function(currentTab, currentStep){
+        currentTab=parseInt(currentTab);
         this.btntext = "Continuar";
-        if (currentTab==this.lasttab) {
-            this.tab=this.firsttab;
+        if (currentTab==this.lastgroup) {
+            this.group=this.firstgroup;
             this.sendForm($scope.formulario)
         }else{ 
-        	nextTab = this.tabs[currentStep+1].section_id;
-            this.tab=nextTab;
-            this.step=currentStep+1;   
+            this.group=currentTab+1;
+            
         }
     };
 

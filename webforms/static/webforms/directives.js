@@ -1,3 +1,41 @@
+app.directive('currencyInput', function($filter, $browser) {
+    return {
+        require: 'ngModel',
+        link: function($scope, $element, $attrs, ngModelCtrl) {
+            var listener = function() {
+                var value = $element.val().replace(/,/g, '');
+                value=parseInt(value);
+                $element.val($filter('number')(value));
+            }
+            
+            // This runs when we update the text field
+            ngModelCtrl.$parsers.push(function(viewValue) {
+                return viewValue.replace(/,/g, '');
+            })
+            
+            // This runs when the model gets updated on the scope directly and keeps our view in sync
+            ngModelCtrl.$render = function() {
+                $element.val($filter('number')(ngModelCtrl.$viewValue))
+            }
+            
+            $element.bind('change', listener)
+            $element.bind('keydown', function(event) {
+                var key = event.keyCode
+                // If the keys include the CTRL, SHIFT, ALT, or META keys, or the arrow keys, do nothing.
+                // This lets us support copy and paste too
+                if (key == 91 || (15 < key && key < 19) || (37 <= key && key <= 40)) 
+                    return 
+                $browser.defer(listener) // Have to do this or changes don't get picked up properly
+            })
+            
+            $element.bind('paste cut', function() {
+                $browser.defer(listener)  
+            })
+        }
+        
+    }
+});
+
 app.directive("paragraphSesion",['globales', function(globales){
 	return{
 		restrict:'E',
@@ -19,11 +57,13 @@ app.directive("groupedSesion",['globales', function(globales){
 		controller: function(){
 			this.groupedInput=[];
 			this.focusInput=0;
-		    this.isSet = function(selectInput) {
+		    this.isSet = function(selectInput, orden) {
+                if (orden<=50) {
+                    return true
+                }
 		      return this.groupedInput[selectInput];
 		    };
 		    this.setInput = function(setInput, active) {
-		    	
 		      this.groupedInput[setInput]= active;
 		      this.focusInput=setInput;
 		      return "";
@@ -32,8 +72,8 @@ app.directive("groupedSesion",['globales', function(globales){
 		    this.isFocus = function(selectInput) {
 		      return this.focusInput=== selectInput;
 		    };        
-      },
-      controllerAs:'gInput'
+    },
+    controllerAs:'gInput'
     };
 }]);
 
@@ -112,10 +152,11 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
     this.step=0;
 
     this.backTab = function(currentTab, currentStep){
+        currentTab=parseInt(currentTab);
+
         if (currentTab!=this.firstgroup) {
-            priorTab = this.tabs[currentStep-1].grupo;
-            this.group=priorTab;
-            this.step=currentStep-1;              
+            this.group=currentTab-1;
+             
         } 
          
     };
@@ -125,16 +166,17 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         this.btntext = "Continuar";
         if (currentTab==this.lastgroup) {
             this.group=this.firstgroup;
-            this.sendForm($scope.formulario)
-        }else{ 
-            this.group=currentTab+1;
             
+            this.sendForm($scope.formulario)
+        }else{
+            this.group=currentTab+1;
         }
     };
 
     this.sendForm = function(filledform){
         if(this.form.$valid) { 
             // Save to db or whatever.
+            console.log($scope.formulario);
             
         this.datatoinsert = {
         "colector_id":globales.user_id,
@@ -160,38 +202,35 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         this.datatoinsert.responses = this.formresponses;
         console.log(this.datatoinsert);
 
-        defaultService.post(globales.static_url + '../service/fill/responses/', this.datatoinsert, function(data) {
+        defaultService.post('http://finantic.contraslash.com/diagnostics/receive-response/', this.datatoinsert, function(data) {
             console.log(data);
+            $window.location.href = "http://finantic.contraslash.com:8000/diagnostics/" + data + "/"
 
         }, function(error) {
             console.log(error)
         });
             swal("Registro exitoso!", "Haz click en el boton para terminar", "success");
             this.form.$setPristine();
-            $window.location.href = "http://finantic.co/dashboard/users/";
+            //$window.location.href = "http://finantic.contraslash.com/diagnostics/2/";
             //$window.location.href = "http://finantic.co/lp/solicitud-realizada/";
             //$window.location.href = "#/histograma/id/"+$scope.form_id;
-       }else{
-            ////OOOOJO PROVISIONAL QUITAR PORQUE DEJA PASAR DE CUALQUIER FORMA///////
-            swal("Registro exitoso!", "Estamos procesando tus datos. Haz click en el boton para continuar", "success");
-            this.form.$setPristine();
-            $window.location.href = "http://finantic.co/dashboard/users/";        
+       }else{       
 
-        /*swal({   
-            title: "Oops...",   
-            text: "Algunas preguntas no han sido contestadas",   
-            type: "warning",   
-            showCancelButton: false,   
-            confirmButtonColor: "#DD6B55",   
-            confirmButtonText: "Aceptar",   
-            closeOnConfirm: true }, 
-            function(){   
-                this.tab=this.errortab;
-            });*/
-        
+            swal({   
+                title: "Oops...",   
+                text: "Algunas preguntas no han sido contestadas",   
+                type: "warning",   
+                showCancelButton: false,   
+                confirmButtonColor: "#DD6B55",   
+                confirmButtonText: "Aceptar",   
+                closeOnConfirm: true }, 
+                function(){   
+                    this.tab=this.errortab;
+                });        
         
        }
 
     };
 }]);
+
 

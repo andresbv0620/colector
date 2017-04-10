@@ -1,7 +1,7 @@
 <fieldset ng-show='section.tipo=="normal"' class="form-group onboarding-input" ng-repeat="input in section.inputs">
 	<span ng-if="input.type==1">
 		<h3>[[input.name]]</h3>
-		<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+		<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
 		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 	</span>
 	<span ng-if="input.type==2">
@@ -11,7 +11,7 @@
 	</span>
 	<span ng-if="input.type==4">
 		<h3>[[input.name]]: [[input.description]]</h3>
-		<select required name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
+		<select name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
 			<option value=""> --- </option>
 		</select>
 		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
@@ -23,7 +23,7 @@
 			</div>
 			<div class="col-md-4 col-lg-4">
 				<label class="radio-inline" ng-repeat="response in input.responses">
-				<input required type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
+				<input type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
 				[[response.value]]
 				</label>
 			</div>
@@ -63,14 +63,17 @@
 		<h3 class="text-center">
 			<span class="label label-primary">[[input.record.value||0|currency]]</span>
 		</h3>
-		<input required ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
+		<input ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
 		<h4 class="pull-left label-text">$500.000</h4>
 		<h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
 		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 	</span>
 	<span ng-if="input.type==15">
 		<h3>[[input.name]]</h3>
-		<input required name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+		<div class="input-group">
+			<div class="input-group-addon">$</div>
+			<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+		</div>
 	</span>
 </fieldset>

@@ -1,21 +1,23 @@
 <div class="row-fluid">
   <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
-    <h3>Puede ingresar varias opciones para [[section.name]]</h3>
-   
-    <div class="f-label form-group" ng-repeat="input in section.inputs" ng-show="gInput.isSet(input.input_id)">
-      <div class="input-group">
-        <input disabled type="text" class="form-control" value="[[input.name]]">
-        <div class="input-group-addon">$</div>
-        <input name="input_[[input.id]]" ng-model="input.record.value" class="form-control hide-last" placeholder="[[input.description]]" type="text" focus="[[gInput.isFocus(input.input_id)]]">
-        <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-        <span class="input-group-addon" ng-click="input.record.value=gInput.setInput(input.input_id, false)">
-        <span class="glyphicon glyphicon-remove"></span>
-        </span>  
+    <h3>Puede ingresar varias opciones para [[section.name]] </h3>
+  
+      <div class="f-label form-group" ng-repeat="input in section.inputs" ng-show="gInput.isSet(input.input_id, input.orden)">
+      
+
+        <div class="input-group">
+          <input disabled type="text" class="form-control" value="[[input.name]]">
+          <div class="input-group-addon">$</div>
+          <input type="text" currency-input = "" name="[[input.input_id]]" ng-model="input.record.value" class="form-control hide-last" placeholder="[[input.description]]"  focus="[[gInput.isFocus(input.input_id)]]" style="text-align: right;">
+          <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+          <span class="input-group-addon" ng-click="input.record.value=gInput.setInput(input.input_id, false)">
+          <span class="glyphicon glyphicon-remove"></span>
+          </span>  
+        </div>
       </div>
-    </div>
-    <select ng-change="selectedInput=gInput.setInput(selectedInput, true)" class="form-control" name="values[]" ng-model="selectedInput" ng-options="option.input_id as option.name  for option in section.inputs">
-      <option value="">----</option>
-    </select>
+      <select ng-change="selectedInput=gInput.setInput(selectedInput, true)" class="form-control" name="values[]" ng-model="selectedInput" ng-options="option.input_id as option.name  for option in section.inputs">
+        <option value="">Agregar más opciones</option>
+      </select>
   </div>  
 </div>
 

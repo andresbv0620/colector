@@ -93,12 +93,16 @@ class SingleForm(View):
                         if len(f.entrada.all()):
                             ficha['inputs'] = []
                             for e in f.entrada.all():
+                                # Datos tabla intermedia de relacion ficha entrada
+                                asignacionentrada = e.asignacionentrada_set.get(ficha=f)
 
                                 entrada = {}
                                 entrada['input_id'] = e.id
                                 entrada['name'] = e.nombre
                                 entrada['description'] = e.descripcion
                                 entrada['type'] = e.tipo
+                                entrada['orden'] = asignacionentrada.orden
+                                entrada['requerido'] = asignacionentrada.requerido
 
                                
                                 ficha['inputs'].append(entrada)

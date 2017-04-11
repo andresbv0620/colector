@@ -140,6 +140,31 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         console.log(error)
     });
 
+    this.checkOptions = function(elemento, valor){
+        if (typeof(elemento.value)==='undefined') {
+            elemento.value=valor;
+        }else{
+            if(!elemento.value.includes(valor)){
+                elemento.value=elemento.value+','+valor;
+            }else{
+                checkResponses=elemento.value.split(",");
+                indextodelete=checkResponses.indexOf(valor);
+                if (indextodelete > -1) {
+                    checkResponses.splice(indextodelete, 1);
+                }
+                elemento.value="";
+                for (response in checkResponses) {
+                    if (elemento.value=="") {
+                        elemento.value=checkResponses[response];
+                    }else{
+                        elemento.value=elemento.value+','+checkResponses[response];
+                    }
+
+                }
+            }
+        }
+    };
+
     this.isVisible = function(visibilityRule, formSections){
         if (visibilityRule!="") {
             var elemento=visibilityRule[0].elemento;
@@ -194,7 +219,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         }else{
             return true
         }
-    }
+    };
 
     this.setLayout = function(currentTab){
         if (currentTab==this.firsttab) {

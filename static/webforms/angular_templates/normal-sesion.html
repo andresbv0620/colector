@@ -34,10 +34,11 @@
 		<h3>[[input.name]]: [[input.description]]</h3>
 		<div class="checkbox" ng-repeat="response in input.responses">
 			<h3>
-				<input type="checkbox" name="response_[[response.id]]" ng-model="input.responses[0].value" id="[[section.id]]_[[input.name]]_[[response.value]]" value="[[response.value]]" checked="">
+				<input type="checkbox" name="response_[[response.id]]" ng-model='checkbox' ng-change="tabs.checkOptions(input.record, response.value)">
 				[[response.value]]
 			</h3>
 		</div>
+		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 	</span>
 	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==6">
 		<div class="form-group">

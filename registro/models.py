@@ -125,7 +125,7 @@ class Ficha(models.Model):
     """
     Entidad de separación de los formularios. Un formulario está compuesto por muchas fichas
     """
-    nombre = models.CharField(max_length=50, blank=True, unique=False)
+    nombre = models.CharField(max_length=500, blank=True, unique=False)
     descripcion = models.TextField(max_length=500, blank=True)
     # entrada = SortedManyToManyField('Entrada')
     # entrada = models.ManyToManyField('Entrada',through='AsignacionEntrada',blank=True)

@@ -114,9 +114,21 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         tabsdata.tabs=$scope.formulario.sections;
         tabsdata.steps=tabsdata.tabs.length;
         tabsdata.firsttab=parseInt(tabsdata.tabs[0].section_id);
-        tabsdata.firstgroup=parseInt(tabsdata.tabs[0].grupo);
+        //tabsdata.firstgroup=parseInt(tabsdata.tabs[0].grupo);
+        tabsdata.firstgroup=1;
+        tabsdata.lastgroup=1;
+        for (sectiontab in tabsdata.tabs) {
+            tabgrupo=tabsdata.tabs[sectiontab].grupo;
+            if (tabgrupo>tabsdata.lastgroup){
+                tabsdata.lastgroup=tabgrupo;
+            }
+            if (tabgrupo<tabsdata.firstgroup){
+                tabsdata.lastgroup=tabgrupo;
+            }
+        }
+        
         tabsdata.lasttab=parseInt(tabsdata.tabs[tabsdata.tabs.length-1].section_id);
-        tabsdata.lastgroup=tabsdata.tabs[tabsdata.tabs.length-1].grupo;
+        //tabsdata.lastgroup=tabsdata.tabs[tabsdata.tabs.length-1].grupo;
         tabsdata.steps=tabsdata.lastgroup;
         tabsdata.tab = tabsdata.firsttab;
         tabsdata.group = tabsdata.firstgroup;

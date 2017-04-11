@@ -57,8 +57,8 @@ app.directive("groupedSesion",['globales', function(globales){
 		controller: function(){
 			this.groupedInput=[];
 			this.focusInput=0;
-		    this.isSet = function(selectInput, orden) {
-                if (orden<=50) {
+		    this.isSet = function(selectInput, requerido) {
+                if (requerido===true) {
                     return true
                 }
 		      return this.groupedInput[selectInput];
@@ -127,6 +127,28 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
     }, function(error) {
         console.log(error)
     });
+
+    this.isVisible = function(visibilityRule, formSections){
+        console.log(visibilityRule);
+        if (visibilityRule!="") {
+            var elemento=visibilityRule[0].elemento;
+            var operador=visibilityRule[0].operador;
+            var valor=visibilityRule[0].valor;        
+
+            for (section in formSections) {
+                sectionInputs = formSections[section].inputs;
+                for (sectionInput in sectionInputs) {
+                    if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value==valor) {
+                        return true;           
+
+                    } 
+
+                }
+            }
+        }else{
+            return true
+        }
+    }
 
     this.setLayout = function(currentTab){
         if (currentTab==this.firsttab) {
@@ -204,7 +226,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
 
         defaultService.post('http://finantic.contraslash.com/diagnostics/receive-response/', this.datatoinsert, function(data) {
             console.log(data);
-            $window.location.href = "http://finantic.contraslash.com:8000/diagnostics/" + data + "/"
+            $window.location.href = "http://finantic.contraslash.com/diagnostics/" + data + "/"
 
         }, function(error) {
             console.log(error)

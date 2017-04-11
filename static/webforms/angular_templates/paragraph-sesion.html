@@ -3,12 +3,12 @@
     <div class="row-fluid">
       <div action="#" class="form-inline lead-big" role="form">
         <div class="form-group" ng-repeat="input in section.inputs">
-          <span ng-if="input.type==1">
+          <span ng-if="input.type==1" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
           <label for="[[input.name]]">[[input.description]] <span>[[input.name]]</span></label>
           <input name="input_[[input.id]]" ng-model="input.record.value" type="text" id="[[input.name]]" placeholder="" >
           <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
-          <span ng-if="input.type==4">
+          <span ng-if="input.type==4" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
             <label for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
             <select id="[[input.name]]"  name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses">
               <option value=""> --- </option>

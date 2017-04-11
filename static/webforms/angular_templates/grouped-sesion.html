@@ -2,10 +2,10 @@
   <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-md-offset-1 col-lg-offset-1">
     <h3>Puede ingresar varias opciones para [[section.name]] </h3>
   
-      <div class="f-label form-group" ng-repeat="input in section.inputs" ng-show="gInput.isSet(input.input_id, input.orden)">
+      <div class="f-label form-group" ng-repeat="input in section.inputs" ng-show="gInput.isSet(input.input_id, input.requerido)">
       
 
-        <div class="input-group">
+        <div class="input-group" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
           <input disabled type="text" class="form-control" value="[[input.name]]">
           <div class="input-group-addon">$</div>
           <input type="text" currency-input = "" name="[[input.input_id]]" ng-model="input.record.value" class="form-control hide-last" placeholder="[[input.description]]"  focus="[[gInput.isFocus(input.input_id)]]" style="text-align: right;">
@@ -16,7 +16,7 @@
         </div>
       </div>
       <select ng-change="selectedInput=gInput.setInput(selectedInput, true)" class="form-control" name="values[]" ng-model="selectedInput" ng-options="option.input_id as option.name  for option in section.inputs">
-        <option value="">Agregar más opciones</option>
+        <option value="">Agregar opciones</option>
       </select>
   </div>  
 </div>

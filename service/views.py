@@ -104,6 +104,18 @@ class SingleForm(View):
                                 entrada['orden'] = asignacionentrada.orden
                                 entrada['requerido'] = asignacionentrada.requerido
 
+                                if asignacionentrada.regla_visibilidad is None:
+                                        entrada['valorvisibility'] = []
+                                else:
+                                    entrada['valorvisibility'] = []
+                                    reglavisibilidadobject = {}
+                                    reglavisibilidad = ReglaVisibilidad.objects.get(visibilizar=asignacionentrada)
+                                    reglavisibilidadobject['elemento'] = reglavisibilidad.elemento.id
+                                    reglavisibilidadobject['operador'] = reglavisibilidad.operador
+                                    reglavisibilidadobject['valor'] = reglavisibilidad.valor
+
+                                    entrada['valorvisibility'].append(reglavisibilidadobject)
+
                                
                                 ficha['inputs'].append(entrada)
 

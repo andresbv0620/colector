@@ -76,6 +76,32 @@ app.directive("groupedSesion",['globales', function(globales){
     controllerAs:'gInput'
     };
 }]);
+//Multiple input type
+app.directive("multipleInput",['globales', function(globales){
+    return{
+        restrict:'E',
+        templateUrl:globales.static_url+"/webforms/angular_templates/multiple-input.html",
+        controller: function(){
+            this.responseInput=[];
+            this.focusInput=0;
+            this.isSet = function(selectResponse) {
+              return this.responseInput[selectResponse];
+            };
+            this.setResponse = function(setResponse, active) {
+              this.responseInput[setResponse]= active;
+              this.focusResponse=setResponse;
+              return "";
+            };
+
+            this.isFocus = function(selectResponse) {
+              return this.focusResponse=== selectResponse;
+            };
+
+
+    },
+    controllerAs:'multiInput'
+    };
+}]);
 
 // Common directive for Focus
 app.directive('focus',
@@ -112,7 +138,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         $scope.formulario = data['response_data'][0];
 
         tabsdata.tabs=$scope.formulario.sections;
-        tabsdata.steps=tabsdata.tabs.length;
+        //tabsdata.steps=tabsdata.tabs.length;
         tabsdata.firsttab=parseInt(tabsdata.tabs[0].section_id);
         //tabsdata.firstgroup=parseInt(tabsdata.tabs[0].grupo);
         tabsdata.firstgroup=1;
@@ -140,6 +166,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         console.log(error)
     });
 
+   
     this.checkOptions = function(elemento, valor){
         if (typeof(elemento.value)==='undefined') {
             elemento.value=valor;
@@ -163,6 +190,7 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
                 }
             }
         }
+        console.log($scope.formulario);
     };
 
     this.isVisible = function(visibilityRule, formSections){

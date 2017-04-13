@@ -1,6 +1,6 @@
 
 html { 
-background: url(http://finantic.co/wp-content/uploads/2016/12/Degradado-2.jpg) no-repeat center center fixed;
+/*background: url(http://finantic.co/wp-content/uploads/2016/12/Degradado-2.jpg) no-repeat center center fixed;*/
 -webkit-background-size: cover;
 -moz-background-size: cover;
 -o-background-size: cover;
@@ -9,8 +9,581 @@ background-size: cover;
 
 body{
 	background:transparent;
+    font-family: 'Nunito', sans-serif;
 }
 
+body header {
+    box-shadow: rgba(0,0,0,.2) 0 1px 2px;
+}   
+
+/*Betterment*/
+
+body .header-region,
+body .progress-region,
+body .main-region,
+body .support-region,
+body .footer-region {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 3.06748%;
+    padding-right: 3.06748%
+}
+.main-region {
+    position: relative
+}
+
+.input-radio:after,
+.input-radio .radio-options li:after,
+.input-check:after,
+.modal-layout .modal-content:after,
+.header-with-rule-and-action:after,
+.main-region:after,
+.projection-legend .key:after,
+.onboarding-header:after,
+.onboarding-footer .disclosure:after,
+.review .panel-header h2:after,
+.projection .projection-graph-container .graph-methodology:after,
+.projection .deposit-sliders:after,
+.portfolio:after,
+.portfolio .target-portfolio-table:after,
+.portfolio .toggle:after {
+    content: "";
+    display: table;
+    clear: both
+} 
+
+.onboarding-header:after,
+.onboarding-footer .disclosure:after,
+.review .panel-header h2:after,
+.projection .projection-graph-container .graph-methodology:after,
+.projection .deposit-sliders:after,
+.portfolio:after,
+.portfolio .target-portfolio-table:after,
+.portfolio .toggle:after {
+    content: "";
+    display: table;
+    clear: both
+}
+
+.onboarding-header .nav-items li a,
+.projection .projection-inputs .input .input-container label,
+.projection .deposit-sliders label {
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    text-decoration: none
+}
+
+.onboarding-header {
+    display: -webkit-box;
+    display: -moz-box;
+    display: box;
+    display: -webkit-flex;
+    display: -moz-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+    -moz-box-align: center;
+    box-align: center;
+    -webkit-align-items: center;
+    -moz-align-items: center;
+    -ms-align-items: center;
+    -o-align-items: center;
+    align-items: center;
+    -ms-flex-align: center;
+    -webkit-box-pack: justify;
+    -moz-box-pack: justify;
+    box-pack: justify;
+    -webkit-justify-content: space-between;
+    -moz-justify-content: space-between;
+    -ms-justify-content: space-between;
+    -o-justify-content: space-between;
+    justify-content: space-between;
+    -ms-flex-pack: justify;
+    height: 65px
+}
+.onboarding-header:after {
+    content: none
+}
+.onboarding-header .logo {
+    display: block;
+    width: 135px;
+    height: 21px;
+    float: left;
+    margin-top: 3px
+}
+.onboarding-header .logo .bmt-logo {
+    fill: #17406B
+}
+.onboarding-header .uber-logo {
+    display: none;
+    width: 53px;
+    margin: 5px 0 0 3px
+}
+.onboarding-header .nav-items {
+    position: relative;
+    list-style: none
+}
+@media screen and (max-width: 675px) {
+    .onboarding-header .nav-items {
+        display: none
+    }
+}
+.onboarding-header .nav-items li {
+    float: left
+}
+.onboarding-header .nav-items li a {
+    display: block;
+    border: 1px solid transparent;
+    font-size: .7em;
+    line-height: 1;
+    font-weight: 900;
+    letter-spacing: .5px;
+    margin-left: 10px;
+    margin-top: -1px;
+    padding: .8em 2em .65em;
+    border-radius: 3px;
+    outline: 0;
+    cursor: pointer;
+    -webkit-transition: all .2s ease-in-out;
+    -moz-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out
+}
+
+
+.sc-Progress {
+    box-sizing: border-box;
+    height: 10px
+}
+.sc-Progress-background {
+    background-color: #90caf9;
+    background-image: linear-gradient(-45deg, rgba(255, 255, 255, .3) 0, rgba(255, 255, 255, .3) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .3) 50%, rgba(255, 255, 255, .3) 75%, transparent 75%, transparent);
+    background-size: 10px 10px;
+    height: 10px
+}
+.sc-Progress--advised .sc-Progress-background {
+    background-color: #ddd
+}
+.sc-Progress-indicator {
+    background-color: #1689e5;
+    border-radius: 0 6px 6px 0;
+    height: 10px
+}
+.sc-Progress--advised .sc-Progress-indicator {
+    background-color: #686868
+}
+
+.sc-progress,
+.progress-region {
+    height: 4.375em;
+    margin-bottom: 3.125em
+}
+
+.sc-progress .back-arrow,
+.progress-region .back-arrow {
+    display: block
+}
+.sc-progress .progress-nav2,
+.progress-region .progress-nav2 {
+    position: relative;
+    padding-top: 2em
+}
+.sc-progress .progress-nav2+.progress-bar2,
+.progress-region .progress-nav2+.progress-bar2 {
+    display: block;
+    height: .188em;
+    background: #ddd
+}
+@media screen and (max-width: 675px) {
+    .sc-progress .progress-nav2+.progress-bar2,
+    .progress-region .progress-nav2+.progress-bar2 {
+        height: .313em
+    }
+}
+.sc-progress .progress-nav2+.progress-bar2 .inner-bar,
+.progress-region .progress-nav2+.progress-bar2 .inner-bar {
+    padding-left: 0;
+    background: #1689e5;
+    height: 100%;
+    width: 0
+}
+.sc-progress .progress-nav2 .step-labels,
+.progress-region .progress-nav2 .step-labels {
+    white-space: nowrap;
+    margin-bottom: 0;
+    font-size: 0
+}
+.sc-progress .progress-nav2 .step-labels .item,
+.progress-region .progress-nav2 .step-labels .item {
+    display: none;
+    box-sizing: border-box;
+    width: 100%;
+    color: #1689e5;
+    text-align: left;
+    font-size: 15px;
+    padding-bottom: 1.33em;
+    position: relative
+}
+.sc-progress .progress-nav2 .step-labels .item[data-step]:before,
+.progress-region .progress-nav2 .step-labels .item[data-step]:before {
+    content: "Step " attr(data-step) ":";
+    float: left;
+    margin-right: 5px
+}
+.sc-progress .progress-nav2 .step-labels .item[data-percentage]:after,
+.progress-region .progress-nav2 .step-labels .item[data-percentage]:after {
+    content: attr(data-percentage) "%";
+    float: right
+}
+.sc-progress .progress-nav2 .step-labels .item.active,
+.progress-region .progress-nav2 .step-labels .item.active {
+    display: block;
+  }
+
+article.home .onboarding-madlib {
+    display: block;
+    padding: 73.61963px 0;
+    text-align: center;
+    background-color: transparent;
+    border-radius: 0;
+    box-shadow: none
+}
+article.home .onboarding-madlib small {
+    text-transform: uppercase;
+    font-size: .9em;
+    color: #686868;
+    display: block;
+    width: 100%;
+    margin: 0 auto 15px;
+    text-align: center
+}
+article.home .onboarding-madlib h1 {
+    display: none
+}
+article.home .onboarding-madlib h2 {
+    font-size: 2.2em;
+    line-height: 1.9;
+    font-weight: 300;
+    color: #686868;
+    padding-left: 20px;
+    padding-right: 20px
+}
+article.home .onboarding-madlib input {
+    line-height: 1;
+    font-weight: 300
+}
+article.home .onboarding-madlib input::-webkit-inner-spin-button,
+article.home .onboarding-madlib input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0
+}
+article.home .onboarding-madlib .madlib-error {
+    position: absolute;
+    top: 100%;
+    width: 200px;
+    text-align: center;
+    font-size: .35em;
+    font-weight: 700;
+    line-height: 1;
+    color: #fb7c00
+}
+article.home .onboarding-madlib .madlib-error:empty {
+    display: none
+}
+article.home .onboarding-madlib .edit-age {
+    display: inline-block;
+    position: relative
+}
+article.home .onboarding-madlib .edit-age .enter-age {
+    width: 70px;
+    display: inline-block;
+    text-align: center;
+    padding: 0;
+    color: #1689e5;
+    background-color: transparent;
+    font-size: 1.0em;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+article.home .onboarding-madlib .edit-age .madlib-error {
+    left: 15px
+}
+article.home .onboarding-madlib .edit-retirement {
+    opacity: 1;
+    height: auto;
+    overflow: visible;
+    width: auto;
+    display: inline-block;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+article.home .onboarding-madlib .edit-retirement .retirement {
+    height: 53px;
+    top: 1px;
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    opacity: 1;
+    white-space: nowrap;
+    padding-left: 15px;
+    padding-right: 15px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+article.home .onboarding-madlib .edit-retirement .retirement:before {
+    content: "”";
+    font-family: ModernPictogramsPro!important;
+    font-size: 100%;
+    line-height: .8;
+    text-transform: none;
+    text-decoration: none!important;
+    font-style: normal!important;
+    font-weight: 400!important;
+    line-height: .8;
+    margin-top: 20px;
+    right: -10px;
+    position: relative;
+    float: right
+}
+article.home .onboarding-madlib .edit-retirement .retirement .select-retirement {
+    width: 190px;
+    display: inline-block;
+    text-align: center;
+    text-transform: lowercase;
+    border: 0;
+    padding: 0;
+    color: #1689e5;
+    background-color: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-size: 1.0em;
+    color: transparent;
+    text-shadow: 0 0 0 #1689e5;
+    font-weight: 300;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none
+}
+article.home .onboarding-madlib .edit-retirement .retirement.focused .select-retirement {
+    background-color: rgba(144, 202, 249, .55)
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 90%;
+    height: 0;
+    opacity: 0;
+    background: #fff;
+    z-index: -1;
+    border: 1px solid #ddd;
+    list-style: none;
+    left: -1px;
+    -webkit-transition: top .1s, opacity .1s;
+    -moz-transition: top .1s, opacity .1s;
+    transition: top .1s, opacity .1s;
+    border-radius: 3px;
+    box-shadow: rgba(0, 0, 0, .25) 0 1px 3px
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown.show {
+    top: 98%;
+    opacity: 1;
+    height: auto;
+    z-index: 10
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown li {
+    display: block;
+    width: 100%;
+    height: 60px;
+    line-height: 2.5;
+    color: #333;
+    font-size: .70em;
+    font-weight: 300;
+    text-decoration: none
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown li.highlighted,
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown li:hover {
+    color: #1689e5;
+    background: #f9f9f9
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown li:first-child {
+    border-bottom: 1px solid #ddd
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown li.disabled {
+    display: none
+}
+article.home .onboarding-madlib .edit-retirement .retirement .retirement-dropdown:hover li.highlighted:not(:hover) {
+    background: #fff
+}
+@media (max-width: 675px) {
+    article.home .onboarding-madlib .edit-retirement {
+        padding-top: 18.40491px
+    }
+}
+article.home .onboarding-madlib .edit-income {
+    display: inline-block;
+    margin-top: 10px;
+    position: relative
+}
+article.home .onboarding-madlib .edit-income span.nowrap {
+    display: inline-block
+}
+article.home .onboarding-madlib .edit-income span.nowrap:before {
+    content: '$';
+    font-size: .9em;
+    margin-right: -8px;
+    padding: 0
+}
+article.home .onboarding-madlib .edit-income .enter-income {
+    width: 195px;
+    display: inline-block;
+    position: relative;
+    text-align: center;
+    margin-left: 10px;
+    margin-top: -45px;
+    color: #1689e5;
+    padding: 0;
+    background-color: transparent;
+    font-size: 1.0em;
+    -webkit-transition: all .3s ease-in-out;
+    -moz-transition: all .3s ease-in-out;
+    transition: all .3s ease-in-out
+}
+article.home .onboarding-madlib .edit-income .enter-income:before {
+    font-size: 1.2em;
+    content: '$';
+    color: #ddd;
+    position: relative;
+    top: 45px;
+    margin-left: 15px;
+    float: left;
+    z-index: 9
+}
+article.home .onboarding-madlib .edit-income .madlib-error {
+    right: 4px
+}
+article.home .onboarding-madlib .border {
+    border: 0;
+    border-bottom: 1px solid #ddd
+}
+article.home .onboarding-madlib .border:hover {
+    border-bottom: 1px solid #999
+}
+article.home .onboarding-madlib .border:focus {
+    border-bottom: 1px solid #000
+}
+article.home .onboarding-madlib .border.error-orange,
+article.home .onboarding-madlib .border:focus.error-orange {
+    color: #fb7c00;
+    border-bottom: 1px solid #fb7c00
+}
+article.home .onboarding-madlib .button {
+    position: relative;
+    margin: 10px auto;
+    display: inline-block;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 1.4
+}
+article.home .information-box {
+    display: none;
+    position: absolute;
+    right: 0;
+    width: 32%
+}
+article.home.with-information-box {
+    position: relative
+}
+article.home.with-information-box .information-box {
+    display: block
+}
+article.home.with-information-box .onboarding-madlib,
+article.home.with-information-box .lucy-footer {
+    width: 68%;
+    padding: 0;
+    text-align: left
+}
+article.home.with-information-box .onboarding-madlib h1,
+article.home.with-information-box .lucy-footer h1 {
+    display: block;
+    margin-top: 70px;
+    font-size: 1.1em;
+    padding-bottom: .5em
+}
+article.home.with-information-box .onboarding-madlib h2,
+article.home.with-information-box .lucy-footer h2 {
+    padding: 0
+}
+article.home.with-information-box .onboarding-madlib h2 .retirement-dropdown,
+article.home.with-information-box .lucy-footer h2 .retirement-dropdown {
+    text-align: center
+}
+@media screen and (max-width: 675px) {
+    article.home.with-information-box .information-box,
+    article.home.with-information-box .onboarding-madlib,
+    article.home.with-information-box .lucy-footer {
+        width: 100%
+    }
+    article.home.with-information-box .information-box {
+        float: none;
+        position: relative
+    }
+    article.home.with-information-box .onboarding-madlib h1 {
+        margin-top: 40px
+    }
+}
+
+.lucy-footer {
+    text-align: center
+}
+.lucy-footer button,
+.lucy-footer .portfolio .plan-features .details a,
+.portfolio .plan-features .details .lucy-footer a,
+.lucy-footer .button {
+    margin-top: 24.53988px;
+    width: 22%
+}
+.lucy-footer button.secondary,
+.lucy-footer .portfolio .plan-features .details a.secondary,
+.portfolio .plan-features .details .lucy-footer a.secondary,
+.lucy-footer .button.secondary {
+    margin-right: .5em
+}
+
+button, .portfolio .plan-features .details a, input[type=button], input[type=reset], input[type=submit], .button, .sc-header .menu-action {
+    background-color: #1689e5;
+    border-color: #1689e5;
+    color: #fff;
+        font-weight: 700;
+
+}
+.checkbox-paragraph{
+line-height: 1px;
+}
+
+body .secondary-text {
+    font-size: 1.6rem;
+    color: #999;
+}
+
+input:checked {
+    height: 50px;
+    width: 50px;
+}
+
+option:checked {
+    display: none;
+}
+/**********************************************BASED STYLES********************************************/
 li{
 	font-size: 30px;
 }
@@ -114,6 +687,18 @@ button.btn {
 }
 .ng-valid.ng-dirty{
   border-color:green;
+}
+
+.input-group-addon-tootip{
+
+  padding-top: 1px;
+  padding-bottom: 1px;
+  padding-right: 3px;
+  padding-left: 3px;
+  background: white;
+  border: 1px solid #fff;
+  font-size: 25px;
+  color: #ffcb4f;
 }
 
 
@@ -229,10 +814,14 @@ input[type=range]:focus::-ms-fill-upper {
     background-color: #f0f0f0;
     text-align: center;
 }
+.paragraph-label{
+    font-weight: 100;
+}
 .lead-big {
-    font-size: 28px;
-    line-height: 48px;
-    color: #999;
+    font-size: 2.2em;
+
+    line-height: 80px;
+    color: #686868;
 }
 .form-inline input,
 .form-inline textarea,
@@ -270,6 +859,8 @@ input[type=range]:focus::-ms-fill-upper {
     width: auto;
 }
 
+
+
 /*Grouped Inputs*/
 
 
@@ -302,3 +893,6 @@ div.input-group-multiple-select{
 .f-label{
     margin-bottom: 5px;
 }
+
+
+

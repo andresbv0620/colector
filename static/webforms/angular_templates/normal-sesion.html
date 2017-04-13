@@ -1,80 +1,89 @@
-<fieldset ng-show='section.tipo=="normal"' class="form-group onboarding-input" ng-repeat="input in section.inputs">
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==1">
-		<h3>[[input.name]]</h3>
-		<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==2">
-		<h3>[[input.name]]</h3>
-		<textarea name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" value="Opcional">Opcional...</textarea>
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==4">
-		<h3>[[input.name]]: [[input.description]]</h3>
-		<select name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
-			<option value=""> --- </option>
-		</select>
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==3">
-		<div class="row-fluid">
-			<div class="col-md-8 col-lg-8">
-				<h4>[[input.name]]: [[input.description]]</h4>
-			</div>
-			<div class="col-md-4 col-lg-4">
-				<label class="radio-inline" ng-repeat="response in input.responses">
-				<input type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
-				[[response.value]]
-				</label>
-			</div>
+<section class="form-region">
+<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
+	<fieldset ng-show='section.tipo=="normal"' class="form-group form-group-lg onboarding-input" ng-repeat="input in section.inputs">
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==1">
+			<h1>[[input.name]]</h1>
+			<p class="secondary-text">[[input.description]]</p>
+			<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-		</div>
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==5">
-		<h3>[[input.name]]: [[input.description]]</h3>
-		<div class="checkbox" ng-repeat="response in input.responses">
-			<h3>
-				<input type="checkbox" name="response_[[response.id]]" ng-model='checkbox' ng-change="tabs.checkOptions(input.record, response.value)">
-				[[response.value]]
-			</h3>
-		</div>
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==6">
-		<div class="form-group">
-			<h3 for="exampleInputFile">[[input.name]]: [[input.description]]</h3>
-			<input name="input_[[input.id]]" type="file" id="exampleInputFile">
-			<p class="help-block">Suba una foto.</p>
-		</div>
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==7">
-		<div class="form-group">
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==2">
+			<h1>[[input.name]]</h1>
+			<p class="secondary-text">[[input.description]]</p>
+			<textarea name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" value="Opcional">Opcional...</textarea>
+			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==4">
 			<h3>[[input.name]]: [[input.description]]</h3>
-			<div class="input-group">
-				<div class="input-group-addon">
-					<i class="fa fa-calendar"></i>
-				</div>
-				<input name="input_[[input.id]]" type="text" class="form-control" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask="">
-			</div>
-			<!-- /.input group -->
-		</div>
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==8">
-		<h3>[[input.name]]</h3>
-		<h3 class="text-center">
-			<span class="label label-primary">[[input.record.value||0|currency]]</span>
-		</h3>
-		<input ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
-		<h4 class="pull-left label-text">$500.000</h4>
-		<h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
-		<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-	</span>
-	<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==15">
-		<h3>[[input.name]]</h3>
-		<div class="input-group">
-			<div class="input-group-addon">$</div>
-			<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+			<select name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
+				<option value=""> --- </option>
+			</select>
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
-		</div>
-	</span>
-</fieldset>
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==3">
+			<div class="row-fluid">
+				<div class="col-md-8 col-lg-8">
+					<h4>[[input.name]]: [[input.description]]</h4>
+				</div>
+				<div class="col-md-4 col-lg-4">
+					<label class="radio-inline" ng-repeat="response in input.responses">
+					<input type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
+					[[response.value]]
+					</label>
+				</div>
+				<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+			</div>
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==5">
+			<h1>[[input.name]]</h1>
+			<p class="secondary-text">[[input.description]]</p>
+			<div class="" ng-repeat="response in input.responses">
+				<h3>
+					<input type="checkbox" name="response_[[response.id]]" ng-model='checkbox' ng-change="tabs.checkOptions(input.record, response.value)">
+					[[response.value]]
+				</h3>
+			</div>
+			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==6">
+			<div class="form-group">
+				<h3 for="exampleInputFile">[[input.name]]: [[input.description]]</h3>
+				<input name="input_[[input.id]]" type="file" id="exampleInputFile">
+				<p class="help-block">Suba una foto.</p>
+			</div>
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==7">
+			<div class="form-group">
+				<h3>[[input.name]]: [[input.description]]</h3>
+				<div class="input-group">
+					<div class="input-group-addon">
+						<i class="fa fa-calendar"></i>
+					</div>
+					<input name="input_[[input.id]]" type="text" class="form-control" data-inputmask="'alias': 'dd/mm/yyyy'" data-mask="">
+				</div>
+				<!-- /.input group -->
+			</div>
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==8">
+			<h1>[[input.name]]</h1>
+			<p class="secondary-text">[[input.description]]</p>
+			<h3 class="text-center">
+				<span class="label label-primary">[[input.record.value||0|currency]]</span>
+			</h3>
+			<input ng-model="input.record.value" type="range" min ="100000" max="150000000" step ="500000" value ="2000000">
+			<h4 class="pull-left label-text">$500.000</h4>
+			<h4 class="pull-right label-text text-right">Más de <br>$50.000.000</h4>
+			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+		</span>
+		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==15">
+			<h1>[[input.name]]</h1>
+			<p class="secondary-text">[[input.description]]</p>
+			<div class="input-group">
+				<div class="input-group-addon">$</div>
+				<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+				<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
+			</div>
+		</span>
+	</fieldset>
+</div>
+</section>

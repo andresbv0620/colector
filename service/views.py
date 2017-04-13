@@ -2197,4 +2197,4 @@ def FormIdReportHistograma(request, id):
 
 
 def get_form_structure(request, id):
-    return HttpResponse(registo_utils.extracer_formulario(id))
+    return HttpResponse(json.dumps(registo_utils.extracer_formulario(id)), content_type='application/json')

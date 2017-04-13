@@ -17,12 +17,13 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from service.views import AllowedForms, GetForms
 from service.views import FillResponsesForm,  DeleteResponsesForm, SaveImg, UploadData
-from service.views import FormIdReportPagServer, RegisterUsersCsv, FormExcelReport, SingleForm
+from service.views import FormIdReportPagServer, RegisterUsersCsv, FormExcelReport, SingleForm, get_form_structure
 
 urlpatterns = [
 
     url(r'^colector/allowed/forms/', AllowedForms.as_view()),
     url(r'^form/single/', SingleForm.as_view()),
+    url(r'^form/structure/(?P<id>\d+)/', get_form_structure),
     url(r'^form/all/', GetForms.as_view()),
     url(r'^fill/responses/$', FillResponsesForm.as_view()),
     url(r'^fill/img/$', SaveImg.as_view()),

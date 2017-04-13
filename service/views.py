@@ -30,6 +30,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import xlsxwriter
 
 from . import tasks as celery_tasks
+from registro import utils as registo_utils
 
 servidor = pymongo.MongoClient('localhost', 27017)
 database = servidor.colector
@@ -2193,3 +2194,7 @@ def FormIdReportHistograma(request, id):
         }
 
     return HttpResponse(json.dumps(data, default=json_util.default), content_type='application/json')
+
+
+def get_form_structure(request, id):
+    return HttpResponse(registo_utils.extracer_formulario(id))

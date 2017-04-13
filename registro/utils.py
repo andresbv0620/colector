@@ -863,6 +863,7 @@ utils.eliminar_respuestas_entrada(1023)
         print ("El formulario no existe")
 # ============ Obtener todo lo relacionado con un formulario ===========
 
+
 def extracer_formulario(id):
     """
     Extrae toda la información de un formulario dado su ID

@@ -1,21 +1,18 @@
 {% extends "webforms/base.html" %}
 {% block content %}
+
+<header>
+  <div class="header-region">
+    <nav class="onboarding-header">
+      <a href="https://finantic.co/" class="logo">
+        FINANTIC
+        <!-- <img style="background-color: black;" alt="Brand" src="http://finantic.co/wp-content/uploads/2016/10/logotipo-finantic-WP-tama%C3%B1o.png"> -->
+      </a>
+    </nav>
+  </div>
+</header>
 <!-- =============================================== -->
 
-<div class="container-fluid">
-  <div class="navbar-header">
-    <a class="navbar-brand" href="#">
-    <img alt="Brand" src="http://finantic.co/wp-content/uploads/2016/10/logotipo-finantic-WP-tama%C3%B1o.png">
-    </a>
-  </div>
-</div>
-<div class="container-fluid">
-  <div class="row">
-    <div class="col-md-8 col-md-offset-2">
-      <h1 class="pag-header text-center"></h1>
-    </div>
-  </div>
-</div>
 <div ng-view></div>
 
 

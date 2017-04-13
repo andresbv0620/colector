@@ -1,24 +1,24 @@
-<section class="paragraph-sesion">
+<section class="main-region">
 
-    <div class="row-fluid">
-      <div action="#" class="form-inline lead-big" role="form">
+    <article class="home">
+      <section action="#" class="onboarding-madlib form-inline lead-big" role="form">
         <div class="form-group" ng-repeat="input in section.inputs">
           <span ng-if="input.type==1" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
-          <label for="[[input.name]]">[[input.description]] <span>[[input.name]]</span></label>
-          <input name="input_[[input.id]]" ng-model="input.record.value" type="text" id="[[input.name]]" placeholder="" >
+          <label class="paragraph-label" for="[[input.name]]">[[input.description]] <span>[[input.name]]</span></label>
+          <input name="input_[[input.id]]" ng-model="input.record.value" type="text" id="[[input.name]]" placeholder="" style="color: #1689e5;">
           <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
           <span ng-if="input.type==4" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
-            <label for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
-            <select id="[[input.name]]"  name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses">
+            <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
+            <select style="color: #1689e5;" id="[[input.name]]"  name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses">
               <option value=""> --- </option>
             </select>
             <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
-          
+
           <span ng-if="input.type==5" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
-            <label for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
-            <div class="checkbox" ng-repeat="response in input.responses">
+            <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
+            <div class="checkbox-paragraph" ng-repeat="response in input.responses">
                 <input type="checkbox" name="response_[[response.id]]" ng-model='checkbox' ng-change="tabs.checkOptions(input.record, response.value)">
                 [[response.value]]
             </div>
@@ -26,6 +26,6 @@
           </span>
         </div>
         <!-- <input type="submit" class="btn btn-default btn-lg submit" value="[[tabs.btntext]]"> -->
-      </div>
-    </div>
+      </section>
+    </article>
 </section>

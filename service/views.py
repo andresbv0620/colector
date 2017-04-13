@@ -103,6 +103,7 @@ class SingleForm(View):
                                 entrada['type'] = e.tipo
                                 entrada['orden'] = asignacionentrada.orden
                                 entrada['requerido'] = asignacionentrada.requerido
+                                entrada['validacion'] = asignacionentrada.validacion
 
                                 if asignacionentrada.regla_visibilidad is None:
                                         entrada['valorvisibility'] = []

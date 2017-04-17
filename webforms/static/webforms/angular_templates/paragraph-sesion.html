@@ -18,12 +18,9 @@
 
           <span ng-if="input.type==5" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
             <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
-            <div class="checkbox-paragraph" ng-repeat="response in input.responses">
-                <input type="checkbox" name="response_[[response.id]]" ng-model='checkbox' ng-change="tabs.checkOptions(input.record, response.value)">
-                [[response.value]]
-            </div>
-            <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
+          <multiple-input ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==5">
+          </multiple-input>
         </div>
         <!-- <input type="submit" class="btn btn-default btn-lg submit" value="[[tabs.btntext]]"> -->
       </section>

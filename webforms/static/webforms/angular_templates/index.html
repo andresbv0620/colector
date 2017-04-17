@@ -2,24 +2,28 @@
 	<div>
 		<div class="progress-nav2">
 			<div class="back-arrow" style="display: none;"></div>
+			<div class="progress-description">Progreso [[(tabs.group)*100/tabs.steps| number : 0]]%</div>
 			<!-- Tabs  -->
-			<ul class="step-labels items-5" style="padding:0px">
+			<!-- <ul class="step-labels items-5" style="padding:0px">
 				<li class='item' ng-class="{ active:tabs.isSet(section.grupo) }" ng-repeat="section in formulario.sections">
-					<a href="" ng-click="tabs.setTab(section.section_id)">Paso [[section.grupo]]: [[section.name]]</a>
+					<a href="" ng-click="tabs.setTab(section.section_id)">[[(tabs.group)*100/tabs.steps| number : 0]]%</a>
 				</li>
-			</ul>
+			</ul> -->
 		</div>
 		<div class="progress-bar2">
-			<div class="inner-bar" style="width: [[(tabs.step+1)*100/tabs.steps| number : 2]]%;"></div>
+			<div class="inner-bar" style="width: [[(tabs.group)*100/tabs.steps| number : 2]]%;"></div>
 		</div>
 
 	</div>
 	<section >
+	<div class="text-center">
+		<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
+	</div>
 	<!--  Form  -->
 	<form name="tabs.form" ng-submit="tabs.nextTab(tabs.group, tabs.step)" novalidate>
 		<div ng-show="tabs.isSet(section.grupo)" ng-repeat="section in formulario.sections">
-			<div class="row-fluid">
-				<div class="col-md-10">
+			<div class="row-fluid section-block">
+				<div class="col-md-12">
 					<h1>[[section.name]]</h1>
     				<p class="secondary-text">[[section.description]]</p>
 					<!--  Form Section types-->
@@ -29,10 +33,10 @@
 					<grouped-sesion ng-show='section.tipo=="agrupada"'></grouped-sesion>
 					
 				</div>
-				<div class="col-md-2 section-description">
+				<!-- <div class="col-md-2 section-description">
 					<h1>[[section.name]]</h1>
 					<p>[[section.description]]</p>
-				</div>
+				</div> -->
 			</div>
 		</div>
 		<div class="row-fluid"> 
@@ -40,13 +44,18 @@
 		    <input type="submit" class="btn btn-primary" value="[[tabs.btntext]]" />
 		  </div>
 		</div>
-		<div class="text-center">
-			<img ng-show="tabs.loading" src="http://assets.motherjones.com/interactives/projects/features/koch-network/shell19/img/loading.gif">
-		</div>
+		
 	</form>
+	
 	</section>
 
+<div class="row-fluid" ng-hide="tabs.group===tabs.firstgroup">
+<div class="col-lg-12 col-md-12">
+	<a href="" ng-click="tabs.backTab(tabs.group, tabs.step)">Atras</a>
+</div>
+</div>
 </section>
+
 
 
 

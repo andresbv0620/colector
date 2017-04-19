@@ -219,43 +219,44 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
             for (section in formSections) {
                 sectionInputs = formSections[section].inputs;
                 for (sectionInput in sectionInputs) {
-                    switch(operador) {
-                        case 'igual_a':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value==valor) {
-                                return true;
-                            }
-                            break;
-                        case 'no_igual_a':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value!=valor) {
-                                return true;
-                            }
-                            break;
-                        case 'es_vacio':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value=='') {
-                                return true;
-                            }
-                            break;
-                        case 'no_es_vacio':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value!='') {
-                                return true;
-                            }
-                            break;
-                        case 'mayor_que':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value>valor) {
-                                return true;
-                            }
-                            break;
-                        case 'menor_que':
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value<valor) {
-                                return true;
-                            }
-                            break;
-                        default:
-                            if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value==valor) {
-                                return true;
-                            }
+                    if (typeof(sectionInputs[sectionInput].record)!=='undefined') {
+                        switch(operador) {
+                            case 'igual_a':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value==valor) {
+                                    return true;
+                                }
+                                break;
+                            case 'no_igual_a':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value!=valor) {
+                                    return true;
+                                }
+                                break;
+                            case 'es_vacio':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value=='') {
+                                    return true;
+                                }
+                                break;
+                            case 'no_es_vacio':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value!='') {
+                                    return true;
+                                }
+                                break;
+                            case 'mayor_que':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value>valor) {
+                                    return true;
+                                }
+                                break;
+                            case 'menor_que':
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value<valor) {
+                                    return true;
+                                }
+                                break;
+                            default:
+                                if (sectionInputs[sectionInput].input_id===elemento && sectionInputs[sectionInput].record.value==valor) {
+                                    return true;
+                                }
+                        }
                     }
-                    
 
                 }
             }

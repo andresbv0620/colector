@@ -14,7 +14,7 @@
     <option value="">Agregar opciones</option>
     <option ng-repeat="response in input.responses" value="[[response.value]]" ng-hide="multiInput.isSet(response.response_id)">[[response.value]]</option>
   </select>
-	<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-placement="top" title="[[input.description]]">
+	<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
 	<span class="glyphicon glyphicon-question-sign"></span>
 	</span>
 </div>

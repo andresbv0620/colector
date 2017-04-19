@@ -1,3 +1,18 @@
+app.directive('tooltip', function(){
+    return {
+        restrict: 'A',
+        link: function(scope, element, attrs){
+            $(element).hover(function(){
+                // on mouseenter
+                $(element).tooltip('show',{trigger: "click"});
+            }, function(){
+                // on mouseleave
+                $(element).tooltip('hide');
+            });
+        }
+    };
+});
+
 app.directive('currencyInput', function($filter, $browser) {
     return {
         require: 'ngModel',
@@ -70,7 +85,7 @@ app.directive("groupedSesion",['globales', function(globales){
 		    };
 
 		    this.isFocus = function(selectInput) {
-		      return this.focusInput=== selectInput;
+		      return this.focusInput== selectInput;
 		    };        
     },
     controllerAs:'gInput'
@@ -332,6 +347,8 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
         });
             swal("Registro exitoso!", "Haz click en el boton para terminar", "success");
             this.form.$setPristine();
+            // http://192.168.1.51:8000/diagnostics/receive-response/
+            //http://finantic.contraslash.com/diagnostics/receive-response/
             //$window.location.href = "http://finantic.contraslash.com/diagnostics/2/";
             //$window.location.href = "http://finantic.co/lp/solicitud-realizada/";
             //$window.location.href = "#/histograma/id/"+$scope.form_id;

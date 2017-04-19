@@ -6,7 +6,7 @@
 			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
 			
 			<p class="secondary-text">[[input.description]]</p>
-			<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text">
+			<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" type="text">
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==2">
@@ -16,10 +16,15 @@
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==4">
-			<h3>[[input.name]]: [[input.description]]</h3>
+			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
+			<div class="input-group">
 			<select name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
 				<option value=""> --- </option>
 			</select>
+			<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
+			<span class="glyphicon glyphicon-question-sign"></span>
+			</span>
+			</div>
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==3">
@@ -71,10 +76,13 @@
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==15">
 			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
-			<p class="secondary-text">[[input.description]]</p>
+			<!-- <p class="secondary-text">[[input.description]]</p> -->
 			<div class="input-group">
 				<div class="input-group-addon">[[input.validacion]]</div>
-				<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" type="text" style="text-align: right;">
+				<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control"  type="text" style="text-align: right;">
+				<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
+				<span class="glyphicon glyphicon-question-sign"></span>
+				</span>
 				<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 			</div>
 		</span>

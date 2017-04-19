@@ -4,12 +4,12 @@
       <div class="input-group" ng-show="gInput.isSet(input.input_id, input.requerido)">
         <input disabled type="text" class="form-control" value="[[input.name]]">
         <div class="input-group-addon">[[input.validacion]]</div>
-        <input type="text" currency-input = "" name="[[input.input_id]]" ng-model="input.record.value" class="form-control hide-last" placeholder="[[input.description]]"  focus="[[gInput.isFocus(input.input_id)]]" style="text-align: right;">
+        <input type="text" currency-input = "" name="[[input.input_id]]" ng-model="input.record.value" class="form-control hide-last" focus="[[gInput.isFocus(input.input_id)]]" style="text-align: right;">
         <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
         <span class="input-group-addon" ng-click="input.record.value=gInput.setInput(input.input_id, false)">
         <span class="glyphicon glyphicon-remove" ></span>
         </span>
-        <span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-placement="top" title="[[input.description]]">
+        <span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
         <span class="glyphicon glyphicon-question-sign" ></span>
         </span>
       </div>

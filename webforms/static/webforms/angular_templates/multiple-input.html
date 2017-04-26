@@ -10,11 +10,11 @@
 </div>
 <div class="form-group form-group-lg">
 <div class="input-group">
-  <select ng-change="tabs.checkOptions(input.record, selectedOption);selectedOption=multiInput.setResponse(selectedOption, true)" class="form-control" ng-model="selectedOption">
+  <select ng-change="tabs.checkOptions(input.record, selectedOption);selectedOption=multiInput.setResponse(selectedOption, true)" class="form-control" ng-model="selectedOption" ng-required="input.requerido">
     <option value="">Agregar opciones</option>
     <option ng-repeat="response in input.responses" value="[[response.value]]" ng-hide="multiInput.isSet(response.response_id)">[[response.value]]</option>
   </select>
-	<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
+	<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip ng-hide='input.description==""'>
 	<span class="glyphicon glyphicon-question-sign"></span>
 	</span>
 </div>

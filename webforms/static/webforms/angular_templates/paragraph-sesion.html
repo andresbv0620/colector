@@ -5,19 +5,19 @@
         <div class="form-group" ng-repeat="input in section.inputs">
           <span ng-if="input.type==1" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
           <label class="paragraph-label" for="[[input.name]]">[[input.description]] <span>[[input.name]]</span></label>
-          <input name="input_[[input.id]]" ng-model="input.record.value" type="text" id="[[input.name]]" placeholder="" style="color: #1689e5;">
+          <input name="[[input.input_id]]" ng-model="input.record.value" type="text" id="[[input.name]]" placeholder="" style="color: #1689e5;" ng-required="input.requerido">
           <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
           <span ng-if="input.type==4" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
             <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
-            <select style="color: #1689e5;" id="[[input.name]]"  name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses">
+            <select style="color: #1689e5;" id="[[input.name]]"  name="[[input.input_id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" ng-required="input.requerido">
               <option value=""> --- </option>
             </select>
             <input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
           </span>
 
           <span ng-if="input.type==5" ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)">
-            <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label>
+            <!-- <label class="paragraph-label" for="[[input.name]]">[[input.description]]<span>[[input.name]]</span></label> -->
           </span>
           <multiple-input ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==5">
           </multiple-input>

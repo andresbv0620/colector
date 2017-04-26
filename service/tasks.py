@@ -49,7 +49,26 @@ def generate_xls_report(id, email, email2):
         # Start from the first cell. Rows and columns are zero indexed.
         rownumber = 1
         col = 0
+        recordsInReport=[]
         for f in filled_forms:
+            #Objeto que determina que un registro es unico
+            unicRecord={}
+            foundRecord=False
+            
+            for unicRec in recordsInReport:
+                if unicRec["hini"] == f["rows"]["Hora Inicio"] and unicRec["hfin"] == f["rows"]["Hora Fin"] and unicRec["colector_id"] == f["rows"]["colector_id"]:
+                    foundRecord=True
+                else:
+                    unicRecord["hini"]=f["rows"]["Hora Inicio"]
+                    unicRecord["hfin"]=f["rows"]["Hora Fin"]
+                    unicRecord["colectorid"]=f["rows"]["colector_id"]
+                    recordsInReport.append(unicRecord)
+
+            if foundRecord:
+                continue
+            ##################################ESTO NO SE HA PROBADO####################
+
+
             f["rows"]["MongoId"] = str(f["_id"])
             #Addin cols to report
             hini={}

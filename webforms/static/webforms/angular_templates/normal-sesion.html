@@ -6,22 +6,22 @@
 			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
 			
 			<p class="secondary-text">[[input.description]]</p>
-			<input name="input_[[input.id]]" ng-model="input.record.value" class="form-control" type="text">
+			<input name="[[input.input_id]]" ng-model="input.record.value" class="form-control" type="text" ng-required="input.requerido">
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==2">
 			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
 			<p class="secondary-text">[[input.description]]</p>
-			<textarea name="input_[[input.id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" value="Opcional">Opcional...</textarea>
+			<textarea name="[[input.input_id]]" ng-model="input.record.value" class="form-control" placeholder="[[input.description]]" value="Opcional" ng-required="input.requerido">Opcional...</textarea>
 			<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">
 		</span>
 		<span ng-show="tabs.isVisible(input.valorvisibility, formulario.sections)" ng-if="input.type==4">
 			<label class="regular" for="[[input.input_id]]">[[input.name]]</label>
 			<div class="input-group">
-			<select name="input_[[input.id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control">
+			<select name="[[input.input_id]]" ng-model="input.record.value" ng-options="option.value as option.value  for option in input.responses" class="form-control" ng-required="input.requerido">
 				<option value=""> --- </option>
 			</select>
-			<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
+			<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip ng-hide='input.description==""'>
 			<span class="glyphicon glyphicon-question-sign"></span>
 			</span>
 			</div>
@@ -34,7 +34,7 @@
 				</div>
 				<div class="col-md-4 col-lg-4">
 					<label class="radio-inline" ng-repeat="response in input.responses">
-					<input type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="">
+					<input type="radio" name="input_[[input.input_id]]" ng-model="input.record.value" id="[[section.id]]_[[input.name]]" value="[[response.value]]" checked="" ng-required="input.requerido">
 					[[response.value]]
 					</label>
 				</div>
@@ -79,8 +79,8 @@
 			<!-- <p class="secondary-text">[[input.description]]</p> -->
 			<div class="input-group">
 				<div class="input-group-addon">[[input.validacion]]</div>
-				<input currency-input = "" name="input_[[input.id]]" ng-model="input.record.value" class="form-control"  type="text" style="text-align: right;">
-				<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
+				<input currency-input = "" name="[[input.input_id]]" ng-model="input.record.value" class="form-control"  type="text" style="text-align: right;" ng-required="input.requerido">
+				<span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip ng-hide='input.description==""'>
 				<span class="glyphicon glyphicon-question-sign"></span>
 				</span>
 				<input type="hidden" value="[[input.record.input_id=input.input_id.toString()]]">

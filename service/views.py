@@ -105,6 +105,8 @@ class SingleForm(View):
                                 entrada['orden'] = asignacionentrada.orden
                                 entrada['requerido'] = asignacionentrada.requerido
                                 entrada['validacion'] = asignacionentrada.validacion
+                                entrada['maximo'] = asignacionentrada.maximo
+                                entrada['minimo'] = asignacionentrada.minimo
 
                                 if asignacionentrada.regla_visibilidad is None:
                                         entrada['valorvisibility'] = []

@@ -10,7 +10,8 @@
         <span class="glyphicon glyphicon-remove" ></span>
         </span>
         <span class="input-group-addon input-group-addon-tootip" data-toggle="tooltip" data-trigger="click" data-placement="top" title="[[input.description]]" tooltip>
-        <span class="glyphicon glyphicon-question-sign" ></span>
+        <span class="glyphicon glyphicon-question-sign" ng-hide='input.description==""'></span>
+        <span class="glyphicon glyphicon-question-sign" ng-show='input.description==""' style="color:#fff"></span>
         </span>
       </div>
     </div>

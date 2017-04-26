@@ -1,3 +1,20 @@
+app.directive('myDirective', function() {
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attr, mCtrl) {
+            function myValidation(value) {
+                if (value.indexOf("e") > -1) {
+                    mCtrl.$setValidity('charE', true);
+                } else {
+                    mCtrl.$setValidity('charE', false);
+                }
+                return value;
+            }
+            mCtrl.$parsers.push(myValidation);
+        }
+    };
+});
+
 app.directive('tooltip', function(){
     return {
         restrict: 'A',
@@ -298,6 +315,22 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
          
     };
 
+    this.isValid = function(currentTab){
+        for (section in this.tabs) {
+                //Valido el grupo o tab actual
+                if(this.tabs[section].grupo==currentTab){
+                    inputs=this.tabs[section].inputs;
+                    for(input in inputs){
+                        formname=inputs[input].input_id.toString();
+                        console.log(formname);
+                        console.log(this.form[formname].$valid);
+                        //console.log(this.form.inputs[input].input_id.$valid);
+                    }
+                }
+            }
+        return false;
+    }
+
     this.nextTab = function(currentTab, currentStep){
         currentTab=parseInt(currentTab);
         this.btntext = "Continuar";
@@ -305,8 +338,10 @@ app.controller('TabController',['$scope', '$routeParams', 'defaultService', 'glo
             this.group=this.firstgroup;
             
             this.sendForm($scope.formulario)
-        }else{
-            this.group=currentTab+1;
+        }else{            
+            if(this.isValid(currentTab)){
+                this.group=currentTab+1;
+            }
         }
     };
 

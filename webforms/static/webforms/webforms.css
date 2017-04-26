@@ -218,7 +218,8 @@ body .footer-region {
     line-height: 1.5;
     color: #333;
     font-weight: 500;
-    z-index: 1
+    z-index: 1;
+    padding-top: 30px;
 }
 
 .sc-progress .progress-nav2+.progress-bar2 .inner-bar,

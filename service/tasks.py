@@ -54,18 +54,26 @@ def generate_xls_report(id, email, email2):
             #Objeto que determina que un registro es unico
             unicRecord={}
             foundRecord=False
-            
-            for unicRec in recordsInReport:
-                if unicRec["hini"] == f["rows"]["Hora Inicio"] and unicRec["hfin"] == f["rows"]["Hora Fin"] and unicRec["colector_id"] == f["rows"]["colector_id"]:
-                    foundRecord=True
-                else:
-                    unicRecord["hini"]=f["rows"]["Hora Inicio"]
-                    unicRecord["hfin"]=f["rows"]["Hora Fin"]
-                    unicRecord["colectorid"]=f["rows"]["colector_id"]
-                    recordsInReport.append(unicRecord)
 
-            if foundRecord:
+            if len(recordsInReport) == 0:
+                unicRecord["hini"]=f["rows"]["Hora Inicio"]
+                unicRecord["hfin"]=f["rows"]["Hora Fin"]
+                unicRecord["colectorid"]=f["rows"]["colector_id"]
+                recordsInReport.append(unicRecord)
+
+            for unicRec in recordsInReport:                
+                if unicRec["hini"] == f["rows"]["Hora Inicio"] and unicRec["hfin"] == f["rows"]["Hora Fin"] and unicRec["colectorid"] == f["rows"]["colector_id"]:
+                    foundRecord=True
+                    continue                    
+
+            if foundRecord:         
                 continue
+            else:
+                unicRecord["hini"]=f["rows"]["Hora Inicio"]
+                unicRecord["hfin"]=f["rows"]["Hora Fin"]
+                unicRecord["colectorid"]=f["rows"]["colector_id"]
+                recordsInReport.append(unicRecord)
+
             ##################################ESTO NO SE HA PROBADO####################
 
 
